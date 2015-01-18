@@ -267,6 +267,7 @@ public final class JavaModelHelper {
 		
 	}
 	
+	
 	public static IPackageFragment[] getPackages(IJavaProject project) throws JavaModelException
 	{
 		return project.getPackageFragments();

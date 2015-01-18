@@ -36,25 +36,11 @@ public class OBPreferences
 	 * restore itself.
 	 */
 	public void createFieldEditors() {
-		addField(new DirectoryFieldEditor(PreferenceConstants.P_PATH, 
-				"&Directory preference:", getFieldEditorParent()));
-		addField(
-			new BooleanFieldEditor(
-				PreferenceConstants.P_BOOLEAN,
-				"&An example of a boolean preference",
-				getFieldEditorParent()));
-
-		addField(new RadioGroupFieldEditor(
-				PreferenceConstants.P_CHOICE,
-			"An example of a multiple-choice preference",
-			1,
-			new String[][] { { "&Choice 1", "choice1" }, {
-				"C&hoice 2", "choice2" }
-		}, getFieldEditorParent()));
-		addField(
-			new StringFieldEditor(PreferenceConstants.P_STRING, "A &text preference:", getFieldEditorParent()));
-		addField(new ColorFieldEditor(PreferenceConstants.P_COLOR_ONE, "Package Color", getFieldEditorParent()));
-		
+		addField(new BooleanFieldEditor(PreferenceConstants.P_BOOLEAN_SHOWEMPTY, "Display Empty Packages", getFieldEditorParent()));
+		addField(new ColorFieldEditor(PreferenceConstants.P_COLOR_ONE, "Package Color Top", getFieldEditorParent()));
+		addField(new ColorFieldEditor(PreferenceConstants.P_COLOR_TWO, "Package Color Bottom", getFieldEditorParent()));
+		addField(new ColorFieldEditor(PreferenceConstants.P_COLOR_THREE, "Class Color Top", getFieldEditorParent()));
+		addField(new ColorFieldEditor(PreferenceConstants.P_COLOR_FOUR, "Class Color Bottom", getFieldEditorParent()));
 	}
 
 	/* (non-Javadoc)

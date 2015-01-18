@@ -12,13 +12,14 @@ import org.eclipse.swt.widgets.Composite;
 
 import com.groupproject.workbench.Activator;
 import com.groupproject.workbench.preferences.PreferenceConstants;
+import com.groupproject.workbench.utility.ObjectBenchUtility;
 
 public class PackageButton extends SquareButton{
 	
 	public int packageId;
 	public String packageValue; 
 	public Composite myComposite; 
-	public Color myActiveColor; 
+
 	
 	
 	public PackageButton(Composite parent, int style, String packageName, int id) {
@@ -61,8 +62,7 @@ public class PackageButton extends SquareButton{
 		}
 		else
 		{
-			backgroundColor = myActiveColor;
-			backgroundColor2 = new Color(myComposite.getDisplay(),200,200,200);
+			getColor();
 		}
 		
 	}
@@ -72,21 +72,11 @@ public class PackageButton extends SquareButton{
 		
 	}
 	
-	private void getColor()
+	void getColor()
 	{
-		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-		String color = store.getString(PreferenceConstants.P_COLOR_ONE);
-		String[] values = color.split(",");
-		if(values.length > 2)
-		{
-			myActiveColor = new Color(myComposite.getDisplay(), new RGB(Integer.parseInt(values[0]), Integer.parseInt(values[1]), Integer.parseInt(values[2])));
-
-		}
-		else
-		{
-			myActiveColor = new Color(myComposite.getDisplay(), 255,200,200);
-		}
-
+		backgroundColor = ObjectBenchUtility.getColorFromString(PreferenceConstants.P_COLOR_ONE);
+		backgroundColor2 = ObjectBenchUtility.getColorFromString(PreferenceConstants.P_COLOR_TWO);
 	}
+	
 
 }

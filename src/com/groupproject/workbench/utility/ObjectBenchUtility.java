@@ -73,10 +73,10 @@ public final class ObjectBenchUtility
 
 	}
 	
-	public static Color getColorFromString()
+	public static Color getColorFromString(String s)
 	{
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-		String color = store.getString(PreferenceConstants.P_COLOR_ONE);
+		String color = store.getString(s);
 		String[] values = color.split(",");
 		Color myActiveColor = null; 
 		if(values.length > 2)
@@ -91,6 +91,20 @@ public final class ObjectBenchUtility
 		
 		return myActiveColor; 
 
+	}
+	
+	public static Boolean showEmptyPackages()
+	{
+		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		String bool = store.getString(PreferenceConstants.P_BOOLEAN_SHOWEMPTY);
+		if(Boolean.parseBoolean(bool) == true)
+		{
+			return true;
+		}
+		else
+		{
+			return false; 
+		} 
 	}
 
 }

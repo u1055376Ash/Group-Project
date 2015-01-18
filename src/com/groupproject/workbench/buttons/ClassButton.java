@@ -7,6 +7,9 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 
+import com.groupproject.workbench.preferences.PreferenceConstants;
+import com.groupproject.workbench.utility.ObjectBenchUtility;
+
 public class ClassButton extends SquareButton{
 	
 	public int classId;
@@ -18,6 +21,7 @@ public class ClassButton extends SquareButton{
 		classId = id;
 		className = cn;
 		packageName = pn; 
+		getColor();
 		//setText(packageValue);
 		//Image image = ImageDescriptor.createFromURL(getClass().getResource("/img/classButton.png")).createImage();
 		setRoundedCorners(true);
@@ -48,5 +52,11 @@ public class ClassButton extends SquareButton{
 	public void checkSubclass()
 	{
 		
+	}
+	
+	public void getColor()
+	{
+		backgroundColor = ObjectBenchUtility.getColorFromString(PreferenceConstants.P_COLOR_THREE);
+		backgroundColor2 = ObjectBenchUtility.getColorFromString(PreferenceConstants.P_COLOR_FOUR);
 	}
 }

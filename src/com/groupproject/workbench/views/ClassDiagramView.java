@@ -252,6 +252,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 
 				});
 				classButtons.get(i).setLayoutData(buttonData);
+				classButtons.get(i).getColor();//hack to fix a bug
 			}
 		}
 		parent.layout();
@@ -382,7 +383,15 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 						}
 
 					});
+					
 					packageButtons.get(i).setLayoutData(buttonData);
+				}
+				if(JavaModelHelper.getNumberOfClassesFromPackage(packages[i]) <= 0)
+				{
+					if(ObjectBenchUtility.showEmptyPackages() == false)
+					{
+						packageButtons.get(i).setVisible(false);
+					}
 				}
 			}
 			
