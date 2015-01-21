@@ -17,20 +17,36 @@ import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.ide.IDE;
 
 import com.groupproject.workbench.Activator;
+import com.groupproject.workbench.BenchInstance;
 import com.groupproject.workbench.JavaModelHelper;
 import com.groupproject.workbench.preferences.PreferenceConstants;
+import com.groupproject.workbench.views.InspectorView;
 import com.groupproject.workbench.views.ObjectBenchView;
 
 public final class ObjectBenchUtility 
 {
 	private static ObjectBenchView objectBench;
+	private static InspectorView inspectorView; 
 	
 	private static String activeProject; 
 	private static String activePackage; 
+	private static Object activeObject; 
+	
+	private static BenchInstance activeInstance; 
 	
 	public static void registerObjectBench(ObjectBenchView ob)
 	{
 		objectBench = ob;
+	}
+	
+	public static void registerInspectorView(InspectorView i)
+	{
+		inspectorView = i; 
+	}
+	
+	public static InspectorView getInspectorView()
+	{
+		return inspectorView; 
 	}
 	
 	public static ObjectBenchView getObjectBench()
@@ -106,5 +122,21 @@ public final class ObjectBenchUtility
 			return false; 
 		} 
 	}
+	
+	
+	public static void setActiveInstance(BenchInstance i) throws JavaModelException
+	{
+		activeInstance = i; 
+		if(inspectorView != null)
+		{
+			inspectorView.update();
+		}
+	}
+	
+	public static BenchInstance getActiveInstance()
+	{
+		return activeInstance;
+	}
+	
 
 }

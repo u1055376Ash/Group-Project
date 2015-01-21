@@ -1,7 +1,14 @@
 package com.groupproject.workbench.views;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+
+
+
+
+
 
 
 
@@ -15,6 +22,8 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.swt.*; 
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.*;
@@ -32,6 +41,8 @@ public class ObjectBenchView extends ViewPart {
 
 	private List<ClassButton> classButtons; 
 	private Composite mainViewArea;
+	
+	private List<Object> instances; 
 	
 	public ObjectBenchView() {
 		// TODO Auto-generated constructor stub
@@ -55,7 +66,7 @@ public class ObjectBenchView extends ViewPart {
 		// TODO Auto-generated method stub
 	}
 
-	public void addObject(String className, String packageName) throws JavaModelException
+	public void addObject(String className, String packageName, Class[] parameters) throws JavaModelException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException
 	{
 		System.out.println("Instantiating: " + className);
 		if(classButtons == null)
@@ -66,10 +77,11 @@ public class ObjectBenchView extends ViewPart {
 		entryString = entryString.substring(0,entryString.lastIndexOf('.'));
 		entryString += " (Instance) ";
 		ClassButton newButton = new ClassButton(mainViewArea,SWT.NONE,className,classButtons.size(), packageName);
+		newButton.setClass(JavaModelHelper.getClass(packageName, className));
 		newButton.setText(entryString);
 		classButtons.add(newButton);
 		FormData buttonData = new FormData(90+(entryString.length() * 3),80);
-		int i = classButtons.size()-1;
+		final int i = classButtons.size()-1;
 		if(i == 0)
 		{
 			System.out.println("First");
@@ -88,7 +100,48 @@ public class ObjectBenchView extends ViewPart {
 			}
 		}
 		classButtons.get(i).setLayoutData(buttonData);
+		
+		classButtons.get(i).addMouseListener(new MouseListener(){
+
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mouseDown(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			@Override
+			public void mouseUp(MouseEvent e) {
+				try {
+					ObjectBenchUtility.setActiveInstance(classButtons.get(i).getInstance());
+				} catch (JavaModelException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				
+			}
+
+		});
+		
 		classButtons.get(i).setMenu(buildMenuForClass(classButtons.get(i)));
+		
+//		Class<?> myClass = classButtons.get(i).getMyClass();
+//
+//		if(parameters.length == 0)
+//		{
+//			//classButtons.get(i).setInstance(myClass.newInstance());
+//		}
+//		else
+//		{
+//			Constructor<?> myConstructor = myClass.getConstructor(parameters);
+//			//classButtons.get(i).setInstance((Object)myConstructor.newInstance());//do fuck all for now.
+//		}
+
+		
 		mainViewArea.layout();
 		mainViewArea.getShell().open();
 	}

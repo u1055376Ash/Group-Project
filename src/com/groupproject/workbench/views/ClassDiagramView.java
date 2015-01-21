@@ -1,6 +1,7 @@
 package com.groupproject.workbench.views;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -264,10 +265,11 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		Menu popupMenu = new Menu(bn);
 
 		String[] constructorNames= JavaModelHelper.getConstructorNames(bn.packageName, bn.className);
-		String[][] constructorParamaterTypes = JavaModelHelper.getConstructorParameters(bn.packageName, bn.className);
-		String[][] constructorParamaterNames = JavaModelHelper.getConstructorParamaterNames(bn.packageName, bn.className);
+		final String[][] constructorParamaterTypes = JavaModelHelper.getConstructorParameters(bn.packageName, bn.className);
+		final String[][] constructorParamaterNames = JavaModelHelper.getConstructorParamaterNames(bn.packageName, bn.className);
 		for(int i = 0; i < constructorNames.length;i++)
 		{
+			final int index = i; // horrible hack to pass the constructor parameter types 
 			MenuItem instantiateItem = new MenuItem(popupMenu, SWT.CASCADE);
 			String addString = "new" + constructorNames[i] + "(";
 			for(int x = 0; x < constructorParamaterTypes[i].length;x++)
@@ -281,11 +283,36 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			instantiateItem.addSelectionListener(new SelectionListener(){
 
 				@Override
-				public void widgetSelected(SelectionEvent e) {
+				public void widgetSelected(SelectionEvent e){
 					//System.out.println("INSTANTIATING...");
 					try {
-						ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName);
+						List<Class> classes = new ArrayList<Class>();
+						for(String s:constructorParamaterTypes[index])
+						{
+							classes.add(Class.forName(activePackageName + "." + s));
+						}
+						ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName, classes.toArray(new Class[classes.size()]));
 					} catch (JavaModelException e1) {
+						e1.printStackTrace();
+					} catch (ClassNotFoundException e1) {
+						e1.printStackTrace();
+					} catch (NoSuchMethodException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (SecurityException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (InstantiationException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (IllegalAccessException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (IllegalArgumentException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (InvocationTargetException e1) {
+						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
@@ -317,8 +344,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			}
 			
 		});
-
-
+		
 		return popupMenu;
 		
 	}

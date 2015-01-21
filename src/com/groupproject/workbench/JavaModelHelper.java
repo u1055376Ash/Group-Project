@@ -36,7 +36,6 @@ public final class JavaModelHelper {
 	private static IWorkspaceRoot root; 
 	private static IProject[] projects; 
 	
-	
 	private static IProject activeProject;
 	private static IPackageFragment activePackage;
 	
@@ -51,11 +50,17 @@ public final class JavaModelHelper {
 		workspace = ResourcesPlugin.getWorkspace(); 
 		root = workspace.getRoot();
 		projects = root.getProjects();
+		
 	}
 	
 	public static IProject getProjectByName(String name)  throws JavaModelException
 	{
 		return root.getProject(name);
+	}
+	
+	public static void addToClassPath()
+	{
+	 //
 	}
 	
 	public static ICompilationUnit[] getClasses(IProject project)  throws JavaModelException
@@ -78,6 +83,7 @@ public final class JavaModelHelper {
 			IFile ifile = (IFile)resource;
 			return ifile;
 		}
+		
 		return null; 
 	}
 	
@@ -93,7 +99,7 @@ public final class JavaModelHelper {
 		return myFile.getRawLocation().toString();
 	}
 	
-	private static ICompilationUnit getClass(String mypackage, String name) throws JavaModelException
+	public static ICompilationUnit getClass(String mypackage, String name) throws JavaModelException
 	{
 		IPackageFragment localPackage = getPackage(mypackage);
 		if(localPackage == null)
@@ -111,6 +117,7 @@ public final class JavaModelHelper {
 		return null;
 		
 	}
+	
 	
 	private static IMethod[] getConstructors(ICompilationUnit unit) throws JavaModelException
 	{
@@ -141,8 +148,11 @@ public final class JavaModelHelper {
 		return strings;
 	}
 	
+	
+
 	private static String[][] getConstructorParameters(ICompilationUnit unit) throws JavaModelException
 	{
+		
 		IMethod[] constructors = getConstructors(unit);
 		String[][] strings = new String[constructors.length][];
 			for(int i =0; i<constructors.length;i++)
@@ -170,6 +180,54 @@ public final class JavaModelHelper {
 			}
 		
 		return strings;
+	}
+	
+	private static String[] getFieldNames(ICompilationUnit unit) throws JavaModelException
+	{
+		if(unit == null)
+		{
+			return null;
+		}
+		IType[] fields = unit.getAllTypes();
+		List<String> strings = new ArrayList<String>();
+		for(int i = 0; i<fields.length;i++)
+		{
+			for(int x = 0; x<fields[i].getFields().length; x++)
+			{
+				strings.add(fields[i].getFields()[x].getElementName());
+				//strings[i] = fields[i].getElementName();
+				
+			}
+			
+		}
+		return strings.toArray(new String[strings.size()]);
+	}
+	
+	private static String[] getFieldTypes(ICompilationUnit unit) throws JavaModelException
+	{
+		IType[] fields = unit.getAllTypes();
+		List<String> strings = new ArrayList<String>();
+		for(int i = 0; i<fields.length;i++)
+		{
+			for(int x = 0; x<fields[i].getFields().length; x++)
+			{
+				strings.add(fields[i].getFields()[x].getTypeSignature());
+				//strings[i] = fields[i].getElementName();
+				
+			}
+			
+		}
+		return strings.toArray(new String[strings.size()]);
+	}
+	
+	
+	public static String[] getFieldTypes(String myPackage,String myClass) throws JavaModelException
+	{
+		return getFieldTypes(getClass(myPackage,myClass));
+	}
+	public static String[] getFieldNames(String myPackage, String myClass) throws JavaModelException
+	{
+		return getFieldNames(getClass(myPackage,myClass));
 	}
 	
 	public static String[][] getConstructorParameters(String myPackage,String myClass) throws JavaModelException

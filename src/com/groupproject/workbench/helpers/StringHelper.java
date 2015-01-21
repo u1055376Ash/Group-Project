@@ -1,6 +1,6 @@
 package com.groupproject.workbench.helpers;
 
-public class StringHelper {
+public final class StringHelper {
 
 	public static String fixType(String s)
 	{

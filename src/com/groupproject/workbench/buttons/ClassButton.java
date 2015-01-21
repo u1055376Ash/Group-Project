@@ -1,12 +1,14 @@
 package com.groupproject.workbench.buttons;
 
 
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 
+import com.groupproject.workbench.BenchInstance;
 import com.groupproject.workbench.preferences.PreferenceConstants;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 
@@ -16,11 +18,16 @@ public class ClassButton extends SquareButton{
 	public String className; 
 	public String packageName; 
 	
+	BenchInstance myInstance; 
+	ICompilationUnit myClass; 
+	
 	public ClassButton(Composite parent, int style, String cn, int id,String pn) {
 		super(parent, style);
 		classId = id;
-		className = cn;
-		packageName = pn; 
+		myInstance = new BenchInstance(cn,pn);
+		className = cn; 
+		packageName = pn;
+		
 		getColor();
 		//setText(packageValue);
 		//Image image = ImageDescriptor.createFromURL(getClass().getResource("/img/classButton.png")).createImage();
@@ -58,5 +65,36 @@ public class ClassButton extends SquareButton{
 	{
 		backgroundColor = ObjectBenchUtility.getColorFromString(PreferenceConstants.P_COLOR_THREE);
 		backgroundColor2 = ObjectBenchUtility.getColorFromString(PreferenceConstants.P_COLOR_FOUR);
+	}
+	
+	public void setClass(ICompilationUnit newClass)
+	{
+		myClass = newClass; 
+		
+	}
+	
+	public Class<?> getMyClass() throws ClassNotFoundException
+	{
+
+
+		String cleanName = myInstance.className.substring(0, myInstance.className.lastIndexOf('.'));
+		Class<?> c  = Class.forName(myInstance.packageName + "." + cleanName);
+		return c;
+	}
+	
+	public void setInstance(BenchInstance o)
+	{
+		myInstance = o; 
+		
+	}
+	
+	public void setInstance(String cN, String pN)
+	{
+		myInstance = new BenchInstance(cN,pN);
+	}
+	
+	public BenchInstance getInstance()
+	{
+		return myInstance; 
 	}
 }
