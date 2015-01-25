@@ -1,6 +1,8 @@
 package com.groupproject.workbench.buttons;
 
 
+import java.lang.reflect.Field;
+
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -9,6 +11,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 
 import com.groupproject.workbench.BenchInstance;
+import com.groupproject.workbench.JavaModelHelper;
+import com.groupproject.workbench.helpers.StringHelper;
 import com.groupproject.workbench.preferences.PreferenceConstants;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 
@@ -18,16 +22,13 @@ public class ClassButton extends SquareButton{
 	public String className; 
 	public String packageName; 
 	
-	BenchInstance myInstance; 
-	ICompilationUnit myClass; 
-	
-	public ClassButton(Composite parent, int style, String cn, int id,String pn) {
+
+
+	public ClassButton(Composite parent, int style, String cn, int id,String pn) throws ClassNotFoundException {
 		super(parent, style);
 		classId = id;
-		myInstance = new BenchInstance(cn,pn);
 		className = cn; 
 		packageName = pn;
-		
 		getColor();
 		//setText(packageValue);
 		//Image image = ImageDescriptor.createFromURL(getClass().getResource("/img/classButton.png")).createImage();
@@ -67,34 +68,11 @@ public class ClassButton extends SquareButton{
 		backgroundColor2 = ObjectBenchUtility.getColorFromString(PreferenceConstants.P_COLOR_FOUR);
 	}
 	
-	public void setClass(ICompilationUnit newClass)
-	{
-		myClass = newClass; 
-		
-	}
-	
 	public Class<?> getMyClass() throws ClassNotFoundException
 	{
 
-
-		String cleanName = myInstance.className.substring(0, myInstance.className.lastIndexOf('.'));
-		Class<?> c  = Class.forName(myInstance.packageName + "." + cleanName);
+		Class<?> c  = JavaModelHelper.getClassFromLoader(StringHelper.getQualifiedName(className, packageName));
 		return c;
 	}
 	
-	public void setInstance(BenchInstance o)
-	{
-		myInstance = o; 
-		
-	}
-	
-	public void setInstance(String cN, String pN)
-	{
-		myInstance = new BenchInstance(cN,pN);
-	}
-	
-	public BenchInstance getInstance()
-	{
-		return myInstance; 
-	}
 }

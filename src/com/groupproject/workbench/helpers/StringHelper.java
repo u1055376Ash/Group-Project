@@ -26,4 +26,16 @@ public final class StringHelper {
 		return s;
 	}
 	
+	
+	public static String stripExtension(String s)
+	{
+		return s.substring(0,s.lastIndexOf('.'));
+	}
+	
+	public static String getQualifiedName(String className,String packageName)
+	{
+		String cleanName = className.substring(0, className.lastIndexOf('.'));
+		String qualifiedName = packageName + "." + cleanName;
+		return qualifiedName;
+	}
 }

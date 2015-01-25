@@ -124,7 +124,7 @@ public final class ObjectBenchUtility
 	}
 	
 	
-	public static void setActiveInstance(BenchInstance i) throws JavaModelException
+	public static void setActiveInstance(BenchInstance i) throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException
 	{
 		activeInstance = i; 
 		if(inspectorView != null)

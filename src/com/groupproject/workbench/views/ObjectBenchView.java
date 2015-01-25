@@ -18,6 +18,7 @@ import java.util.List;
 
 
 
+
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.swt.*; 
@@ -33,13 +34,13 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.*;
 
 import com.groupproject.workbench.JavaModelHelper;
-import com.groupproject.workbench.buttons.ClassButton;
+import com.groupproject.workbench.buttons.ObjectBenchButton;
 import com.groupproject.workbench.buttons.PackageButton;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 
 public class ObjectBenchView extends ViewPart {
 
-	private List<ClassButton> classButtons; 
+	private List<ObjectBenchButton> ObjectBenchButtons; 
 	private Composite mainViewArea;
 	
 	private List<Object> instances; 
@@ -69,19 +70,18 @@ public class ObjectBenchView extends ViewPart {
 	public void addObject(String className, String packageName, Class[] parameters) throws JavaModelException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException
 	{
 		System.out.println("Instantiating: " + className);
-		if(classButtons == null)
+		if(ObjectBenchButtons == null)
 		{
-			classButtons = new ArrayList<ClassButton>();
+			ObjectBenchButtons = new ArrayList<ObjectBenchButton>();
 		}
 		String entryString = className;
 		entryString = entryString.substring(0,entryString.lastIndexOf('.'));
 		entryString += " (Instance) ";
-		ClassButton newButton = new ClassButton(mainViewArea,SWT.NONE,className,classButtons.size(), packageName);
-		newButton.setClass(JavaModelHelper.getClass(packageName, className));
+		ObjectBenchButton newButton = new ObjectBenchButton(mainViewArea,SWT.NONE,className,ObjectBenchButtons.size(), packageName);
 		newButton.setText(entryString);
-		classButtons.add(newButton);
+		ObjectBenchButtons.add(newButton);
 		FormData buttonData = new FormData(90+(entryString.length() * 3),80);
-		final int i = classButtons.size()-1;
+		final int i = ObjectBenchButtons.size()-1;
 		if(i == 0)
 		{
 			System.out.println("First");
@@ -94,14 +94,14 @@ public class ObjectBenchView extends ViewPart {
 			if(i > 0)
 			{
 				System.out.println("Another");
-				buttonData.left = new FormAttachment(classButtons.get(i-1),15,SWT.RIGHT);
-				buttonData.bottom = new FormAttachment(classButtons.get(i-1),0,SWT.BOTTOM);
-				buttonData.top = new FormAttachment(classButtons.get(i-1),0,SWT.TOP);
+				buttonData.left = new FormAttachment(ObjectBenchButtons.get(i-1),15,SWT.RIGHT);
+				buttonData.bottom = new FormAttachment(ObjectBenchButtons.get(i-1),0,SWT.BOTTOM);
+				buttonData.top = new FormAttachment(ObjectBenchButtons.get(i-1),0,SWT.TOP);
 			}
 		}
-		classButtons.get(i).setLayoutData(buttonData);
+		ObjectBenchButtons.get(i).setLayoutData(buttonData);
 		
-		classButtons.get(i).addMouseListener(new MouseListener(){
+		ObjectBenchButtons.get(i).addMouseListener(new MouseListener(){
 
 			@Override
 			public void mouseDoubleClick(MouseEvent e) {
@@ -116,8 +116,20 @@ public class ObjectBenchView extends ViewPart {
 			@Override
 			public void mouseUp(MouseEvent e) {
 				try {
-					ObjectBenchUtility.setActiveInstance(classButtons.get(i).getInstance());
+					ObjectBenchUtility.setActiveInstance(ObjectBenchButtons.get(i).getInstance());
 				} catch (JavaModelException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (NoSuchFieldException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (SecurityException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IllegalArgumentException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IllegalAccessException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
@@ -127,18 +139,18 @@ public class ObjectBenchView extends ViewPart {
 
 		});
 		
-		classButtons.get(i).setMenu(buildMenuForClass(classButtons.get(i)));
+		ObjectBenchButtons.get(i).setMenu(buildMenuForClass(ObjectBenchButtons.get(i)));
 		
-//		Class<?> myClass = classButtons.get(i).getMyClass();
+//		Class<?> myClass = ObjectBenchButtons.get(i).getMyClass();
 //
 //		if(parameters.length == 0)
 //		{
-//			//classButtons.get(i).setInstance(myClass.newInstance());
+//			//ObjectBenchButtons.get(i).setInstance(myClass.newInstance());
 //		}
 //		else
 //		{
 //			Constructor<?> myConstructor = myClass.getConstructor(parameters);
-//			//classButtons.get(i).setInstance((Object)myConstructor.newInstance());//do fuck all for now.
+//			//ObjectBenchButtons.get(i).setInstance((Object)myConstructor.newInstance());//do fuck all for now.
 //		}
 
 		
@@ -146,7 +158,7 @@ public class ObjectBenchView extends ViewPart {
 		mainViewArea.getShell().open();
 	}
 	
-	private Menu buildMenuForClass(ClassButton bn) throws JavaModelException
+	private Menu buildMenuForClass(ObjectBenchButton bn) throws JavaModelException
 	{
 		Menu popupMenu = new Menu(bn);
 		if(JavaModelHelper.getClassMethodNames(bn.packageName, bn.className) != null)

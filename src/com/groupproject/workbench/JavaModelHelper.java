@@ -1,8 +1,14 @@
 package com.groupproject.workbench;
 
 import java.io.File;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
@@ -30,6 +36,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
  */
 import org.eclipse.core.runtime.IAdaptable;
 
+import com.groupproject.workbench.helpers.StringHelper;
+
 public final class JavaModelHelper {	
 	
 	private static IWorkspace workspace;
@@ -39,17 +47,18 @@ public final class JavaModelHelper {
 	private static IProject activeProject;
 	private static IPackageFragment activePackage;
 	
-	private JavaModelHelper()
+	private JavaModelHelper() throws MalformedURLException, Exception
 	{
 		Initialise();
 	}
 	
 	
-	public static void Initialise()
+	public static void Initialise() throws MalformedURLException, Exception
 	{
 		workspace = ResourcesPlugin.getWorkspace(); 
 		root = workspace.getRoot();
 		projects = root.getProjects();
+		addToClassPath();
 		
 	}
 	
@@ -58,9 +67,21 @@ public final class JavaModelHelper {
 		return root.getProject(name);
 	}
 	
-	public static void addToClassPath()
+	
+	static void addToClassPath() throws MalformedURLException, Exception
 	{
-	 //
+		for(IProject p:projects)
+		{
+			for(IResource r:p.members())
+			{
+				addURL(r.getLocation().toFile().toURI().toURL());
+			}
+		}
+	}
+	
+	public static void addToClassPath(String name, String packageName) throws MalformedURLException, JavaModelException, Exception
+	{
+		addURL(getClassFile(packageName,name).toURI().toURL());
 	}
 	
 	public static ICompilationUnit[] getClasses(IProject project)  throws JavaModelException
@@ -308,7 +329,7 @@ public final class JavaModelHelper {
 		
 	}
 	
-	public static String[] getClassNames(String myPackage) throws JavaModelException
+	public static String[] getClassNames(String myPackage) throws JavaModelException, ClassNotFoundException
 	{
 		IPackageFragment localPackage = getPackage(myPackage);
 		if(localPackage == null)
@@ -320,6 +341,7 @@ public final class JavaModelHelper {
 		for(int i = 0; i<classes.length;i++)
 		{
 			strings[i] = classes[i].getElementName();
+			addToClassPath(StringHelper.stripExtension(localPackage.getElementName() + "." + strings[i]));
 		}
 		return strings;
 		
@@ -331,7 +353,7 @@ public final class JavaModelHelper {
 		return project.getPackageFragments();
 	}
 	
-	public static IPackageFragment[] getPackages(String projectName) throws JavaModelException
+	public static IPackageFragment[] getPackages(String projectName) throws MalformedURLException, Exception
 	{
 		IJavaProject project = getJavaProject(getProject(projectName));
 		List<IPackageFragment> fragments = new ArrayList<IPackageFragment>();
@@ -344,6 +366,7 @@ public final class JavaModelHelper {
 					if(!myPackage.getElementName().isEmpty())
 					{
 						fragments.add(myPackage);	
+						
 					}
 				}
 			}
@@ -351,7 +374,20 @@ public final class JavaModelHelper {
 		return (IPackageFragment[]) fragments.toArray(new IPackageFragment[fragments.size()]);
 	}
 	
-	public static String[] getPackageNames(String projectName) throws JavaModelException
+	
+	static void addToClassPath(String s) throws ClassNotFoundException
+	{
+		ClassLoader.getSystemClassLoader().loadClass(s);
+		//System.out.println(s);
+		//ResourceBundle.getBundle(s,Locale.getDefault(), ClassLoader.getSystemClassLoader());
+	}
+	
+	
+	public static Class<?> getClassFromLoader(String s) throws ClassNotFoundException
+	{
+		return ClassLoader.getSystemClassLoader().loadClass(s);
+	}
+	public static String[] getPackageNames(String projectName) throws MalformedURLException, Exception
 	{
 		IPackageFragment[] packages = getPackages(projectName);
 		String[] returnString = new String[packages.length]; 
@@ -392,7 +428,7 @@ public final class JavaModelHelper {
 	
 
 	
-	private static IProject getProject(String name)
+	private static IProject getProject(String name) throws MalformedURLException, Exception
 	{
 		if(projects == null)
 		{
@@ -429,6 +465,16 @@ public final class JavaModelHelper {
 	public static String getActiveProjectName()
 	{
 		return (getActiveProject() != null) ? getActiveProject().getName():null;
+	}
+	
+	public static void addURL(URL url) throws Exception{
+		URLClassLoader classLoader = (URLClassLoader)ClassLoader.getSystemClassLoader(); 
+		Class<URLClassLoader> myClass = URLClassLoader.class; 
+		
+		Method method = myClass.getDeclaredMethod("addURL", new Class[]{URL.class});
+		method.setAccessible(true);
+		method.invoke(classLoader, new Object[]{url});
+		
 	}
 	
 	 private static IResource extractSelection(ISelection sel) {

@@ -20,6 +20,8 @@ import com.groupproject.workbench.utility.ObjectBenchUtility;
 
 public class InspectorView extends ViewPart {
 
+	Boolean enableEditing; //Will allow a user to edit values from within the inspector. 
+	
 	Composite mainViewArea;
 	Label header; 
 	List<Label> fieldNameLabels;
@@ -46,7 +48,6 @@ public class InspectorView extends ViewPart {
 		fieldTypeLabels = new ArrayList<Label>();
 		fieldValueLabels = new ArrayList<Label>();
 		header = new Label(mainViewArea, SWT.CENTER);
-		
 		header.setText("Instance Inspector");
 		header.setBounds(mainViewArea.getClientArea());
 	}
@@ -57,9 +58,9 @@ public class InspectorView extends ViewPart {
 
 	}
 	
-	public void update() throws JavaModelException
+	public void update() throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException
 	{
-		//disposeLabels(); 
+		disposeLabels(); 
 		BenchInstance instance = ObjectBenchUtility.getActiveInstance();
 		System.out.println(instance.packageName + ":" + instance.className);
 		String[] fieldNames = JavaModelHelper.getFieldNames(instance.packageName, instance.className);

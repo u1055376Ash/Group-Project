@@ -2,6 +2,7 @@ package com.groupproject.workbench.views;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -94,7 +95,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		}
 	}
 
-	public void displayPackageView(Composite parent) throws JavaModelException
+	public void displayPackageView(Composite parent) throws MalformedURLException, Exception
 	{
 		JavaModelHelper.Initialise();
 		//activeProjectName = JavaModelHelper.getActiveProjectName(); 
@@ -106,7 +107,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		}
 	}
 	
-	public void displayClassView(Composite parent) throws JavaModelException
+	public void displayClassView(Composite parent) throws MalformedURLException, Exception
 	{
 		//System.out.println("Displaying Classes");
 		JavaModelHelper.Initialise();
@@ -166,7 +167,11 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			public void mouseDoubleClick(MouseEvent e) {
 				try {
 					viewPackages();
-				} catch (JavaModelException e1) {
+				} catch (MalformedURLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 				
@@ -187,7 +192,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		});
 		refresh();
 	}
-	public void createClassButtons(Composite parent) throws JavaModelException
+	public void createClassButtons(Composite parent) throws JavaModelException, ClassNotFoundException
 	{
 		if(upButton == null || upButton.isDisposed())
 			{
@@ -218,6 +223,15 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			}
 			if(createNew)
 			{
+				try {
+					JavaModelHelper.addToClassPath(classes[i], activePackageName);
+				} catch (MalformedURLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				classButtons.add(new ClassButton(parent,SWT.NONE,classes[i],i,activePackageName));
 				classButtons.get(i).setText(entryString);
 				classButtons.get(i).setMenu(buildMenuForClass(classes[i], classButtons.get(i)));
@@ -394,6 +408,12 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 							} catch (JavaModelException e1) {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
+							} catch (MalformedURLException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} catch (Exception e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
 							}
 						}
 
@@ -421,7 +441,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 				}
 			}
 			
-		} catch (JavaModelException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
@@ -471,12 +491,18 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		catch(JavaModelException e)
 		{
 			e.printStackTrace();
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		
 	}
 	
-	private void viewClasses(String mypackage) throws JavaModelException
+	private void viewClasses(String mypackage) throws MalformedURLException, Exception
 	{
 		clear();
 		activePackageName = mypackage; 
@@ -485,7 +511,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		displayClassView(mainViewArea);
 	}
 	
-	private void viewPackages() throws JavaModelException
+	private void viewPackages() throws MalformedURLException, Exception
 	{
 		clear();
 		activePackageName = ""; 
