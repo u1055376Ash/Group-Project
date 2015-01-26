@@ -13,6 +13,12 @@ public class ObjectBenchButton extends ClassButton {
 		myInstance = new BenchInstance(cn,pn);
 	}
 	
+	public ObjectBenchButton(Composite parent, int style, String cn, int id,
+			String pn, Object instance) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+		super(parent, style, cn, id, pn);
+		myInstance = new BenchInstance(cn,pn,instance);
+	}
+	
 	public void setInstance(BenchInstance o)
 	{
 		myInstance = o; 

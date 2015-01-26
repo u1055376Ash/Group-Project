@@ -29,16 +29,19 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.window.Window;
 
 import com.groupproject.workbench.JavaModelHelper;
 import com.groupproject.workbench.buttons.ClassButton;
 import com.groupproject.workbench.buttons.PackageButton;
 import com.groupproject.workbench.buttons.SquareButton;
+import com.groupproject.workbench.dialogs.ConstructorDialog;
 import com.groupproject.workbench.helpers.StringHelper;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 
@@ -300,12 +303,35 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 				public void widgetSelected(SelectionEvent e){
 					//System.out.println("INSTANTIATING...");
 					try {
-						List<Class> classes = new ArrayList<Class>();
-						for(String s:constructorParamaterTypes[index])
+						Object object = null; 
+						if(constructorParamaterTypes[index].length > 0)
 						{
-							classes.add(Class.forName(activePackageName + "." + s));
+							List<Class> classes = new ArrayList<Class>();
+							for(String s:constructorParamaterTypes[index])
+							{
+								//System.out.println(s);
+								Class<?> myClass = ObjectBenchUtility.getClassFromType(s);
+								//This whole section needs expanding to account for non-native Java types. 
+								if(myClass == null)
+								{
+									//Need to add method to the JavaModelHelper to check if a classname exists. 
+									//myClass = JavaModelHelper.getClassFromLoader(StringHelper.getQualifiedName(s, activePackageName));
+								}
+								if(myClass == null)
+								{
+									//myClass = Class.forName(s); //This is going to cause more trouble than its worth. 
+								}
+								classes.add(myClass);
+							}
+							ConstructorDialog dialog = new ConstructorDialog(mainViewArea.getShell(),JavaModelHelper.getClassFromLoader((StringHelper.getQualifiedName(selectedClass, activePackageName))).getDeclaredConstructor(classes.toArray(new Class<?>[classes.size()])));
+							if(dialog.open() == Window.OK)
+							{
+								object = dialog.getInstance();
+								//System.out.println("IM IN");
+								//ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName, object);
+							}
 						}
-						ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName, classes.toArray(new Class[classes.size()]));
+						ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName, object);
 					} catch (JavaModelException e1) {
 						e1.printStackTrace();
 					} catch (ClassNotFoundException e1) {

@@ -4,21 +4,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.swt.*; 
@@ -67,7 +52,7 @@ public class ObjectBenchView extends ViewPart {
 		// TODO Auto-generated method stub
 	}
 
-	public void addObject(String className, String packageName, Class[] parameters) throws JavaModelException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException
+	public void addObject(String className, String packageName, Object instance) throws JavaModelException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException
 	{
 		System.out.println("Instantiating: " + className);
 		if(ObjectBenchButtons == null)
@@ -77,7 +62,7 @@ public class ObjectBenchView extends ViewPart {
 		String entryString = className;
 		entryString = entryString.substring(0,entryString.lastIndexOf('.'));
 		entryString += " (Instance) ";
-		ObjectBenchButton newButton = new ObjectBenchButton(mainViewArea,SWT.NONE,className,ObjectBenchButtons.size(), packageName);
+		ObjectBenchButton newButton = new ObjectBenchButton(mainViewArea,SWT.NONE,className,ObjectBenchButtons.size(), packageName, instance);
 		newButton.setText(entryString);
 		ObjectBenchButtons.add(newButton);
 		FormData buttonData = new FormData(90+(entryString.length() * 3),80);

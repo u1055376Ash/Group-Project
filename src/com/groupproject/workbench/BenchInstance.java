@@ -24,6 +24,14 @@ public class BenchInstance {
 		Instantiate();
 	}
 	
+	public BenchInstance(String c, String p, Object o) throws ClassNotFoundException, InstantiationException, IllegalAccessException
+	{
+		className = c;
+		packageName = p; 
+		myClass = JavaModelHelper.getClassFromLoader(StringHelper.getQualifiedName(c, p));
+		myInstance = o; 
+	}
+	
 	public BenchInstance() throws ClassNotFoundException, InstantiationException, IllegalAccessException
 	{
 		this("DefaultClass","DefaultPackage");
@@ -57,6 +65,11 @@ public class BenchInstance {
 	void Instantiate() throws InstantiationException, IllegalAccessException
 	{
 		myInstance = myClass.newInstance();
+	}
+	
+	public void setObject(Object o)
+	{
+		myInstance = o; 
 	}
 
 }
