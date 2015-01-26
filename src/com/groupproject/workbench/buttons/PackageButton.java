@@ -70,7 +70,7 @@ public class PackageButton extends SquareButton{
 	@Override
 	public void checkSubclass()
 	{
-		
+		//DO NOT REMOVE
 	}
 	
 	void getColor()

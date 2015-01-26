@@ -7,9 +7,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaProject;
@@ -19,40 +16,47 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.ISelectionService;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-/*
- * Static class for helping gain access to the Java Model. 
- */
 import org.eclipse.core.runtime.IAdaptable;
-
 import com.groupproject.workbench.helpers.StringHelper;
 
+/*
+ * JavaModelHelper - This class contains methods to gather information on user defined classes. This class can traverse the Eclipse AST and gather
+ * information as required. This class is to be used exclusively for gathering information. 
+ */
 public final class JavaModelHelper {	
 	
-	private static IWorkspace workspace;
-	private static IWorkspaceRoot root; 
-	private static IProject[] projects; 
+	private static IWorkspace workspace;						//The active Eclipse Workspace
+	private static IWorkspaceRoot root; 						//The root of the Eclipse Workspace
+	private static IProject[] projects; 						//A collection of projects
 	
-	private static IProject activeProject;
-	private static IPackageFragment activePackage;
+	private static IProject activeProject;						//The active project
+//	private static IPackageFragment activePackage;				//The active package
 	
+	
+	/*
+	 * Constructor
+	 */
 	private JavaModelHelper() throws MalformedURLException, Exception
 	{
 		Initialise();
 	}
 	
+	/*
+	 * Methods 
+	 */
 	
+	/*
+	 * Initialise - Initialises the JavaModelHelper
+	 */
 	public static void Initialise() throws MalformedURLException, Exception
 	{
 		workspace = ResourcesPlugin.getWorkspace(); 
@@ -62,12 +66,19 @@ public final class JavaModelHelper {
 		
 	}
 	
+	
+	/*
+	 * Get Project by Name - Returns a project by its name. 
+	 */
 	public static IProject getProjectByName(String name)  throws JavaModelException
 	{
 		return root.getProject(name);
 	}
 	
 	
+	/*
+	 * Add to Class Path - Adds a users class to the plugins class path. 
+	 */
 	static void addToClassPath() throws MalformedURLException, Exception
 	{
 		for(IProject p:projects)
@@ -79,22 +90,37 @@ public final class JavaModelHelper {
 		}
 	}
 	
+	/*
+	 * Add To Class Path - Adds a users class to the plugins class path from qualified class name. 
+	 */
 	public static void addToClassPath(String name, String packageName) throws MalformedURLException, JavaModelException, Exception
 	{
 		addURL(getClassFile(packageName,name).toURI().toURL());
 	}
 	
+	
+	/*
+	 * Get Classes - Gets the classes from a given project. 
+	 */
 	public static ICompilationUnit[] getClasses(IProject project)  throws JavaModelException
 	{
+		//TODO Implement this method, can use the other version for ease. 
 		return null; 
 	}
 	
+	/*
+	 * Get Classes - Returns the classes in a package. 
+	 */
 	public static ICompilationUnit[] getClasses(IPackageFragment myPackage) throws JavaModelException
 	{
 		return myPackage.getCompilationUnits();
 		
 	}
 	
+	
+	/*
+	 * Get Class IFile - This method gets the actual reference to the file used for a class. 
+	 */
 	private static IFile getClassIFile(String myPackage, String myClassName) throws JavaModelException
 	{
 		ICompilationUnit myClass = getClass(myPackage,myClassName);
@@ -108,18 +134,28 @@ public final class JavaModelHelper {
 		return null; 
 	}
 	
+	/*
+	 * Get Class File - This method returns a classes source file. 
+	 */
 	public static File getClassFile(String myPackage, String myClassName) throws JavaModelException
 	{
 		IFile iFile = getClassIFile(myPackage,myClassName);
 		return iFile.getRawLocation().makeAbsolute().toFile();
 	}
 	
+	/*
+	 * Get Class File Path - Returns the absolute path of a given classes file. 
+	 */
 	public static String getClassFilePath(String myPackage, String myClassName) throws JavaModelException
 	{
 		IFile myFile = getClassIFile(myPackage,myClassName);
 		return myFile.getRawLocation().toString();
 	}
 	
+	/*
+	 * Get Class - Returns the compilation unit of the class. 
+	 * TODO - Refactor this method to better reflect what is returned. 
+	 */
 	public static ICompilationUnit getClass(String mypackage, String name) throws JavaModelException
 	{
 		IPackageFragment localPackage = getPackage(mypackage);
@@ -139,7 +175,9 @@ public final class JavaModelHelper {
 		
 	}
 	
-	
+	/*
+	 * Get Constructors - Returns a collection of constructors from a given compilation unit(class file). 
+	 */
 	private static IMethod[] getConstructors(ICompilationUnit unit) throws JavaModelException
 	{
 		List<IMethod> methods = new ArrayList<IMethod>();
@@ -156,6 +194,10 @@ public final class JavaModelHelper {
 		return methods.toArray(new IMethod[methods.size()]);
 	}
 	
+	
+	/*
+	 * Get Constructor Names - This method returns the names of all the constructors in a given class from a given package. 
+	 */
 	public static String[] getConstructorNames(String myPackage, String myClass) throws JavaModelException
 	{
 		ICompilationUnit desiredClass = getClass(myPackage,myClass);
@@ -170,7 +212,9 @@ public final class JavaModelHelper {
 	}
 	
 	
-
+	/*
+	 * Get Constructor Parameters - Returns the parameters to be passed to all constructors in a given class. 
+	 */
 	private static String[][] getConstructorParameters(ICompilationUnit unit) throws JavaModelException
 	{
 		
@@ -188,6 +232,9 @@ public final class JavaModelHelper {
 		
 	}
 	
+	/*
+	 * Get Constructor Parameter Names - Returns the names of all parameters to be passed to all constructors in a given class. 
+	 */
 	private static String[][] getConstructorParameterNames(ICompilationUnit unit) throws JavaModelException
 	{
 		IMethod[] constructors = getConstructors(unit);
@@ -203,6 +250,9 @@ public final class JavaModelHelper {
 		return strings;
 	}
 	
+	/*
+	 * Get Field Names - Returns a collection of field names (global variables) from a given class. 
+	 */
 	private static String[] getFieldNames(ICompilationUnit unit) throws JavaModelException
 	{
 		if(unit == null)
@@ -224,6 +274,9 @@ public final class JavaModelHelper {
 		return strings.toArray(new String[strings.size()]);
 	}
 	
+	/*
+	 * Get Field Types - Returns a collection of string representations of a fields type.
+	 */
 	private static String[] getFieldTypes(ICompilationUnit unit) throws JavaModelException
 	{
 		IType[] fields = unit.getAllTypes();
@@ -241,28 +294,43 @@ public final class JavaModelHelper {
 		return strings.toArray(new String[strings.size()]);
 	}
 	
-	
+	/*
+	 * Get Field Types - Returns a collection of string representations of a fields type from a given class and package. 
+	 */
 	public static String[] getFieldTypes(String myPackage,String myClass) throws JavaModelException
 	{
 		return getFieldTypes(getClass(myPackage,myClass));
 	}
+	
+	/*
+	 * Get Field Names - Returns the field names of a given class. 
+	 */
 	public static String[] getFieldNames(String myPackage, String myClass) throws JavaModelException
 	{
 		return getFieldNames(getClass(myPackage,myClass));
 	}
 	
+	/*
+	 * Get Constructor Parameters - Returns the parameter types of a given classes constructors. 
+	 */
 	public static String[][] getConstructorParameters(String myPackage,String myClass) throws JavaModelException
 	{
 		ICompilationUnit unit = getClass(myPackage,myClass);
 		return getConstructorParameters(unit);
 	}
 	
+	/*
+	 * Get Constructor Parameter Names - Returns a collection of parameter names for all constructors of a given class.
+	 */
 	public static String[][] getConstructorParamaterNames(String myPackage, String myClass) throws JavaModelException
 	{
 		ICompilationUnit unit = getClass(myPackage,myClass);
 		return getConstructorParameterNames(unit);
 	}
 	
+	/*
+	 * Get Methods - Returns a collection of methods from a class. 
+	 */
 	private static IMethod[] getMethods(ICompilationUnit unit) throws JavaModelException
 	{
 		List<IMethod> methods = new ArrayList<IMethod>();
@@ -284,6 +352,9 @@ public final class JavaModelHelper {
 		return methods.toArray(new IMethod[methods.size()]);
 	}
 	
+	/*
+	 * Get Class Method Names - Returns a collection of method names from a given class. 
+	 */
 	public static String[] getClassMethodNames(String myPackage, String myClass) throws JavaModelException
 	{
 		IPackageFragment localPackage = getPackage(myPackage);
@@ -310,25 +381,32 @@ public final class JavaModelHelper {
 		return strings;
 	}
 	
-	private static IField[] getFields(ICompilationUnit unit) throws JavaModelException
-	{
-		List<IField> fields = new ArrayList<IField>();
-		for(IType type:unit.getTypes())
-		{
-			for(IField field:type.getFields())
-			{
-				fields.add(field);
-			}
-		}
-		return fields.toArray(new IField[fields.size()]);
-	}
+//	private static IField[] getFields(ICompilationUnit unit) throws JavaModelException
+//	{
+//		List<IField> fields = new ArrayList<IField>();
+//		for(IType type:unit.getTypes())
+//		{
+//			for(IField field:type.getFields())
+//			{
+//				fields.add(field);
+//			}
+//		}
+//		return fields.toArray(new IField[fields.size()]);
+//	}
 	
-	public static IField[] getClassFields(String myPacakge, String myClass)
+	/*
+	 * Get Class Fields - Gets a collection of fields from a given class. 
+	 */
+	private static IField[] getClassFields(String myPacakge, String myClass)
 	{
+		//TODO - Implement this method. 
 		return null;
 		
 	}
 	
+	/*
+	 * Get Class Names - Returns a collection of class names from a given package. 
+	 */
 	public static String[] getClassNames(String myPackage) throws JavaModelException, ClassNotFoundException
 	{
 		IPackageFragment localPackage = getPackage(myPackage);
@@ -347,12 +425,17 @@ public final class JavaModelHelper {
 		
 	}
 	
-	
+	/*
+	 * Get Packages - Returns a collection of packages from a given Java project. 
+	 */
 	public static IPackageFragment[] getPackages(IJavaProject project) throws JavaModelException
 	{
 		return project.getPackageFragments();
 	}
 	
+	/*
+	 * Get Packages - Returns a collection of packages from a given project by name. 
+	 */
 	public static IPackageFragment[] getPackages(String projectName) throws MalformedURLException, Exception
 	{
 		IJavaProject project = getJavaProject(getProject(projectName));
@@ -374,19 +457,29 @@ public final class JavaModelHelper {
 		return (IPackageFragment[]) fragments.toArray(new IPackageFragment[fragments.size()]);
 	}
 	
-	
+	/*
+	 * Add To Class Path - Attemps to add a user class to the class path. 
+	 */
 	static void addToClassPath(String s) throws ClassNotFoundException
 	{
+		//TODO - Look at maybe removing this method as it may now be depreciated. 
 		ClassLoader.getSystemClassLoader().loadClass(s);
 		//System.out.println(s);
 		//ResourceBundle.getBundle(s,Locale.getDefault(), ClassLoader.getSystemClassLoader());
 	}
 	
-	
+	/*
+	 * Get Class From Loader - This tiny method solves the reflection problem as a result of the dual VM setup in Eclipse. 
+	 * This method allows us to get the Class object from a qualified class name. 
+	 */
 	public static Class<?> getClassFromLoader(String s) throws ClassNotFoundException
 	{
 		return ClassLoader.getSystemClassLoader().loadClass(s);
 	}
+	
+	/*
+	 * Get Package Names - Returns a collection of package names from a given project. 
+	 */
 	public static String[] getPackageNames(String projectName) throws MalformedURLException, Exception
 	{
 		IPackageFragment[] packages = getPackages(projectName);
@@ -398,7 +491,10 @@ public final class JavaModelHelper {
 		return returnString;
 	}
 	
-	public static int getNumberOfClassesFromPackage(IPackageFragment myPackage)
+	/*
+	 * Get Number of Classes From Package - Returns the number of classes in a given package. 
+	 */
+	private static int getNumberOfClassesFromPackage(IPackageFragment myPackage)
 	{
 		try {
 			return 	myPackage.getCompilationUnits().length;
@@ -408,11 +504,17 @@ public final class JavaModelHelper {
 		return 0;
 	}
 	
+	/*
+	 * Get Number of Classes From Package - Returns the number of classes in a given package. 
+	 */
 	public static int getNumberOfClassesFromPackage(String name) throws JavaModelException
 	{
 		return getNumberOfClassesFromPackage(getPackage(name));
 	}
 	
+	/*
+	 * Get Package - Returns a package found by name.
+	 */
 	private static IPackageFragment getPackage(String name) throws JavaModelException
 	{
 		IPackageFragment[] packages =  getPackages(getJavaProject(getActiveProject()));
@@ -426,8 +528,9 @@ public final class JavaModelHelper {
 		return null;
 	}
 	
-
-	
+	/*
+	 * Get Project - Returns a project requested by its name. 
+	 */
 	private static IProject getProject(String name) throws MalformedURLException, Exception
 	{
 		if(projects == null)
@@ -444,11 +547,17 @@ public final class JavaModelHelper {
 		return null; 
 	}
 	
+	/*
+	 * Get Java Project - Returns the Java Project from a given IProject. 
+	 */
 	private static IJavaProject getJavaProject(IProject project)
 	{
 		return JavaCore.create(project);
 	}
 	
+	/*
+	 * Get Active Project - Returns the active project. 
+	 */
 	private static IProject getActiveProject()
 	{
 
@@ -462,12 +571,20 @@ public final class JavaModelHelper {
 		return activeProject; 
 	}
 	
+	/*
+	 * Get Active Project Name - Returns the name of an active project. 
+	 */
 	public static String getActiveProjectName()
 	{
 		return (getActiveProject() != null) ? getActiveProject().getName():null;
 	}
 	
+	/*
+	 * Add URL - Adds a URL to the class path. 
+	 */
 	public static void addURL(URL url) throws Exception{
+		//DEPRECIATED.
+		//TODO - Check links for safe removal. 
 		URLClassLoader classLoader = (URLClassLoader)ClassLoader.getSystemClassLoader(); 
 		Class<URLClassLoader> myClass = URLClassLoader.class; 
 		
@@ -477,6 +594,9 @@ public final class JavaModelHelper {
 		
 	}
 	
+	/*
+	 * Extract Selection - This method takes the active selection from the resource viewer. 
+	 */
 	 private static IResource extractSelection(ISelection sel) {
 	      if (!(sel instanceof IStructuredSelection))
 	         return null;

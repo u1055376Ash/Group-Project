@@ -1,29 +1,29 @@
 package com.groupproject.workbench.buttons;
 
 
-import java.lang.reflect.Field;
-
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
-
-import com.groupproject.workbench.BenchInstance;
 import com.groupproject.workbench.JavaModelHelper;
 import com.groupproject.workbench.helpers.StringHelper;
 import com.groupproject.workbench.preferences.PreferenceConstants;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 
+/*
+ * Class Button - A representation of a class that can be used as a button. Inherits from Square Button. 
+ */
 public class ClassButton extends SquareButton{
 	
-	public int classId;
-	public String className; 
-	public String packageName; 
+	public int classId;						//The ID of the class. 
+	public String className; 				//The name of the Class to be associated with. 
+	public String packageName; 				//The name of the Package that the Class is associated with. 
 	
 
-
+	/*
+	 * Constructors 
+	 */
 	public ClassButton(Composite parent, int style, String cn, int id,String pn) throws ClassNotFoundException {
 		super(parent, style);
 		classId = id;
@@ -59,15 +59,21 @@ public class ClassButton extends SquareButton{
 	@Override
 	public void checkSubclass()
 	{
-		
+		// DO NOT REMOVE!
 	}
 	
+	/*
+	 * Get Colour - Sets the colours based on colours specified in the preferences.
+	 */
 	public void getColor()
 	{
 		backgroundColor = ObjectBenchUtility.getColorFromString(PreferenceConstants.P_COLOR_THREE);
 		backgroundColor2 = ObjectBenchUtility.getColorFromString(PreferenceConstants.P_COLOR_FOUR);
 	}
 	
+	/*
+	 * Get My Class - Returns an object representing the class referenced in this button. 
+	 */
 	public Class<?> getMyClass() throws ClassNotFoundException
 	{
 

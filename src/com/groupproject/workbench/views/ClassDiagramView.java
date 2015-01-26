@@ -1,27 +1,14 @@
 package com.groupproject.workbench.views;
 
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
-
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.ide.IDE;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -29,14 +16,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.window.Window;
-
 import com.groupproject.workbench.JavaModelHelper;
 import com.groupproject.workbench.buttons.ClassButton;
 import com.groupproject.workbench.buttons.PackageButton;
@@ -45,23 +30,25 @@ import com.groupproject.workbench.dialogs.ConstructorDialog;
 import com.groupproject.workbench.helpers.StringHelper;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 
+/*
+ * Class Diagram View - This is the class taht holds the Class Diagram view. 
+ * 
+ *TODO - This class needs quite a bit of clean-up, possibly splitting some of it into re-usable sub-classes. 
+ */
 public class ClassDiagramView extends ViewPart implements ISelectionListener{
 
-	private Rectangle clientArea; 
-	private GC gc; 
-	private Composite mainViewArea;
-	private Label viewHeader; 
-
-	
-	private List<PackageButton> packageButtons;
-	private List<ClassButton> classButtons; 
-	private String activeProjectName;
-	private String activePackageName; 
-	
-	private SquareButton upButton; 
-	
-	private int state = 0; 
-	
+	private Composite mainViewArea;						//A reference to the scrollable main view area
+	private Label viewHeader; 							//A label showing the active package/project
+	private List<PackageButton> packageButtons;			//A list of package buttons used to display packages
+	private List<ClassButton> classButtons; 			//List of class buttons used to display classes
+	private String activeProjectName;					//The active project name
+	private String activePackageName; 					//The active package name
+	private SquareButton upButton; 						//The reference to the "up" button. 
+	private int state = 0; 								//The state that the view is in Package Viewing = 0 | Class Viewing = 1 
+	//TODO - Maybe remove state and add a simple boolean switch? 
+	/*
+	 * Default Constructor 
+	 */
 	public ClassDiagramView() {
 
 	}
@@ -71,7 +58,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		packageButtons = new ArrayList<PackageButton>();
 		classButtons = new ArrayList<ClassButton>();
 		activeProjectName = JavaModelHelper.getActiveProjectName();
-		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER); //Set up scrollable
 		mainViewArea = new Composite(sc, SWT.NONE);
 		mainViewArea.setLayout(new FormLayout());
 		mainViewArea.setSize(400,400);
@@ -80,9 +67,12 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		sc.setExpandVertical(true);
 		sc.setMinSize(mainViewArea.computeSize(1000, 1000));
 		viewHeader = new Label(mainViewArea,0);
-		getViewSite().getPage().addSelectionListener(this);
+		getViewSite().getPage().addSelectionListener(this); //Listens to the project resource explorer
 	}
 
+	/*
+	 * Check Project Name - This checks whether the project has changed. 
+	 */
 	private void checkProjectName()
 	{
 		if(JavaModelHelper.getActiveProjectName() == null || JavaModelHelper.getActiveProjectName().isEmpty())
@@ -98,6 +88,9 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		}
 	}
 
+	/*
+	 * Display Package View - This displays the packages in a given project. 
+	 */
 	public void displayPackageView(Composite parent) throws MalformedURLException, Exception
 	{
 		JavaModelHelper.Initialise();
@@ -110,10 +103,13 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		}
 	}
 	
+	/*
+	 * Display Class View - This displays the classes in a selected package. 
+	 */
 	public void displayClassView(Composite parent) throws MalformedURLException, Exception
 	{
 		//System.out.println("Displaying Classes");
-		JavaModelHelper.Initialise();
+		JavaModelHelper.Initialise(); //Initialises the Java Model
 		//activeProjectName = JavaModelHelper.getActiveProjectName(); 
 		checkProjectName();
 		if(activeProjectName != null)
@@ -128,6 +124,9 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		
 	}
 	
+	/*
+	 * Update Header - Updates the header
+	 */
 	private void updateHeader() 
 	{
 		if(state == 0)
@@ -155,7 +154,9 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 
 	}
 	
-	
+	/*
+	 * Add "Up" Button - Adds the up button when required. 
+	 */
 	private void addUpButton(Composite parent)
 	{
 		upButton = new SquareButton(parent,SWT.NONE);
@@ -181,20 +182,18 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			}
 
 			@Override
-			public void mouseDown(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
+			public void mouseDown(MouseEvent e) {}
 			@Override
-			public void mouseUp(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
+			public void mouseUp(MouseEvent e) {}
 			
 		});
 		refresh();
 	}
+	
+	/*
+	 * Create Class Buttons - This is the method that draws the class icons. 
+	 *TODO - Add dependencies here! 
+	 */
 	public void createClassButtons(Composite parent) throws JavaModelException, ClassNotFoundException
 	{
 		if(upButton == null || upButton.isDisposed())
@@ -203,12 +202,11 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			}
 		if(JavaModelHelper.getClassNames(activePackageName) == null)
 		{
-			return;
+			return; //If a package is empty then return 
 		}
-			final String[] classes = JavaModelHelper.getClassNames(activePackageName);
+			final String[] classes = JavaModelHelper.getClassNames(activePackageName); //Get the class names 
 		
-
-		for(int i = 0; i < classes.length;i++)
+		for(int i = 0; i < classes.length;i++) 
 		{
 			String entryString = classes[i];
 			entryString = entryString.substring(0,entryString.lastIndexOf('.'));
@@ -216,7 +214,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			Boolean createNew = true; 
 			for(int x = 0; x<classButtons.size();x++)
 			{
-				if(classButtons.get(x).classId == i)
+				if(classButtons.get(x).classId == i) //if the button has already been made, update it
 				{
 					createNew = false; 
 					classButtons.get(x).setText(classes[i]);
@@ -226,18 +224,19 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			}
 			if(createNew)
 			{
+				//Create a new class button. 
 				try {
-					JavaModelHelper.addToClassPath(classes[i], activePackageName);
-				} catch (MalformedURLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					JavaModelHelper.addToClassPath(classes[i], activePackageName); //This makes sure that the class is added to the class path
+					//TODO This may cause problems later on, may need to have a method that does this before drawing the buttons.
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
-				}
+				} 
+				//Add the button
 				classButtons.add(new ClassButton(parent,SWT.NONE,classes[i],i,activePackageName));
 				classButtons.get(i).setText(entryString);
 				classButtons.get(i).setMenu(buildMenuForClass(classes[i], classButtons.get(i)));
+				
+				//Position the button
 				FormData buttonData = new FormData(90+(entryString.length() * 3),80);
 				if(i-1 >= 0)
 				{
@@ -250,6 +249,8 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 					buttonData.left = new FormAttachment(5);
 					buttonData.top = new FormAttachment(20);
 				}	
+				
+				//Set up the listeners 
 				classButtons.get(i).addMouseListener(new MouseListener(){
 
 					@Override
@@ -258,16 +259,9 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 					}
 
 					@Override
-					public void mouseDown(MouseEvent e) {
-						// TODO Auto-generated method stub
-						
-					}
+					public void mouseDown(MouseEvent e) {}
 					@Override
-					public void mouseUp(MouseEvent e) {
-						// TODO Auto-generated method stub
-						
-					}
-
+					public void mouseUp(MouseEvent e) {}
 				});
 				classButtons.get(i).setLayoutData(buttonData);
 				classButtons.get(i).getColor();//hack to fix a bug
@@ -277,18 +271,26 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		parent.getShell().layout();
 	}
 	
+	/*
+	 * Build Menu for Class - This method builds the right click menu for a class.
+	 * Here we get all of the constructor information.
+	 * TODO - This method needs cleaning and maybe moving into the utility class. 
+	 */
 	private Menu buildMenuForClass(final String selectedClass, final ClassButton bn) throws JavaModelException
 	{
 		Menu popupMenu = new Menu(bn);
-
+		//Get String values
 		String[] constructorNames= JavaModelHelper.getConstructorNames(bn.packageName, bn.className);
 		final String[][] constructorParamaterTypes = JavaModelHelper.getConstructorParameters(bn.packageName, bn.className);
 		final String[][] constructorParamaterNames = JavaModelHelper.getConstructorParamaterNames(bn.packageName, bn.className);
+		
 		for(int i = 0; i < constructorNames.length;i++)
 		{
 			final int index = i; // horrible hack to pass the constructor parameter types 
 			MenuItem instantiateItem = new MenuItem(popupMenu, SWT.CASCADE);
+			//Build the string for constructor
 			String addString = "new" + constructorNames[i] + "(";
+			
 			for(int x = 0; x < constructorParamaterTypes[i].length;x++)
 			{
 				addString += StringHelper.fixType(constructorParamaterTypes[i][x]) + " ";
@@ -306,12 +308,12 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 						Object object = null; 
 						if(constructorParamaterTypes[index].length > 0)
 						{
-							List<Class> classes = new ArrayList<Class>();
+							List<Class<?>> classes = new ArrayList<Class<?>>();
 							for(String s:constructorParamaterTypes[index])
 							{
 								//System.out.println(s);
 								Class<?> myClass = ObjectBenchUtility.getClassFromType(s);
-								//This whole section needs expanding to account for non-native Java types. 
+								//TODO This whole section needs expanding to account for non-native Java types. 
 								if(myClass == null)
 								{
 									//Need to add method to the JavaModelHelper to check if a classname exists. 
@@ -332,41 +334,18 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 							}
 						}
 						ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName, object);
-					} catch (JavaModelException e1) {
+					} catch (Exception e1) {
 						e1.printStackTrace();
-					} catch (ClassNotFoundException e1) {
-						e1.printStackTrace();
-					} catch (NoSuchMethodException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (SecurityException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (InstantiationException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (IllegalAccessException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (IllegalArgumentException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (InvocationTargetException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
+						//I'll confess there were about 10 catch clauses here before.
+					} 
 				}
 
 				@Override
-				public void widgetDefaultSelected(SelectionEvent e) {
-					// TODO Auto-generated method stub
-					
-				}
-				
+				public void widgetDefaultSelected(SelectionEvent e) {}
 			});
-
-			
 		}
+		
+		//Create the secondary menu underneath the constructors 
 		new MenuItem(popupMenu, SWT.SEPARATOR);
 		MenuItem openEditorItem = new MenuItem(popupMenu, SWT.CASCADE);
 		openEditorItem.setText("Open Editor");
@@ -378,17 +357,16 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			}
 
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
+			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 		
 		return popupMenu;
 		
 	}
 	
+	/*
+	 * Create Package Buttons - Creates the buttons to represent packages
+	 */
 	public void createPackageButtons(Composite parent)
 	{
 		try {
@@ -431,33 +409,22 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 						public void mouseDoubleClick(MouseEvent e) {
 							try {
 								viewClasses(packages[currentNumber]);
-							} catch (JavaModelException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							} catch (MalformedURLException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
 							} catch (Exception e1) {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
-							}
+							} 
 						}
 
 						@Override
-						public void mouseDown(MouseEvent e) {
-							// TODO Auto-generated method stub
-							
-						}
+						public void mouseDown(MouseEvent e) {}
 						@Override
-						public void mouseUp(MouseEvent e) {
-							// TODO Auto-generated method stub
-							
-						}
+						public void mouseUp(MouseEvent e) {}
 
 					});
 					
 					packageButtons.get(i).setLayoutData(buttonData);
 				}
+				//Get number of classes
 				if(JavaModelHelper.getNumberOfClassesFromPackage(packages[i]) <= 0)
 				{
 					if(ObjectBenchUtility.showEmptyPackages() == false)
@@ -476,23 +443,22 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	}
 	
 	@Override
-	public void setFocus() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void setFocus() {}
 	
 	@Override
 	public void dispose()
 	{
 		clear();
 		super.dispose();
-
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 * Selection Changed - This controls the event of a user changing projects in the resource view. 
+	 */
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) 
 	{
-		//clear();
-		//refresh();
 		try{
 			String checkString = "[P/" + activeProjectName + "]";
 			if(state == 0)
@@ -514,20 +480,18 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 				displayClassView(mainViewArea);
 			}
 		}
-		catch(JavaModelException e)
+		catch(Exception e)
 		{
 			e.printStackTrace();
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
+		
 
 		
 	}
 	
+	/*
+	 * View Classes - Switches the system over to view classes 
+	 */
 	private void viewClasses(String mypackage) throws MalformedURLException, Exception
 	{
 		clear();
@@ -537,6 +501,9 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		displayClassView(mainViewArea);
 	}
 	
+	/*
+	 * View Packages - Switches the system over to view packages
+	 */
 	private void viewPackages() throws MalformedURLException, Exception
 	{
 		clear();
@@ -545,12 +512,19 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		getViewSite().getPage().addSelectionListener(this);
 		displayPackageView(mainViewArea);
 	}
+	
+	/*
+	 * Refresh - Refreshes the view
+	 */
 	void refresh()
 	{
 		mainViewArea.layout();
 		mainViewArea.getShell().layout();
 	}
 	
+	/*
+	 * Clear - Clears the view
+	 */
 	private void clear()
 	{
 		//viewHeader.dispose();
@@ -558,6 +532,9 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		disposeButtons();
 	}
 	
+	/*
+	 * Dispose Buttons - Disposes the buttons as needed.
+	 */
 	private void disposeButtons()
 	{
 		if(state == 0)

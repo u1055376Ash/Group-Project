@@ -1,14 +1,11 @@
 package com.groupproject.workbench.preferences;
 
-import java.awt.Color;
-
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
-
 import com.groupproject.workbench.Activator;
 
 /**
- * Class used to initialize default preference values.
+ * Preference Initialiser - Class used to initialise default preference values.
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 

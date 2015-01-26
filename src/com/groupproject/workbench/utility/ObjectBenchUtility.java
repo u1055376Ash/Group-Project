@@ -13,66 +13,84 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Widget;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.ide.IDE;
-
 import com.groupproject.workbench.Activator;
 import com.groupproject.workbench.BenchInstance;
 import com.groupproject.workbench.JavaModelHelper;
 import com.groupproject.workbench.preferences.PreferenceConstants;
 import com.groupproject.workbench.views.InspectorView;
 import com.groupproject.workbench.views.ObjectBenchView;
-
+/**
+ * Object Bench Utility - This static class contains methods to assist in common operations. 
+ * @author Tsumiki
+ *
+ */
 public final class ObjectBenchUtility 
 {
-	private static ObjectBenchView objectBench;
-	private static InspectorView inspectorView; 
+	private static ObjectBenchView objectBench;					//A link to the object bench accessible by all classes. 	
+	private static InspectorView inspectorView; 				//A link to the inspector view. 
+	private static String activePackage; 						//The active package
+	private static BenchInstance activeInstance; 				//The active instance accessible by all classes. 
 	
-	private static String activeProject; 
-	private static String activePackage; 
-	private static Object activeObject; 
-	
-	private static BenchInstance activeInstance; 
-	
+	/*
+	 * Register Object Bench - Registers the Object Bench with this utility. 
+	 */
 	public static void registerObjectBench(ObjectBenchView ob)
 	{
 		objectBench = ob;
 	}
-	
+
+	/*
+	 * Register Inspector View - Registers the inspector view with this utility. 
+	 */
 	public static void registerInspectorView(InspectorView i)
 	{
 		inspectorView = i; 
 	}
 	
+	/*
+	 * Get Inspector View - Returns a reference to the inspector view. 
+	 */
 	public static InspectorView getInspectorView()
 	{
 		return inspectorView; 
 	}
 	
+	/*
+	 * Get Object Bench - Returns a reference to the Object Bench View. 
+	 */
 	public static ObjectBenchView getObjectBench()
 	{
 		return objectBench;
 	}
 	
+	/*
+	 * Get Active Package - Returns the name of the active package. 
+	 */
 	public static String getActivePackage()
 	{
 		return activePackage; 
 	}
+	
+	/*
+	 * Set Active Pacakage - Sets the active package. 
+	 */
 	public static void setActivePackage(String s)
 	{
 		activePackage = s;
 	}
 	
+	/*
+	 * Open Class In Editor - This method enables a class to be opened in the default class editor. 
+	 */
 	public static void openClassInEditor(String myPackage, String myClass)
 	{
+		//TODO - Look into adding our own editor with scope highlighting here. 
 		File file;
 		try {
 			file = JavaModelHelper.getClassFile(myPackage, myClass);
@@ -83,7 +101,7 @@ public final class ObjectBenchUtility
 				try{
 					//page.toggleZoom(page.getActivePartReference());
 					
-					IEditorPart part = IDE.openEditorOnFileStore(page, fileStore);
+					IDE.openEditorOnFileStore(page, fileStore);
 					page.setPartState(page.getActivePartReference(), IWorkbenchPage.STATE_MAXIMIZED);
 					//page.getActivePart().getSite().getShell().setMaximized(true);
 				}catch(PartInitException e2){
@@ -91,14 +109,18 @@ public final class ObjectBenchUtility
 				}
 			}
 		} catch (JavaModelException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
 	}
 	
+	/*
+	 * Get Color From String - This method gets a color from preferences. 
+	 */
 	public static Color getColorFromString(String s)
 	{
+		
+		//TODO - Refactor this to getColorFromPreferences(String s)
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		String color = store.getString(s);
 		String[] values = color.split(",");
@@ -116,7 +138,9 @@ public final class ObjectBenchUtility
 		return myActiveColor; 
 
 	}
-	
+	/*
+	 * Show Empty Packages - Gets whether to show empty packages from preferences.
+	 */
 	public static Boolean showEmptyPackages()
 	{
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
@@ -131,7 +155,9 @@ public final class ObjectBenchUtility
 		} 
 	}
 	
-	
+	/*
+	 * Set Active Instance - Sets the active instance...
+	 */
 	public static void setActiveInstance(BenchInstance i) throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException
 	{
 		activeInstance = i; 
@@ -141,13 +167,20 @@ public final class ObjectBenchUtility
 		}
 	}
 	
+	/*
+	 * Get Active Instance - Returns the active instance 
+	 */
 	public static BenchInstance getActiveInstance()
 	{
 		return activeInstance;
 	}
 	
+	/*
+	 * Get Class From Type - Returns a class type from a string.
+	 */
 	public static Class<?> getClassFromType(String s)
 	{
+		//TODO - Extend this so user classes can be found. 
 		if(s.equals("I"))
 		{
 			return int.class;
@@ -196,6 +229,9 @@ public final class ObjectBenchUtility
 		
 	}
 
+	/*
+	 * Get Control - Gets a control based on a string type. 
+	 */
 	public static Control getControl(Composite control, String s)
 	{
 		if(s.equals("I") || s.equals("int"))

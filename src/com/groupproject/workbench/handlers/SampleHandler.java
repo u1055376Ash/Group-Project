@@ -17,7 +17,9 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.Document;
-
+/*
+ * NOTE - This method provided the basis for the JavaModelHelper, this provided a good basic starting point. 
+ */
 public class SampleHandler extends AbstractHandler {
 
 	@Override

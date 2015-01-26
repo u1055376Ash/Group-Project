@@ -10,7 +10,7 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * @author Tsumiki
- *
+ * Object Bench Perspective - The class for the perspective. 
  */
 public class ObjectBenchPerspective implements IPerspectiveFactory {
 

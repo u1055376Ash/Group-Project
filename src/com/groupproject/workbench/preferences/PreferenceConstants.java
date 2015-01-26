@@ -1,7 +1,7 @@
 package com.groupproject.workbench.preferences;
 
 /**
- * Constant definitions for plug-in preferences
+ * Preference Constants - Constant definitions for plug-in preferences
  */
 public class PreferenceConstants {
 

@@ -2,37 +2,43 @@ package com.groupproject.workbench.views;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.part.ViewPart;
-
 import com.groupproject.workbench.BenchInstance;
 import com.groupproject.workbench.JavaModelHelper;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 
+/*
+ * Inspector View - The class for the inspector view. The inspector is where an instantiated class can be inspected to determine 
+ * field values. 
+ * TODO - Maybe we can also make the fields editable through the inspector? 
+ */
 public class InspectorView extends ViewPart {
 
-	Boolean enableEditing; //Will allow a user to edit values from within the inspector. 
+	Boolean enableEditing; 					//Will allow a user to edit values from within the inspector. 
 	
-	Composite mainViewArea;
-	Label header; 
-	List<Label> fieldNameLabels;
-	List<Label> fieldTypeLabels;
-	List<Label> fieldValueLabels; 
+	Composite mainViewArea;					//The main view area 
+	Label header; 							//The header, usually the name of the instance
+	List<Label> fieldNameLabels;			//A list of field names
+	List<Label> fieldTypeLabels;			//A list of field types 
+	List<Label> fieldValueLabels;			//A list of field values 
 	
-	
-	public InspectorView() {
-		// TODO Auto-generated constructor stub
-	}
+	/*
+	 * Default Constructor 
+	 */
+	public InspectorView() {}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	public void createPartControl(Composite parent) {
 		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
@@ -52,25 +58,32 @@ public class InspectorView extends ViewPart {
 		header.setBounds(mainViewArea.getClientArea());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
 	@Override
-	public void setFocus() {
-		// TODO Auto-generated method stub
-
-	}
+	public void setFocus() {}
 	
+	/*
+	 * Update - This method updates the inspector, making it get the active instance. This method reads the active instance and gets all field values
+	 */
 	public void update() throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException
 	{
 		disposeLabels(); 
-		BenchInstance instance = ObjectBenchUtility.getActiveInstance();
+		BenchInstance instance = ObjectBenchUtility.getActiveInstance(); //Get instance name 
 		System.out.println(instance.packageName + ":" + instance.className);
 		String[] fieldNames = JavaModelHelper.getFieldNames(instance.packageName, instance.className);
 		header.setText(instance.className + "(Instance)");
+		//Iterate over field names
 		for(int i = 0; i< fieldNames.length;i++)
 		{
-			//FormData labelData = new FormData(100, SWT.DEFAULT);
-			FormData labelData = new FormData(85 + (fieldNames.length * 4), SWT.DEFAULT);
+			//Create Label
 			fieldNameLabels.add(new Label(mainViewArea, SWT.NONE));
 			fieldNameLabels.get(i).setText(fieldNames[i]);
+			//FormData labelData = new FormData(100, SWT.DEFAULT);
+			//Position Label
+			FormData labelData = new FormData(85 + (fieldNames.length * 4), SWT.DEFAULT);
 			if( i == 0)
 			{
 				labelData.top = new FormAttachment(30);
@@ -82,6 +95,8 @@ public class InspectorView extends ViewPart {
 				labelData.left = new FormAttachment(5);
 			}
 			fieldNameLabels.get(i).setLayoutData(labelData);
+			
+			//Create value label
 			fieldValueLabels.add(new Label(mainViewArea, SWT.BORDER));
 			String s = instance.getValue(fieldNames[i]) != null ? instance.getValue(fieldNames[i]).toString():"null";
 			fieldValueLabels.get(i).setText(s);
@@ -102,13 +117,20 @@ public class InspectorView extends ViewPart {
 		mainViewArea.layout();
 	}
 	
+	
+	/*
+	 * Dispose Labels - Destroys all labels. 
+	 */
 	public void disposeLabels()
 	{
 		for(Label l:fieldNameLabels)
 		{
-			if(l != null || l.isDisposed() == false)
+			if(l != null)
 			{
-				l.dispose();
+				if(!l.isDisposed())
+				{
+					l.dispose();
+				}
 			}
 
 		}

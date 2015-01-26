@@ -1,7 +1,13 @@
 package com.groupproject.workbench.helpers;
 
+/*
+ * String Helper - A collection of methods to assist in building strings used throughout the plugin. 
+ */
 public final class StringHelper {
 
+	/*
+	 * Fix Type - this returns a string that represents an objects type in an easier to read manner. 
+	 */
 	public static String fixType(String s)
 	{
 		s = s.replace(";", "");
@@ -50,12 +56,17 @@ public final class StringHelper {
 		return s;
 	}
 	
-	
+	/*
+	 * Strip Extension - Strips the extension from a class name. 
+	 */
 	public static String stripExtension(String s)
 	{
 		return s.substring(0,s.lastIndexOf('.'));
 	}
 	
+	/*
+	 * Get Qualified Name - Returns a full, qualified name of a class based on its class and package name.
+	 */
 	public static String getQualifiedName(String className,String packageName)
 	{
 		if(className.isEmpty() || packageName.isEmpty() || className == null || packageName == null || className.length() <= 0 || packageName.length() <= 0)

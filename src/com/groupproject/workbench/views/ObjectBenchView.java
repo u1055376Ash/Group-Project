@@ -1,6 +1,5 @@
 package com.groupproject.workbench.views;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,27 +11,26 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.*;
-
 import com.groupproject.workbench.JavaModelHelper;
 import com.groupproject.workbench.buttons.ObjectBenchButton;
-import com.groupproject.workbench.buttons.PackageButton;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 
+/*
+ * Object Bench View - This is the view for the object bench. This class controls all instances of user classes and stores them in ObjectBenchButton.
+ */
 public class ObjectBenchView extends ViewPart {
 
 	private List<ObjectBenchButton> ObjectBenchButtons; 
 	private Composite mainViewArea;
 	
-	private List<Object> instances; 
-	
-	public ObjectBenchView() {
-		// TODO Auto-generated constructor stub
-	}
+	/*
+	 * Default Constructor
+	 */
+	public ObjectBenchView() {	}
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -44,88 +42,72 @@ public class ObjectBenchView extends ViewPart {
 		sc.setExpandHorizontal(true);
 		sc.setMinSize(mainViewArea.computeSize(1000, 100));
 		sc.setMinHeight(110);
-		ObjectBenchUtility.registerObjectBench(this);
+		ObjectBenchUtility.registerObjectBench(this); //Register this with the ObjectBenchUtility so other classes can access this instance
 	}
 
 	@Override
-	public void setFocus() {
-		// TODO Auto-generated method stub
-	}
+	public void setFocus() {}
 
+	/*
+	 * Add Object - This method adds an instance to the object bench. The object is created from its name, package and an object representing the instance. 
+	 */
 	public void addObject(String className, String packageName, Object instance) throws JavaModelException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException
 	{
-		System.out.println("Instantiating: " + className);
+		//System.out.println("Instantiating: " + className); //Uncomment to debug
 		if(ObjectBenchButtons == null)
 		{
-			ObjectBenchButtons = new ArrayList<ObjectBenchButton>();
+			ObjectBenchButtons = new ArrayList<ObjectBenchButton>(); 
 		}
 		String entryString = className;
-		entryString = entryString.substring(0,entryString.lastIndexOf('.'));
+		entryString = entryString.substring(0,entryString.lastIndexOf('.')); //strip extension TODO - use the strip extension found in StringHelper class
 		entryString += " (Instance) ";
+		//Create an ObjectBenchButton to represent instance. 
 		ObjectBenchButton newButton = new ObjectBenchButton(mainViewArea,SWT.NONE,className,ObjectBenchButtons.size(), packageName, instance);
 		newButton.setText(entryString);
 		ObjectBenchButtons.add(newButton);
+		//Position button object. 
 		FormData buttonData = new FormData(90+(entryString.length() * 3),80);
-		final int i = ObjectBenchButtons.size()-1;
+		final int i = ObjectBenchButtons.size()-1; //dirty hack for button listener
 		if(i == 0)
 		{
-			System.out.println("First");
+			//System.out.println("First");
 			buttonData.left = new FormAttachment(2);
 			buttonData.top = new FormAttachment(2);
-			//buttonData.bottom = new FormAttachment(50);
 		}
 		else
 		{
 			if(i > 0)
 			{
-				System.out.println("Another");
+				//System.out.println("Another");
 				buttonData.left = new FormAttachment(ObjectBenchButtons.get(i-1),15,SWT.RIGHT);
 				buttonData.bottom = new FormAttachment(ObjectBenchButtons.get(i-1),0,SWT.BOTTOM);
 				buttonData.top = new FormAttachment(ObjectBenchButtons.get(i-1),0,SWT.TOP);
 			}
 		}
 		ObjectBenchButtons.get(i).setLayoutData(buttonData);
-		
+		//Set up the listener for the buttons. 
 		ObjectBenchButtons.get(i).addMouseListener(new MouseListener(){
 
 			@Override
-			public void mouseDoubleClick(MouseEvent e) {
-
-			}
+			public void mouseDoubleClick(MouseEvent e) {}
 
 			@Override
-			public void mouseDown(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
+			public void mouseDown(MouseEvent e) {}
 			@Override
 			public void mouseUp(MouseEvent e) {
 				try {
 					ObjectBenchUtility.setActiveInstance(ObjectBenchButtons.get(i).getInstance());
-				} catch (JavaModelException e1) {
-					// TODO Auto-generated catch block
+				} catch (Exception e1) {
 					e1.printStackTrace();
-				} catch (NoSuchFieldException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (SecurityException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (IllegalArgumentException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (IllegalAccessException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				
-				
+				} 
+			
 			}
 
 		});
 		
 		ObjectBenchButtons.get(i).setMenu(buildMenuForClass(ObjectBenchButtons.get(i)));
 		
+		//TODO - in final build remove this code.
 //		Class<?> myClass = ObjectBenchButtons.get(i).getMyClass();
 //
 //		if(parameters.length == 0)
@@ -143,6 +125,11 @@ public class ObjectBenchView extends ViewPart {
 		mainViewArea.getShell().open();
 	}
 	
+	/*
+	 * Build Menu For Class - This method builds the right-click menu for an instance. 
+	 * This method reads the methods of a class. 
+	 * TODO - This method still needs to ascertain the parameters of a method and implement a means to call the method on click. 
+	 */
 	private Menu buildMenuForClass(ObjectBenchButton bn) throws JavaModelException
 	{
 		Menu popupMenu = new Menu(bn);
@@ -157,15 +144,11 @@ public class ObjectBenchView extends ViewPart {
 
 					@Override
 					public void widgetSelected(SelectionEvent e) {
-						// TODO Auto-generated method stub
-						
+						//TODO - Invoke method, if there are parameters display a dialog to take parameters then run the method. 
 					}
 
 					@Override
-					public void widgetDefaultSelected(SelectionEvent e) {
-						// TODO Auto-generated method stub
-						
-					}
+					public void widgetDefaultSelected(SelectionEvent e) {}
 					
 				});
 			}
