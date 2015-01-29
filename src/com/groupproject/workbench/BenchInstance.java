@@ -1,6 +1,9 @@
 package com.groupproject.workbench;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+
 import com.groupproject.workbench.helpers.StringHelper;
 /*
  * The class that controls an instance of a users class.
@@ -45,12 +48,76 @@ public class BenchInstance {
 	 * 
 	 */
 	
+	
+	public Method getMethod(String name, Class<?>[] parameterTypes) throws NoSuchMethodException, SecurityException
+	{
+		return myClass.getDeclaredMethod(name, parameterTypes); 
+	}
 	/*
 	 * Call Method - Calls a method that should be contained in the object instance. 
 	 */
-	public void callMethod(String m)
+	public Object callMethod(String s)
 	{
+		return callMethod(s,null);
+	}
+	
+	public Object callMethod(String s, Object[] params)
+	{
+		Method[] allMethods = myClass.getDeclaredMethods();
+		for(Method m: allMethods)
+		{
+			System.out.print(m.getName()+":"+s);
+			
+			if(m.getName().equals(s))
+			{
+				System.out.println("Method Found");
+				Type[] pType = m.getGenericParameterTypes();
+				try
+				{
+					m.setAccessible(true);
+					if(m.getReturnType() == void.class)
+					{
+						m.invoke(myInstance, (Object[])null);
+						return null; 
+					}
+					else
+					{
+						Object o = m.invoke(myInstance, (Object[])null);
+						return o;
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
 		//This method needs to be implemented to call an instances method based on name and parameters. 
+		return null;
+
+	}
+	
+	public Object callMethod(Method m, Object[] params)
+	{
+		try
+		{
+			m.setAccessible(true);
+			if(m.getReturnType() == void.class)
+			{
+				m.invoke(myInstance, params);
+				return null; 
+			}
+			else
+			{
+				Object o = m.invoke(myInstance, params);
+				return o;
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	
@@ -59,15 +126,23 @@ public class BenchInstance {
 	 */
 	public String getValue(String fieldName) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException
 	{
-		Field field = myClass.getDeclaredField(fieldName);
-		field.setAccessible(true);
-		Object obj = field.get(myInstance);//.toString();
-		String value = "null";
-		if(obj != null)
+		if(myInstance != null)
 		{
-			value = obj.toString();
+			Field field = myClass.getDeclaredField(fieldName);
+			field.setAccessible(true);
+			Object obj = field.get(myInstance);//.toString();
+			String value = "null";
+			if(obj != null)
+			{
+				value = obj.toString();
+			}
+			return value;
 		}
-		return value;
+		else
+		{
+			return null;
+		}
+
 	}
 	
 	/*
@@ -96,5 +171,6 @@ public class BenchInstance {
 	{
 		myInstance = o; 
 	}
+	
 
 }

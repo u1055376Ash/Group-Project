@@ -7,6 +7,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaProject;
@@ -26,6 +27,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
+
 import com.groupproject.workbench.helpers.StringHelper;
 
 /*
@@ -379,6 +381,127 @@ public final class JavaModelHelper {
 			strings[i] = methods[i].getElementName();
 		}
 		return strings;
+	}
+	
+	public static String[] getClassMethodReturnTypes(String myPackage, String myClass) throws JavaModelException
+	{
+		
+		IPackageFragment localPackage = getPackage(myPackage);
+		if(localPackage == null)
+		{
+			return null;
+		}
+		ICompilationUnit[] classes = getClasses(localPackage);
+		ICompilationUnit desiredClass = null;
+		for(ICompilationUnit c:classes)
+		{
+			if(c.getElementName() == myClass)
+			{
+				desiredClass = c; 
+			}
+		}
+		IMethod[] methods = getMethods(desiredClass);
+		
+		String[] strings = new String[methods.length];
+		
+		for(int i = 0; i<methods.length;i++)
+		{
+			strings[i] = methods[i].getReturnType();
+		}
+		return strings;
+		
+	}
+	
+	public static String[] getMethodSignatures(String myPackage, String myClass) throws JavaModelException
+	{
+		IPackageFragment localPackage = getPackage(myPackage);
+		if(localPackage == null)
+		{
+			return null;
+		}
+		ICompilationUnit[] classes = getClasses(localPackage);
+		ICompilationUnit desiredClass = null;
+		for(ICompilationUnit c:classes)
+		{
+			if(c.getElementName() == myClass)
+			{
+				desiredClass = c; 
+			}
+		}
+		IMethod[] methods = getMethods(desiredClass);
+		String[] strings = new String[methods.length];
+		
+		for(int i = 0; i<methods.length;i++)
+		{
+			String s = StringHelper.fixType(methods[i].getReturnType()) + " " + methods[i].getElementName() + "(";
+			String[] names = methods[i].getParameterNames();
+			String[] types = methods[i].getParameterTypes(); 
+			for(int x = 0; x<names.length;x++)
+			{
+				if(x < names.length -1)
+				{
+					s += StringHelper.fixType(types[x]) + " " + names[x] + ",";
+				}
+				else
+				{
+					s += StringHelper.fixType(types[x]) + " " + names[x];
+				}
+			}
+			s += ")";
+			strings[i] = s;
+		}
+		return strings;
+	}
+	
+	public static String[][] getClassMethodParameterTypes(String myPackage, String myClass) throws JavaModelException
+	{
+		IPackageFragment localPackage = getPackage(myPackage);
+		if(localPackage == null)
+		{
+			return null;
+		}
+		ICompilationUnit[] classes = getClasses(localPackage);
+		ICompilationUnit desiredClass = null;
+		for(ICompilationUnit c:classes)
+		{
+			if(c.getElementName() == myClass)
+			{
+				desiredClass = c; 
+			}
+		}
+		IMethod[] methods = getMethods(desiredClass);
+		String[][]stringReturn = new String[methods.length][];
+		for(int i = 0; i<methods.length;i++)
+		{
+				stringReturn[i] = methods[i].getParameterTypes();
+		}
+		return stringReturn;
+	
+	}
+	
+	public static String[][] getClassMethodParameterNames(String myPackage, String myClass,String methodName, String returnType) throws JavaModelException
+	{
+		IPackageFragment localPackage = getPackage(myPackage);
+		if(localPackage == null)
+		{
+			return null;
+		}
+		ICompilationUnit[] classes = getClasses(localPackage);
+		ICompilationUnit desiredClass = null;
+		for(ICompilationUnit c:classes)
+		{
+			if(c.getElementName() == myClass)
+			{
+				desiredClass = c; 
+			}
+		}
+		IMethod[] methods = getMethods(desiredClass);
+		String[][]stringReturn = new String[methods.length][];
+		for(int i = 0; i<methods.length;i++)
+		{
+				stringReturn[i] = methods[i].getParameterTypes();
+		}
+		return stringReturn;
 	}
 	
 //	private static IField[] getFields(ICompilationUnit unit) throws JavaModelException

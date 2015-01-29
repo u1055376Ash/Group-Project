@@ -52,6 +52,10 @@ public final class StringHelper {
 		{
 			s = "Char";
 		}
+		if(s.equals("V"))
+		{
+			s = "void";
+		}
 		
 		return s;
 	}

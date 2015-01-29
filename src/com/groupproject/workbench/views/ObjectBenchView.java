@@ -1,10 +1,15 @@
 package com.groupproject.workbench.views;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.*; 
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseEvent;
@@ -15,8 +20,11 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.*;
+
 import com.groupproject.workbench.JavaModelHelper;
 import com.groupproject.workbench.buttons.ObjectBenchButton;
+import com.groupproject.workbench.dialogs.MethodDialog;
+import com.groupproject.workbench.helpers.StringHelper;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 
 /*
@@ -130,21 +138,65 @@ public class ObjectBenchView extends ViewPart {
 	 * This method reads the methods of a class. 
 	 * TODO - This method still needs to ascertain the parameters of a method and implement a means to call the method on click. 
 	 */
-	private Menu buildMenuForClass(ObjectBenchButton bn) throws JavaModelException
+	private Menu buildMenuForClass(final ObjectBenchButton bn) throws JavaModelException
 	{
 		Menu popupMenu = new Menu(bn);
 		if(JavaModelHelper.getClassMethodNames(bn.packageName, bn.className) != null)
 		{
-			String[] methods = JavaModelHelper.getClassMethodNames(bn.packageName, bn.className);
-			for(String s:methods)
+			String[] methods = JavaModelHelper.getMethodSignatures(bn.packageName, bn.className);
+			final String[] methodNames = JavaModelHelper.getClassMethodNames(bn.packageName, bn.className);
+			final String[] returnTypes = JavaModelHelper.getClassMethodReturnTypes(bn.packageName, bn.className);
+			final String[][] methodTypes = JavaModelHelper.getClassMethodParameterTypes(bn.packageName, bn.className);
+			for(int i = 0; i < methods.length; i++)
 			{
-				MenuItem methodItem = new MenuItem(popupMenu, SWT.CASCADE);
-				methodItem.setText(s);
+				final int index = i; //nasty hack to fix minor issue. 
+				MenuItem methodItem = new MenuItem(popupMenu, SWT.NONE); 
+				methodItem.setText(methods[i]);
 				methodItem.addSelectionListener(new SelectionListener(){
 
 					@Override
 					public void widgetSelected(SelectionEvent e) {
 						//TODO - Invoke method, if there are parameters display a dialog to take parameters then run the method. 
+						Class<?>[] parameters = ObjectBenchUtility.getParameterTypes(methodTypes[index]);
+						if(parameters.length > 0)
+						{
+							try {
+								Method method = bn.getInstance().getMethod(methodNames[index],parameters);
+								MethodDialog dialog = new MethodDialog(mainViewArea.getShell(), method);
+								if(dialog.open() == Window.OK)
+								{
+									if(dialog.getReturnCode() != Dialog.CANCEL)
+									{
+										Object[] objects = dialog.getParameters(); 
+										MessageDialog msg = new MessageDialog(mainViewArea.getShell(), "Return Value", MessageDialog.getDefaultImage(), 
+												"Return Value: " + bn.getInstance().callMethod(method,objects).toString() + " (" + StringHelper.fixType(returnTypes[index]) + ") ", 
+												MessageDialog.INFORMATION, new String[] {"OK"}, 0);
+										if(msg.open() == Window.OK)
+										{
+											//System.out.println("IM IN");
+											//ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName, object);
+										}
+									}
+									//System.out.println("IM IN");
+									//ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName, object);
+								}
+							} catch (Exception e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} 
+						}
+						else
+						{
+							bn.getInstance().callMethod(methodNames[index]);
+						}
+					
+					try {
+						ObjectBenchUtility.setActiveInstance(bn.getInstance());
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					} 
+						
+					
 					}
 
 					@Override

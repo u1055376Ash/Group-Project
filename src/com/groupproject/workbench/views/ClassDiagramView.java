@@ -3,6 +3,7 @@ package com.groupproject.workbench.views;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseEvent;
@@ -20,8 +21,10 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.window.Window;
+
 import com.groupproject.workbench.JavaModelHelper;
 import com.groupproject.workbench.buttons.ClassButton;
 import com.groupproject.workbench.buttons.PackageButton;
@@ -328,12 +331,22 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 							ConstructorDialog dialog = new ConstructorDialog(mainViewArea.getShell(),JavaModelHelper.getClassFromLoader((StringHelper.getQualifiedName(selectedClass, activePackageName))).getDeclaredConstructor(classes.toArray(new Class<?>[classes.size()])));
 							if(dialog.open() == Window.OK)
 							{
-								object = dialog.getInstance();
+								if(dialog.getReturnCode() != Dialog.CANCEL)
+								{
+									object = dialog.getInstance();
+									ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName, object);
+								}
+
 								//System.out.println("IM IN");
 								//ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName, object);
 							}
 						}
-						ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName, object);
+						else
+						{
+							object = JavaModelHelper.getClassFromLoader((StringHelper.getQualifiedName(selectedClass, activePackageName))).newInstance();
+							ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName, object);
+						}
+						
 					} catch (Exception e1) {
 						e1.printStackTrace();
 						//I'll confess there were about 10 catch clauses here before.

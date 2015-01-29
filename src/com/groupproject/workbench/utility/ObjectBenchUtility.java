@@ -228,6 +228,17 @@ public final class ObjectBenchUtility
 		return null; 
 		
 	}
+	
+	public static Class<?>[] getParameterTypes(String[] types)
+	{
+		Class<?>[] classes = new Class<?>[types.length];
+		for(int i = 0; i<types.length;i++)
+		{
+			classes[i] = getClassFromType(types[i]);
+		}
+		
+		return classes; 
+	}
 
 	/*
 	 * Get Control - Gets a control based on a string type. 

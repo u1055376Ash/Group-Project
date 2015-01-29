@@ -1,11 +1,11 @@
 package com.groupproject.workbench.dialogs;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -13,18 +13,18 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 
 /*
- * Constructor Dialog - This class controls the dialog when instantiating a class, this allows for the parameters of a constructor to be entered. 
- * 
+ * Method Dialog - This class will provide a dialog to enter parameters when calling a method.
  */
-public class ConstructorDialog  extends Dialog{
-
-	Constructor<?> constructor; 			//This is the constructor associated with this dialog. 
+public class MethodDialog extends Dialog {
+	
+	public Method myMethod; 
 	Composite container;					//The main view in this dialog. 
 	List<Control> controls; 				//A list of controls
 	Object[] objects;						//A list of objects
@@ -32,12 +32,11 @@ public class ConstructorDialog  extends Dialog{
 	/*
 	 * Constructor
 	 */
-	public ConstructorDialog(Shell parentShell, Constructor<?> con) {
+	public MethodDialog(Shell parentShell, Method method) {
 		super(parentShell);
-		constructor = con; 
+		myMethod = method; 
 	}
 	
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
@@ -60,12 +59,7 @@ public class ConstructorDialog  extends Dialog{
 	 */
 	void parseParameters()
 	{
-		if(constructor.getParameterTypes().length < 1)
-		{
-			okPressed();
-			return;
-		}
-		for(Class<?> c:constructor.getParameterTypes())
+		for(Class<?> c:myMethod.getParameterTypes())
 		{
 			//System.out.println(c.getName());
 			
@@ -86,13 +80,6 @@ public class ConstructorDialog  extends Dialog{
 		}
 		container.layout();
 		
-	}
-	
-	@Override
-	protected void okPressed()
-	{
-		objects = getParameterValues();
-		super.okPressed();
 	}
 	
 	/*
@@ -149,17 +136,16 @@ public class ConstructorDialog  extends Dialog{
 		return objects; 
 	}
 	
-	 /*
-	  * Get Instance - Creates an instance using the constructor and returns it. 
-	  */
-	public Object getInstance() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException
+	@Override
+	protected void okPressed()
 	{
-//		for(Object o:objects)
-//		{
-//			//System.out.println(o.toString());
-//		}
-		return constructor.newInstance(objects);
+		objects = getParameterValues();
+		super.okPressed();
 	}
 	
-
+	public Object[] getParameters()
+	{
+		return objects; 
+	}
+	 
 }
