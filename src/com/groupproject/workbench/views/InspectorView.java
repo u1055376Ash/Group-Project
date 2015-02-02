@@ -72,7 +72,12 @@ public class InspectorView extends ViewPart {
 	{
 		disposeLabels(); 
 		BenchInstance instance = ObjectBenchUtility.getActiveInstance(); //Get instance name 
-		System.out.println(instance.packageName + ":" + instance.className);
+		if(instance == null) //handles a potential error
+		{
+			disposeLabels();
+			return; 
+		}
+		//System.out.println(instance.packageName + ":" + instance.className);
 		String[] fieldNames = JavaModelHelper.getFieldNames(instance.packageName, instance.className);
 		header.setText(instance.className + "(Instance)");
 		//Iterate over field names
@@ -120,6 +125,7 @@ public class InspectorView extends ViewPart {
 	
 	/*
 	 * Dispose Labels - Destroys all labels. 
+	 *TODO - Refactor this to remove object fields when we implement editing. 
 	 */
 	public void disposeLabels()
 	{
@@ -134,7 +140,18 @@ public class InspectorView extends ViewPart {
 			}
 
 		}
+		for(Label l1:fieldValueLabels)
+		{
+			if(l1 != null)
+			{
+				if(!l1.isDisposed())
+				{
+					l1.dispose();
+				}
+			}
+		}
 		fieldNameLabels = new ArrayList<Label>();
+		fieldValueLabels = new ArrayList<Label>();
 	}
 	
 

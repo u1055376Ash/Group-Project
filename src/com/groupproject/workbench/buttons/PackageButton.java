@@ -15,11 +15,14 @@ import com.groupproject.workbench.BenchInstance;
 import com.groupproject.workbench.preferences.PreferenceConstants;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 
+/*
+ * Package Button - A button that represents that packages in the package viewer. 
+ */
 public class PackageButton extends SquareButton{
 	
-	public int packageId;
-	public String packageValue; 
-	public Composite myComposite; 
+	public int packageId;					//The ID of the package NOTE - DEPRECIATED, MAYBE REMOVE?
+	public String packageValue; 			//The name of the package
+	public Composite myComposite; 			//The value of the composite holding this button. 
 
 	
 	
@@ -35,15 +38,12 @@ public class PackageButton extends SquareButton{
 		this.setTextDirection(SWT.LEFT_TO_RIGHT);
 		addSelectionListener(new SelectionListener() {
 
+			//If we want to add a behaviour when a package is selected. 
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-				//System.out.println("Selected: " + packageValue);
-			}
+			public void widgetSelected(SelectionEvent e) {}
 
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-
-			}
+			public void widgetDefaultSelected(SelectionEvent e) {}
 			
 		});
 //Will re-factor this to be used throughout the initialisation. 

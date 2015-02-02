@@ -32,7 +32,7 @@ import com.groupproject.workbench.utility.ObjectBenchUtility;
  */
 public class ObjectBenchView extends ViewPart {
 
-	private List<ObjectBenchButton> ObjectBenchButtons; 
+	private List<ObjectBenchButton> objectBenchButtons; 
 	private Composite mainViewArea;
 	
 	/*
@@ -62,20 +62,20 @@ public class ObjectBenchView extends ViewPart {
 	public void addObject(String className, String packageName, Object instance) throws JavaModelException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException
 	{
 		//System.out.println("Instantiating: " + className); //Uncomment to debug
-		if(ObjectBenchButtons == null)
+		if(objectBenchButtons == null)
 		{
-			ObjectBenchButtons = new ArrayList<ObjectBenchButton>(); 
+			objectBenchButtons = new ArrayList<ObjectBenchButton>(); 
 		}
 		String entryString = className;
 		entryString = entryString.substring(0,entryString.lastIndexOf('.')); //strip extension TODO - use the strip extension found in StringHelper class
 		entryString += " (Instance) ";
 		//Create an ObjectBenchButton to represent instance. 
-		ObjectBenchButton newButton = new ObjectBenchButton(mainViewArea,SWT.NONE,className,ObjectBenchButtons.size(), packageName, instance);
+		ObjectBenchButton newButton = new ObjectBenchButton(mainViewArea,SWT.NONE,className,objectBenchButtons.size(), packageName, instance);
 		newButton.setText(entryString);
-		ObjectBenchButtons.add(newButton);
+		objectBenchButtons.add(newButton);
 		//Position button object. 
 		FormData buttonData = new FormData(90+(entryString.length() * 3),80);
-		final int i = ObjectBenchButtons.size()-1; //dirty hack for button listener
+		final int i = objectBenchButtons.size()-1; //dirty hack for button listener
 		if(i == 0)
 		{
 			//System.out.println("First");
@@ -87,14 +87,14 @@ public class ObjectBenchView extends ViewPart {
 			if(i > 0)
 			{
 				//System.out.println("Another");
-				buttonData.left = new FormAttachment(ObjectBenchButtons.get(i-1),15,SWT.RIGHT);
-				buttonData.bottom = new FormAttachment(ObjectBenchButtons.get(i-1),0,SWT.BOTTOM);
-				buttonData.top = new FormAttachment(ObjectBenchButtons.get(i-1),0,SWT.TOP);
+				buttonData.left = new FormAttachment(objectBenchButtons.get(i-1),15,SWT.RIGHT);
+				buttonData.bottom = new FormAttachment(objectBenchButtons.get(i-1),0,SWT.BOTTOM);
+				buttonData.top = new FormAttachment(objectBenchButtons.get(i-1),0,SWT.TOP);
 			}
 		}
-		ObjectBenchButtons.get(i).setLayoutData(buttonData);
+		objectBenchButtons.get(i).setLayoutData(buttonData);
 		//Set up the listener for the buttons. 
-		ObjectBenchButtons.get(i).addMouseListener(new MouseListener(){
+		objectBenchButtons.get(i).addMouseListener(new MouseListener(){
 
 			@Override
 			public void mouseDoubleClick(MouseEvent e) {}
@@ -104,7 +104,7 @@ public class ObjectBenchView extends ViewPart {
 			@Override
 			public void mouseUp(MouseEvent e) {
 				try {
-					ObjectBenchUtility.setActiveInstance(ObjectBenchButtons.get(i).getInstance());
+					ObjectBenchUtility.setActiveInstance(objectBenchButtons.get(i).getInstance());
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				} 
@@ -113,7 +113,7 @@ public class ObjectBenchView extends ViewPart {
 
 		});
 		
-		ObjectBenchButtons.get(i).setMenu(buildMenuForClass(ObjectBenchButtons.get(i)));
+		objectBenchButtons.get(i).setMenu(buildMenuForClass(objectBenchButtons.get(i)));
 		
 		//TODO - in final build remove this code.
 //		Class<?> myClass = ObjectBenchButtons.get(i).getMyClass();
@@ -206,7 +206,35 @@ public class ObjectBenchView extends ViewPart {
 			}
 		
 		}
+		new MenuItem(popupMenu, SWT.SEPARATOR);
+		MenuItem removeItem = new MenuItem(popupMenu, SWT.NONE);
+		removeItem.setText("Remove");
+		removeItem.addSelectionListener(new SelectionListener(){
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try{
+					removeObject(bn);
+				}
+				catch(Exception ex)
+				{
+					ex.printStackTrace();
+				}
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+			
+		});
 		return popupMenu;
 		
+	}
+	
+	void removeObject(ObjectBenchButton bn) throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException
+	{
+		objectBenchButtons.remove(bn);
+		bn.dispose();
+		ObjectBenchUtility.setActiveInstance(null);
+		mainViewArea.layout();
 	}
 }

@@ -3,6 +3,9 @@ package com.groupproject.workbench.buttons;
 import org.eclipse.swt.widgets.Composite;
 import com.groupproject.workbench.BenchInstance;
 
+/*
+ * Object Bench Button - This class represents an instance of a class in the object bench view. 
+ */
 public class ObjectBenchButton extends ClassButton {
 	BenchInstance myInstance; 			//The instance of an object associated with this button. 
 	
