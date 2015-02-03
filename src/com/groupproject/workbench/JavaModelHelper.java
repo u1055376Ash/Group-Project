@@ -1,6 +1,7 @@
 package com.groupproject.workbench;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -8,6 +9,15 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaProject;
@@ -20,15 +30,9 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISelectionService;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IAdaptable;
 
 import com.groupproject.workbench.helpers.StringHelper;
+import com.groupproject.workbench.helpers.TemplateLoader;
 
 /*
  * JavaModelHelper - This class contains methods to gather information on user defined classes. This class can traverse the Eclipse AST and gather
@@ -64,8 +68,20 @@ public final class JavaModelHelper {
 		workspace = ResourcesPlugin.getWorkspace(); 
 		root = workspace.getRoot();
 		projects = root.getProjects();
+		if(projects[0] != null && activeProject == null)
+		{
+			activeProject = projects[0];
+		}
 		addToClassPath();
-		
+	}
+	
+	/*
+	 * Build Project - Makes a project rebuild.
+	 */
+	public static void buildProject(String projectName) throws CoreException
+	{
+		IProject p = root.getProject(projectName);
+		p.build(0, null);
 	}
 	
 	
@@ -77,6 +93,44 @@ public final class JavaModelHelper {
 		return root.getProject(name);
 	}
 	
+	/*
+	 * New Class - Creates a new class
+	 *TODO - Extend this method to include different class types from template.
+	 */
+	public static void newClass(String className, int classType, String myPackage) throws IOException, JavaModelException
+	{
+		switch(classType)
+		{
+		case 0:
+			Template t = TemplateLoader.getTemplate(0); 
+			t.setName(className, myPackage);
+			className += ".java";
+			IPackageFragment p = getPackage(myPackage);
+			if(p == null)
+			{
+				System.out.println("No Package Found");
+				return;
+			}
+			p.createCompilationUnit(className, t.getBody(), true, null);
+			p.save(null, true);
+			break;
+		default:
+			break;
+		}
+	}
+	
+	public static Boolean newPackage(String packageName) throws CoreException
+	{
+		if(packageName.contains(".package"))
+		{
+			return false; 
+		}
+		IFolder sourceFolder = activeProject.getFolder("src");
+		//sourceFolder.create(false, true, null);
+		IJavaProject jProject = getJavaProject(activeProject);
+		jProject.getPackageFragmentRoot(sourceFolder).createPackageFragment(packageName, true, null);
+		return true; 
+	}
 	
 	/*
 	 * Add to Class Path - Adds a users class to the plugins class path. 
@@ -542,7 +596,7 @@ public final class JavaModelHelper {
 		for(int i = 0; i<classes.length;i++)
 		{
 			strings[i] = classes[i].getElementName();
-			addToClassPath(StringHelper.stripExtension(localPackage.getElementName() + "." + strings[i]));
+			//addToClassPath(StringHelper.stripExtension(localPackage.getElementName() + "." + strings[i]));
 		}
 		return strings;
 		
@@ -577,7 +631,7 @@ public final class JavaModelHelper {
 				}
 			}
 		}
-		return (IPackageFragment[]) fragments.toArray(new IPackageFragment[fragments.size()]);
+		return fragments.toArray(new IPackageFragment[fragments.size()]);
 	}
 	
 	/*
@@ -699,7 +753,7 @@ public final class JavaModelHelper {
 	 */
 	public static String getActiveProjectName()
 	{
-		return (getActiveProject() != null) ? getActiveProject().getName():null;
+		return (getActiveProject() != null) ? getActiveProject().getName():(projects != null && projects.length > 0) ? projects[0].getName():null;
 	}
 	
 	/*

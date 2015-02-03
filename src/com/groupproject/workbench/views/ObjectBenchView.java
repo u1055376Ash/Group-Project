@@ -5,12 +5,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.ui.part.ViewPart;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
-import org.eclipse.swt.*; 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -19,7 +17,10 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.ui.part.ViewPart;
 
 import com.groupproject.workbench.JavaModelHelper;
 import com.groupproject.workbench.buttons.ObjectBenchButton;
@@ -165,10 +166,10 @@ public class ObjectBenchView extends ViewPart {
 								MethodDialog dialog = new MethodDialog(mainViewArea.getShell(), method);
 								if(dialog.open() == Window.OK)
 								{
-									if(dialog.getReturnCode() != Dialog.CANCEL)
+									if(dialog.getReturnCode() != Window.CANCEL)
 									{
 										Object[] objects = dialog.getParameters(); 
-										MessageDialog msg = new MessageDialog(mainViewArea.getShell(), "Return Value", MessageDialog.getDefaultImage(), 
+										MessageDialog msg = new MessageDialog(mainViewArea.getShell(), "Return Value", Window.getDefaultImage(), 
 												"Return Value: " + bn.getInstance().callMethod(method,objects).toString() + " (" + StringHelper.fixType(returnTypes[index]) + ") ", 
 												MessageDialog.INFORMATION, new String[] {"OK"}, 0);
 										if(msg.open() == Window.OK)
@@ -230,6 +231,9 @@ public class ObjectBenchView extends ViewPart {
 		
 	}
 	
+	/*
+	 * Remove Object - Removes an object from the object bench. 
+	 */
 	void removeObject(ObjectBenchButton bn) throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException
 	{
 		objectBenchButtons.remove(bn);

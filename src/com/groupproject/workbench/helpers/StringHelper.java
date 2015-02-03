@@ -73,6 +73,10 @@ public final class StringHelper {
 	 */
 	public static String getQualifiedName(String className,String packageName)
 	{
+		if(packageName.equals(""))
+		{
+			return stripExtension(className);
+		}
 		if(className.isEmpty() || packageName.isEmpty() || className == null || packageName == null || className.length() <= 0 || packageName.length() <= 0)
 		{
 			return "";

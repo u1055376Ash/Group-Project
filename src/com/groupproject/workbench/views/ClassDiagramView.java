@@ -4,6 +4,9 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseEvent;
@@ -20,16 +23,14 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.window.Window;
 
 import com.groupproject.workbench.JavaModelHelper;
 import com.groupproject.workbench.buttons.ClassButton;
 import com.groupproject.workbench.buttons.PackageButton;
 import com.groupproject.workbench.buttons.SquareButton;
 import com.groupproject.workbench.dialogs.ConstructorDialog;
+import com.groupproject.workbench.dialogs.NewClassDialog;
+import com.groupproject.workbench.dialogs.NewPackageDialog;
 import com.groupproject.workbench.helpers.StringHelper;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 
@@ -47,8 +48,10 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	private String activeProjectName;					//The active project name
 	private String activePackageName; 					//The active package name
 	private SquareButton upButton; 						//The reference to the "up" button. 
+	private SquareButton newClassButton;				//The reference to the "new class" button.
+	private SquareButton newPackageButton;				//The reference to the "new package" button.
 	private int state = 0; 								//The state that the view is in Package Viewing = 0 | Class Viewing = 1 
-	//TODO - Maybe remove state and add a simple boolean switch? 
+	//TODO - Maybe remove state and add a simple boolean switch? Or remove altogether now? 
 	/*
 	 * Default Constructor 
 	 */
@@ -56,10 +59,20 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 
 	}
 
+	/*
+	 * Create Part Control - Sets up the view. 
+	 */
 	@Override
 	public void createPartControl(final Composite parent) {
 		packageButtons = new ArrayList<PackageButton>();
 		classButtons = new ArrayList<ClassButton>();
+		try {
+			JavaModelHelper.Initialise();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		activeProjectName = JavaModelHelper.getActiveProjectName();
 		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER); //Set up scrollable
 		mainViewArea = new Composite(sc, SWT.NONE);
@@ -70,7 +83,73 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		sc.setExpandVertical(true);
 		sc.setMinSize(mainViewArea.computeSize(1000, 1000));
 		viewHeader = new Label(mainViewArea,0);
+		mainViewArea.setMenu(buildContextMenu());
 		getViewSite().getPage().addSelectionListener(this); //Listens to the project resource explorer
+	}
+	
+	/*
+	 * Build Context Menu - Builds the context menu for the class view. 
+	 */
+	Menu buildContextMenu()
+	{
+		Menu menu = new Menu(mainViewArea);
+		MenuItem newClassItem = new MenuItem(menu, SWT.CASCADE);
+		MenuItem newPackageItem = new MenuItem(menu, SWT.NONE);
+		newClassItem.setText("New Class");
+		newPackageItem.setText("New Package");
+		
+		newClassItem.addSelectionListener(new SelectionListener(){
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {addClass();}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+			
+		});
+		
+		newPackageItem.addSelectionListener(new SelectionListener(){
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {addPackage();}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+			
+		});
+		
+		
+		return menu; 
+	}
+	
+	/*
+	 * Add Class - Displays the dialog to add a class to the active project. 
+	 * TODO - Add more error handling. 
+	 */
+	void addClass()
+	{
+		NewClassDialog dialog = new NewClassDialog(mainViewArea.getShell(), activePackageName);
+		if(dialog.open() == Window.OK)
+		{
+			//
+		}
+		try {
+			JavaModelHelper.buildProject(activeProjectName);
+			displayClassView(mainViewArea);
+		} catch (Exception e) {e.printStackTrace();}
+	}
+	
+	/*
+	 * Add Package - Displays the dialog to add a package to the active project. 
+	 *TODO - Add more error handling. 
+	 */
+	void addPackage()
+	{
+		NewPackageDialog dialog = new NewPackageDialog(mainViewArea.getShell());
+		if(dialog.open() == Window.OK)
+		{
+			
+		}
 	}
 
 	/*
@@ -104,6 +183,9 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			updateHeader();
 			createPackageButtons(parent);
 		}
+		activePackageName = "";
+		disposeButtons(true);
+		createClassButtons(parent, true);
 	}
 	
 	/*
@@ -113,12 +195,13 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	{
 		//System.out.println("Displaying Classes");
 		JavaModelHelper.Initialise(); //Initialises the Java Model
+		disposeButtons(false);
 		//activeProjectName = JavaModelHelper.getActiveProjectName(); 
 		checkProjectName();
 		if(activeProjectName != null)
 		{
 				updateHeader();
-				createClassButtons(parent);
+				createClassButtons(parent,false);
 		}
 		else
 		{
@@ -194,15 +277,75 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	}
 	
 	/*
+	 * Add New Class Button - Adds the "New Class" button to the view. 
+	 */
+	private void addNewClassButton(Composite parent)
+	{
+		newClassButton = new SquareButton(parent, SWT.NONE);
+		FormData newClassData = new FormData(75,40);
+		newClassData.top = new FormAttachment(7);
+		if(upButton != null || !upButton.isDisposed())
+		{
+			newClassData.left = new FormAttachment(upButton, 50, SWT.LEFT);
+		}
+		else
+		{
+			newClassData.left = new FormAttachment(2); 
+		}
+		newClassButton.setLayoutData(newClassData);
+		newClassButton.setText("New Class");
+		newClassButton.addMouseListener(new MouseListener(){
+
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {}
+
+			@Override
+			public void mouseDown(MouseEvent e) {}
+			@Override
+			public void mouseUp(MouseEvent e) {addClass();}
+			
+		});
+		refresh();
+		
+	}
+	
+	/*
+	 * Add New Package Button - Adds the "New Package" button to the view. 
+	 */
+	private void addNewPackageButton(Composite parent)
+	{
+		newPackageButton = new SquareButton(parent, SWT.NONE);
+		FormData newPackageData = new FormData(85,40);
+		newPackageData.top = new FormAttachment(7);
+		newPackageData.left = new FormAttachment(newClassButton, 85, SWT.LEFT);
+		newPackageButton.setLayoutData(newPackageData);
+		newPackageButton.setText("New Package");
+		newPackageButton.addMouseListener(new MouseListener(){
+
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {}
+
+			@Override
+			public void mouseDown(MouseEvent e) {}
+			@Override
+			public void mouseUp(MouseEvent e) {addPackage();}
+			
+		});
+	}
+	
+	/*
 	 * Create Class Buttons - This is the method that draws the class icons. 
 	 *TODO - Add dependencies here! 
 	 */
-	public void createClassButtons(Composite parent) throws JavaModelException, ClassNotFoundException
+	public void createClassButtons(Composite parent, Boolean pushDown) throws JavaModelException, ClassNotFoundException
 	{
-		if(upButton == null || upButton.isDisposed())
+		if(upButton == null || upButton.isDisposed() && !activePackageName.equals(""))
 			{
 				addUpButton(parent);
+
 			}
+		addNewClassButton(parent);
+		addNewPackageButton(parent);
 		if(JavaModelHelper.getClassNames(activePackageName) == null)
 		{
 			return; //If a package is empty then return 
@@ -220,8 +363,23 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 				if(classButtons.get(x).classId == i) //if the button has already been made, update it
 				{
 					createNew = false; 
-					classButtons.get(x).setText(classes[i]);
+					classButtons.get(x).setText(StringHelper.stripExtension(classes[i]));
+					classButtons.get(x).className = classes[i];
+					classButtons.get(x).packageName = activePackageName;
 					classButtons.get(x).setMenu(buildMenuForClass(classes[i], classButtons.get(x)));
+					classButtons.get(x).addMouseListener(new MouseListener(){
+
+						@Override
+						public void mouseDoubleClick(MouseEvent e) {
+							ObjectBenchUtility.openClassInEditor(activePackageName,classes[currentClassId]);
+						}
+
+						@Override
+						public void mouseDown(MouseEvent e) {}
+						@Override
+						public void mouseUp(MouseEvent e) {}
+					});
+					classButtons.get(x).getColor();//hack to fix a bug
 					break;
 				}
 			}
@@ -245,12 +403,12 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 				{
 					buttonData.left = new FormAttachment(classButtons.get(i-1), 50, SWT.RIGHT);
 					buttonData.bottom = new FormAttachment(classButtons.get(i-1), 0, SWT.BOTTOM);
-					buttonData.top = new FormAttachment(classButtons.get(i-1),0, SWT.TOP);
+					buttonData.top =  new FormAttachment(classButtons.get(i-1),0, SWT.TOP);
 				}
 				if(i == 0)
 				{
 					buttonData.left = new FormAttachment(5);
-					buttonData.top = new FormAttachment(20);
+					buttonData.top = pushDown ?  new FormAttachment(25):new FormAttachment(15);
 				}	
 				
 				//Set up the listeners 
@@ -292,7 +450,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			final int index = i; // horrible hack to pass the constructor parameter types 
 			MenuItem instantiateItem = new MenuItem(popupMenu, SWT.CASCADE);
 			//Build the string for constructor
-			String addString = "new" + constructorNames[i] + "(";
+			String addString = "new " + constructorNames[i] + "(";
 			
 			for(int x = 0; x < constructorParamaterTypes[i].length;x++)
 			{
@@ -331,7 +489,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 							ConstructorDialog dialog = new ConstructorDialog(mainViewArea.getShell(),JavaModelHelper.getClassFromLoader((StringHelper.getQualifiedName(selectedClass, activePackageName))).getDeclaredConstructor(classes.toArray(new Class<?>[classes.size()])));
 							if(dialog.open() == Window.OK)
 							{
-								if(dialog.getReturnCode() != Dialog.CANCEL)
+								if(dialog.getReturnCode() != Window.CANCEL)
 								{
 									object = dialog.getInstance();
 									ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName, object);
@@ -414,7 +572,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 					if(i == 0)
 					{
 						buttonData.left = new FormAttachment(5);
-						buttonData.top = new FormAttachment(20);
+						buttonData.top = new FormAttachment(15);
 					}
 					packageButtons.get(i).addMouseListener(new MouseListener(){
 
@@ -470,6 +628,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
 	 * Selection Changed - This controls the event of a user changing projects in the resource view. 
 	 */
+	@Override
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) 
 	{
 		try{
@@ -542,28 +701,29 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	{
 		//viewHeader.dispose();
 		getViewSite().getPage().removeSelectionListener(this);
-		disposeButtons();
+		disposeButtons(false);
 	}
 	
 	/*
-	 * Dispose Buttons - Disposes the buttons as needed.
+	 * Dispose Buttons - Disposes the buttons as needed. UPDATE - Now takes a boolean field to skip clearing package buttons. 
 	 */
-	private void disposeButtons()
+	private void disposeButtons(Boolean skip)
 	{
-		if(state == 0)
+		if(!skip)
 		{
 			for(PackageButton button:packageButtons)
 			{
 				button.dispose();
 			}
 			packageButtons = new ArrayList<PackageButton>();
+		
+
+
 		}
-		if(state == 1)
+		for(ClassButton button:classButtons)
 		{
-			for(ClassButton button:classButtons)
-			{
-				button.dispose();
-			}
+			button.dispose();
+		}
 			classButtons = new ArrayList<ClassButton>();
 			if(upButton != null)
 			{
@@ -574,7 +734,20 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 						upButton.dispose();
 					}
 			}
-		}
+			if(newClassButton != null)
+			{
+				if(!newClassButton.isDisposed())
+				{
+					newClassButton.dispose();
+				}
+			}
+			if(newPackageButton != null)
+			{
+				if(!newPackageButton.isDisposed())
+				{
+					newPackageButton.dispose();
+				}
+			}
 
 	}
 	

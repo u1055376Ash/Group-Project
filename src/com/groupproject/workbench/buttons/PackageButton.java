@@ -2,16 +2,12 @@ package com.groupproject.workbench.buttons;
 
 
 
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 
-import com.groupproject.workbench.Activator;
-import com.groupproject.workbench.BenchInstance;
 import com.groupproject.workbench.preferences.PreferenceConstants;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 

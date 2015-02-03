@@ -71,7 +71,7 @@ public class BenchInstance {
 			if(m.getName().equals(s))
 			{
 				System.out.println("Method Found");
-				Type[] pType = m.getGenericParameterTypes();
+				//Type[] pType = m.getGenericParameterTypes();
 				try
 				{
 					m.setAccessible(true);

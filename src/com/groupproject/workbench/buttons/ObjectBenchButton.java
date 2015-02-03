@@ -1,6 +1,7 @@
 package com.groupproject.workbench.buttons;
 
 import org.eclipse.swt.widgets.Composite;
+
 import com.groupproject.workbench.BenchInstance;
 
 /*

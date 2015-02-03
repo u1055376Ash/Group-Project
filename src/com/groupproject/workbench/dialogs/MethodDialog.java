@@ -1,6 +1,5 @@
 package com.groupproject.workbench.dialogs;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +40,7 @@ public class MethodDialog extends Dialog {
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
 	 */
+	@Override
 	protected Control createDialogArea(Composite parent){
 		Composite area = (Composite) super.createDialogArea(parent);
 		container = new Composite(area, SWT.NONE);
@@ -50,7 +50,6 @@ public class MethodDialog extends Dialog {
 		container.setLayout(layout);
 		controls = new ArrayList<Control>();
 		parseParameters();
-		
 		return container;
 	}
 	

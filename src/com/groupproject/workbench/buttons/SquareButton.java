@@ -123,12 +123,14 @@ public class SquareButton extends Canvas {
 	
 	protected void addListeners() {
 		addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				SquareButton.this.widgetDisposed(e);
 			}
 		});
 		
 		addPaintListener(new PaintListener() {
+			@Override
 			public void paintControl(PaintEvent e) {
 				SquareButton.this.paintControl(e);
 			}
@@ -136,11 +138,13 @@ public class SquareButton extends Canvas {
 		
 		// MOUSE EVENTS
 		this.addListener(SWT.MouseEnter, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
 				SquareButton.this.setHoverColor(e);
 			}
 		});
 		this.addListener(SWT.MouseExit, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
 				if (isFocused)
 					SquareButton.this.setSelectedColor(e);
@@ -149,6 +153,7 @@ public class SquareButton extends Canvas {
 			}
 		});
 		this.addListener(SWT.MouseUp, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
 				if (e.button == 1) {
 					SquareButton.this.setHoverColor(e);
@@ -159,11 +164,13 @@ public class SquareButton extends Canvas {
 			}
 		});
 		this.addListener(SWT.MouseHover, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
 				SquareButton.this.setHoverColor(e);
 			}
 		});
 		this.addListener(SWT.MouseDown, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
 				if (e.button == 1) {
 					SquareButton.this.setClickedColor(e);
@@ -173,6 +180,7 @@ public class SquareButton extends Canvas {
 		
 		// TAB TRAVERSAL (a KeyDown listener is also required)
 		this.addListener (SWT.Traverse, new Listener () {
+			@Override
 			public void handleEvent (Event e) {
 				switch (e.detail) {
 					case SWT.TRAVERSE_ESCAPE:
@@ -187,6 +195,7 @@ public class SquareButton extends Canvas {
 			}
 		});
 		this.addListener (SWT.FocusIn, new Listener () {
+			@Override
 			public void handleEvent (Event e) {
 				isFocused = true;
 				SquareButton.this.setSelectedColor(e);
@@ -194,6 +203,7 @@ public class SquareButton extends Canvas {
 			}
 		});
 		this.addListener (SWT.FocusOut, new Listener () {
+			@Override
 			public void handleEvent (Event e) {
 				isFocused = false;
 				SquareButton.this.setNormalColor(e);
@@ -202,6 +212,7 @@ public class SquareButton extends Canvas {
 		});
 		
 		this.addListener (SWT.KeyUp, new Listener () {
+			@Override
 			public void handleEvent (Event e) {
 				isFocused = true;
 				SquareButton.this.setSelectedColor(e);
@@ -209,6 +220,7 @@ public class SquareButton extends Canvas {
 			}
 		});
 		keyListener = new Listener () {
+			@Override
 			public void handleEvent (Event e) {
 				// required for tab traversal to work
 				switch (e.character) {
@@ -389,7 +401,7 @@ public class SquareButton extends Canvas {
 		// draw a 1-pixel border the same color as the canvas background instead
 		// so the rounded corners look right
 		gc.setLineStyle(SWT.LINE_SOLID);
-		int arcHeight = Math.max(5, (int)(p.y / 10));
+		int arcHeight = Math.max(5, p.y / 10);
 		int arcWidth = arcHeight;
 		int bw = borderWidth;
 		if (borderWidth > 0) {
@@ -495,6 +507,7 @@ public class SquareButton extends Canvas {
 	}
 	
 	
+	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 		if ((wHint == SWT.DEFAULT) && (hHint == SWT.DEFAULT) && !changed && 
 				(lastWidth > 0) && (lastHeight > 0)) {
@@ -572,10 +585,12 @@ public class SquareButton extends Canvas {
 	 * background image has transparency, the background color will show 
 	 * through the transparency.
 	 */
+	@Override
 	public void setBackgroundImage(Image backgroundImage) {
 		this.backgroundImage = backgroundImage;
 		redraw();
 	}
+	@Override
 	public Image getBackgroundImage() {
 		return backgroundImage;
 	}
@@ -615,9 +630,11 @@ public class SquareButton extends Canvas {
 		this.text = text;
 		redraw();
 	}
+	@Override
 	public Font getFont() {
 		return font;
 	}
+	@Override
 	public void setFont(Font font) {
 		if (font != null)
 			this.font = font;
@@ -633,6 +650,7 @@ public class SquareButton extends Canvas {
 	 * or participate in the tab order of the widget container, 
 	 * and does not notify listeners when clicked.
 	 */
+	@Override
 	public void setEnabled(boolean enabled) {
 		boolean oldSetting = this.enabled;
 		this.enabled = enabled;
@@ -648,9 +666,11 @@ public class SquareButton extends Canvas {
 			}
 		}
 	}
+	@Override
 	public boolean getEnabled() {
 		return enabled;
 	}
+	@Override
 	public boolean isEnabled() {
 		return enabled;
 	}
@@ -723,6 +743,7 @@ public class SquareButton extends Canvas {
 	public void setBorderWidth(int borderWidth) {
 		this.borderWidth = borderWidth;
 	}
+	@Override
 	public int getBorderWidth() {
 		return borderWidth;
 	}
