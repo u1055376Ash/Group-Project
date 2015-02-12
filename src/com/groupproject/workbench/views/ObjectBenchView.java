@@ -241,4 +241,9 @@ public class ObjectBenchView extends ViewPart {
 		ObjectBenchUtility.setActiveInstance(null);
 		mainViewArea.layout();
 	}
+	
+	public Object[] getInstancesOfType(String t)
+	{
+		return null;
+	}
 }

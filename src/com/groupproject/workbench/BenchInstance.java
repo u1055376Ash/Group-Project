@@ -2,7 +2,6 @@ package com.groupproject.workbench;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 
 import com.groupproject.workbench.helpers.StringHelper;
 /*
@@ -145,6 +144,32 @@ public class BenchInstance {
 
 	}
 	
+	public Class<?> getFieldClass(String fieldName) throws NoSuchFieldException, SecurityException
+	{
+		if(myInstance != null)
+		{
+			Field field = myClass.getDeclaredField(fieldName);
+			field.setAccessible(true);
+			return field.getType();
+		}
+		return null;
+	}
+	
+	/*
+	 * Get Field - This method gets the object associated with a field. 
+	 */
+	public Object getField(String fieldName) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException
+	{
+		if(myInstance != null)
+		{
+			Field field = myClass.getDeclaredField(fieldName);
+			field.setAccessible(true);
+			Object obj = field.get(myInstance);
+			return obj;
+		}
+		return null;
+	}
+	
 	/*
 	 * Set Value - Allows a user to set a value contained in an instance.
 	 */
@@ -155,6 +180,25 @@ public class BenchInstance {
 		field.set(myInstance, value);
 	}
 	
+	/*
+	 * Set Value - Set a value of an instance by passing the original object with one to replace it. 
+	 */
+	public void setValue(Object o, Object v) throws IllegalArgumentException, IllegalAccessException
+	{
+		for(Field f:myClass.getDeclaredFields())
+		{
+			f.setAccessible(true);
+			if(f.get(myInstance) != null)
+			{
+				if(f.get(myInstance).equals(o))
+				{
+					f.set(myInstance, v);
+				}
+				
+			}
+
+		}
+	}
 	/*
 	 * Instantiate - Instantiates the instance, provided there is a zero-parameter constructor. 
 	 */

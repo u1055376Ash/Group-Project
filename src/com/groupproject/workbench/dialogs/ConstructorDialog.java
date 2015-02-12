@@ -105,49 +105,8 @@ public class ConstructorDialog  extends Dialog{
 		objects = new Object[controls.size()];
 		for(int i = 0; i<controls.size();i++)
 		{
-			String s = (String)controls.get(i).getData("typeKey");
-			if(s.equals("int"))
-			{
-				Spinner spin = (Spinner)controls.get(i);
-				objects[i] = Integer.parseInt(spin.getText());
-			}
-			if(s.equals("double"))
-			{
-				Spinner spin = (Spinner)controls.get(i);
-				objects[i] = Double.parseDouble(spin.getText());
-			}
-			if(s.equals("float"))
-			{
-				Spinner spin = (Spinner)controls.get(i);
-				objects[i] = Float.parseFloat(spin.getText());
-			}
-			if(s.equals("byte"))
-			{
-				Spinner spin = (Spinner)controls.get(i);
-				objects[i] = Byte.parseByte(spin.getText());
-			}
-			if(s.equals("long"))
-			{
-				Spinner spin = (Spinner)controls.get(i);
-				objects[i] = Long.parseLong(spin.getText());
-			}
-			if(s.equals("char"))
-			{
-				Text t = (Text)controls.get(i);
-				objects[i] = t.getText();
-			}
-			if(s.equals("string"))
-			{
-				Text t = (Text)controls.get(i);
-				objects[i] = t.getText();
-			}
-			if(s.equals("boolean"))
-			{
-				Button b = (Button)controls.get(i);
-				objects[i] = b.getSelection();
-			}
+			objects[i] = ObjectBenchUtility.getControlValue(controls.get(i));
 		}
-		
 		return objects; 
 	}
 	
