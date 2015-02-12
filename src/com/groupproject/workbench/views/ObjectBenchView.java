@@ -234,7 +234,7 @@ public class ObjectBenchView extends ViewPart {
 	/*
 	 * Remove Object - Removes an object from the object bench. 
 	 */
-	void removeObject(ObjectBenchButton bn) throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException
+	void removeObject(ObjectBenchButton bn) throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ArrayIndexOutOfBoundsException, NoSuchMethodException
 	{
 		objectBenchButtons.remove(bn);
 		bn.dispose();

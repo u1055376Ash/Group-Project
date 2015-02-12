@@ -119,6 +119,9 @@ public final class JavaModelHelper {
 		}
 	}
 	
+	/*
+	 * New Package - Creates a new package. 
+	 */
 	public static Boolean newPackage(String packageName) throws CoreException
 	{
 		if(packageName.contains(".package"))
@@ -437,6 +440,9 @@ public final class JavaModelHelper {
 		return strings;
 	}
 	
+	/*
+	 * Get Class Method Return Types - Returns the types that methods in a class return. 
+	 */
 	public static String[] getClassMethodReturnTypes(String myPackage, String myClass) throws JavaModelException
 	{
 		
@@ -466,6 +472,9 @@ public final class JavaModelHelper {
 		
 	}
 	
+	/*
+	 * Ge Method Signatures - Gets the full method signatures from a class. 
+	 */
 	public static String[] getMethodSignatures(String myPackage, String myClass) throws JavaModelException
 	{
 		IPackageFragment localPackage = getPackage(myPackage);
@@ -507,6 +516,10 @@ public final class JavaModelHelper {
 		return strings;
 	}
 	
+	/*
+	 * Get Class Method Parameter Types - Returns a multi-dimensional array containing all of the parameter types for each method. 
+	 * Example:- String[i][x] i = The method x = The parameter type
+	 */
 	public static String[][] getClassMethodParameterTypes(String myPackage, String myClass) throws JavaModelException
 	{
 		IPackageFragment localPackage = getPackage(myPackage);
@@ -533,6 +546,10 @@ public final class JavaModelHelper {
 	
 	}
 	
+	/*
+	 * Get Class Method Parameter Names - Gets the names of parameters within all methods. 
+	 * Example:- String[i][x] i = the method x = the parameter name
+	 */
 	public static String[][] getClassMethodParameterNames(String myPackage, String myClass,String methodName, String returnType) throws JavaModelException
 	{
 		IPackageFragment localPackage = getPackage(myPackage);
@@ -654,6 +671,22 @@ public final class JavaModelHelper {
 		return ClassLoader.getSystemClassLoader().loadClass(s);
 	}
 	
+	/*
+	 * Get Superclass - Gets the superclass of a given class. 
+	 */
+	public static Class<?> getSuperclass(Class<?> c)
+	{
+		return c.getSuperclass();
+	}
+	
+	/*
+	 * Get Superclass - Gets the superclass of a given class. 
+	 */
+	public static Class<?> getSuperClass(String s) throws ClassNotFoundException
+	{
+		Class<?> c = getClassFromLoader(s);
+		return getSuperclass(c);
+	}
 	/*
 	 * Get Package Names - Returns a collection of package names from a given project. 
 	 */

@@ -60,7 +60,7 @@ public class InspectorView extends ViewPart {
 		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 		mainViewArea = new Composite(sc, SWT.NONE);
 		mainViewArea.setLayout(new FormLayout());
-		mainViewArea.setSize(500,500);
+		mainViewArea.setSize(500,1025);
 		sc.setContent(mainViewArea);
 		sc.setExpandHorizontal(true);
 		sc.setMinSize(mainViewArea.computeSize(500, 500));
@@ -92,7 +92,7 @@ public class InspectorView extends ViewPart {
 	/*
 	 * Update - This method updates the inspector, making it get the active instance. This method reads the active instance and gets all field values
 	 */
-	public void update() throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException
+	public void update() throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ArrayIndexOutOfBoundsException, NoSuchMethodException
 	{
 		int yValue = 30; 
 		clear();
@@ -201,7 +201,7 @@ public class InspectorView extends ViewPart {
 					number.setLayoutData(lData);
 					yValue += 25;
 					//System.out.println(Array.get(arrayField, x).getClass().getName());
-					final Control c = ObjectBenchUtility.getControl(mainViewArea, Array.get(arrayField, x).getClass().getName());
+					final Control c = ObjectBenchUtility.getControl(mainViewArea, arrayField.getClass().getComponentType().getName());
 					if(c == null)
 					{
 						//TryToGetObjectsFromBench
@@ -236,7 +236,15 @@ public class InspectorView extends ViewPart {
 				final String currentName = fieldNames[i];
 				System.out.println(instance.getFieldClass(fieldNames[i]).getName());
 				final Control c = ObjectBenchUtility.getControl(mainViewArea, instance.getFieldClass(fieldNames[i]).getName());
-				ObjectBenchUtility.setControlValue(c, instance.getField(currentName));
+				if(c == null)
+				{
+					//Do something
+				}
+				else
+				{
+					ObjectBenchUtility.setControlValue(c, instance.getField(currentName));
+				}
+
 				if(c != null)
 				{
 					FormData controlData = new FormData(80, SWT.DEFAULT);

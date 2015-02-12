@@ -426,10 +426,53 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 				});
 				classButtons.get(i).setLayoutData(buttonData);
 				classButtons.get(i).getColor();//hack to fix a bug
+				
 			}
 		}
 		parent.layout();
 		parent.getShell().layout();
+	}
+	
+	/*
+	 * Check Super Class - Checks if the class is inherited. 
+	 */
+	void checkSuperClass(ClassButton b) throws ClassNotFoundException
+	{
+		Class<?> superClass = JavaModelHelper.getSuperclass(b.getMyClass()); 
+		if(superClass != null)
+		{
+			for(ClassButton a:classButtons)
+			{
+				if(a.getMyClass().equals(superClass))
+				{
+					drawInheritanceLink(b,a); //Maybe 
+				}
+			}
+		}
+	}
+	
+	/*
+	 * Check Dependencies - This method will check to see if a given class depends on any other class in the diagram. 
+	 */
+	void checkDependencies(ClassButton b)
+	{
+		//TODO - Implement a check to see if te class uses any other class in the same diagram. 
+	}
+	
+	/*
+	 * Draw Inheritance Link - Draws an arrow tipped line between two given classes. 
+	 */
+	void drawInheritanceLink(ClassButton a, ClassButton b)
+	{
+		//TODO - If a class inherits from another class draw a link between them. 
+	}
+	
+	/*
+	 * Draw Dependence Link - Draws a dashed? line between two given classes that are dependent on each other. 
+	 */
+	void drawDependenceLink(ClassButton a, ClassButton b)
+	{
+		//TODO - Implement this. 
 	}
 	
 	/*
