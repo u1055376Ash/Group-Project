@@ -7,9 +7,12 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -179,9 +182,10 @@ public final class ObjectBenchUtility
 	/*
 	 * Get Class From Type - Returns a class type from a string.
 	 */
-	public static Class<?> getClassFromType(String s)
+	public static Class<?> getClassFromType(String s) throws ClassNotFoundException
 	{
 		//TODO - Extend this so user classes can be found. 
+		System.out.println(":"+s+":");
 		if(s.equals("I"))
 		{
 			return int.class;
@@ -226,11 +230,17 @@ public final class ObjectBenchUtility
 		{
 			return char.class;
 		}
+		if(s.equals("QColor;"))
+		{
+			return java.awt.Color.class;
+		}
+		//Class<?> c = Class.forName(s);
+		
 		return null; 
 		
 	}
 	
-	public static Class<?>[] getParameterTypes(String[] types)
+	public static Class<?>[] getParameterTypes(String[] types) throws ClassNotFoundException
 	{
 		Class<?>[] classes = new Class<?>[types.length];
 		for(int i = 0; i<types.length;i++)
@@ -244,7 +254,7 @@ public final class ObjectBenchUtility
 	/*
 	 * Get Control - Gets a control based on a string type. 
 	 */
-	public static Control getControl(Composite control, String s)
+	public static Control getControl(final Composite control, String s)
 	{
 		if(s.equals("I") || s.equals("int") || s.equals("java.lang.Integer"))
 		{
@@ -333,6 +343,47 @@ public final class ObjectBenchUtility
 			text.setData("typeKey", "char");
 			return text;
 		}
+		if(s.equals("QColor;") || s.equals("Color")|| s.equals("java.awt.Color"))
+		{
+			final Button colorButton = new Button(control, SWT.NONE);
+			colorButton.setText("Color");
+			colorButton.setData("typeKey", "color");
+			colorButton.addSelectionListener(new SelectionListener(){
+
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+			        ColorDialog dlg = new ColorDialog(control.getShell());
+			        java.awt.Color color = null;
+			        // Set the selected color in the dialog from
+			        // user's selected color
+			        //dlg.setRGB(colorLabel.getBackground().getRGB());
+
+			        // Change the title bar text
+			        dlg.setText("Choose a Color");
+
+			        // Open the dialog and retrieve the selected color
+			        RGB rgb = dlg.open();
+			        if (rgb != null) {
+			          // Dispose the old color, create the
+			          // new one, and set into the label
+			          color = new java.awt.Color(rgb.red, rgb.green, rgb.blue);
+			         // colorLabel.setBackground(color);
+			        }
+			       // colorButton.setData("typeKey", "color");
+			        colorButton.setData("typeData", color);
+					
+				}
+
+				@Override
+				public void widgetDefaultSelected(SelectionEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+			});
+			
+			return colorButton;
+		}
 		
 		/*
 		 * Failing this object isn't a primitive type we need to try and see if there are any instances on the object bench. 
@@ -384,6 +435,12 @@ public final class ObjectBenchUtility
 			Button b = (Button)c;
 			o = b.getSelection();
 		}
+		if(s.equals("color"))
+		{
+			Button b = (Button)c;
+			o = (java.awt.Color)b.getData("typeData");
+			
+		}
 		
 		return o;
 	}
@@ -391,6 +448,10 @@ public final class ObjectBenchUtility
 	public static void setControlValue(Control c, Object o)
 	{
 		String s = (String)c.getData("typeKey");
+		if(s == null)
+		{
+			return;
+		}
 		if(s.equals("int"))
 		{
 			Spinner spin = (Spinner)c;

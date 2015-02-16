@@ -60,7 +60,7 @@ public class ObjectBenchView extends ViewPart {
 	/*
 	 * Add Object - This method adds an instance to the object bench. The object is created from its name, package and an object representing the instance. 
 	 */
-	public void addObject(String className, String packageName, Object instance) throws JavaModelException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException
+	public void addObject(String className, String packageName, Object instance) throws Exception
 	{
 		//System.out.println("Instantiating: " + className); //Uncomment to debug
 		if(objectBenchButtons == null)
@@ -139,7 +139,7 @@ public class ObjectBenchView extends ViewPart {
 	 * This method reads the methods of a class. 
 	 * TODO - This method still needs to ascertain the parameters of a method and implement a means to call the method on click. 
 	 */
-	private Menu buildMenuForClass(final ObjectBenchButton bn) throws JavaModelException
+	private Menu buildMenuForClass(final ObjectBenchButton bn) throws JavaModelException, Exception
 	{
 		Menu popupMenu = new Menu(bn);
 		if(JavaModelHelper.getClassMethodNames(bn.packageName, bn.className) != null)
@@ -158,7 +158,14 @@ public class ObjectBenchView extends ViewPart {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
 						//TODO - Invoke method, if there are parameters display a dialog to take parameters then run the method. 
-						Class<?>[] parameters = ObjectBenchUtility.getParameterTypes(methodTypes[index]);
+						Class<?>[] parameters = null;
+						try {
+							parameters = ObjectBenchUtility.getParameterTypes(methodTypes[index]);
+						} catch (ClassNotFoundException e2) {
+							// TODO Auto-generated catch block
+							e2.printStackTrace();
+						}
+						
 						if(parameters.length > 0)
 						{
 							try {
@@ -169,14 +176,20 @@ public class ObjectBenchView extends ViewPart {
 									if(dialog.getReturnCode() != Window.CANCEL)
 									{
 										Object[] objects = dialog.getParameters(); 
-										MessageDialog msg = new MessageDialog(mainViewArea.getShell(), "Return Value", Window.getDefaultImage(), 
-												"Return Value: " + bn.getInstance().callMethod(method,objects).toString() + " (" + StringHelper.fixType(returnTypes[index]) + ") ", 
-												MessageDialog.INFORMATION, new String[] {"OK"}, 0);
-										if(msg.open() == Window.OK)
+										Object o = bn.getInstance().callMethod(method,objects);
+										//System.out.println(returnTypes[index]);
+										if(!returnTypes[index].equals("V"))
 										{
-											//System.out.println("IM IN");
-											//ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName, object);
+											MessageDialog msg = new MessageDialog(mainViewArea.getShell(), "Return Value", Window.getDefaultImage(), 
+													"Return Value: " + o.toString() + " (" + StringHelper.fixType(returnTypes[index]) + ") ", 
+													MessageDialog.INFORMATION, new String[] {"OK"}, 0);
+											if(msg.open() == Window.OK)
+											{
+												//System.out.println("IM IN");
+												//ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName, object);
+											}
 										}
+
 									}
 									//System.out.println("IM IN");
 									//ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName, object);
@@ -188,7 +201,14 @@ public class ObjectBenchView extends ViewPart {
 						}
 						else
 						{
-							bn.getInstance().callMethod(methodNames[index]);
+							MessageDialog msg = new MessageDialog(mainViewArea.getShell(), "Return Value", Window.getDefaultImage(), 
+									"Return Value: " + bn.getInstance().callMethod(methodNames[index]).toString() + " (" + StringHelper.fixType(returnTypes[index]) + ") ", 
+									MessageDialog.INFORMATION, new String[] {"OK"}, 0);
+							if(msg.open() == Window.OK)
+							{
+								//System.out.println("IM IN");
+								//ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName, object);
+							}
 						}
 					
 					try {
