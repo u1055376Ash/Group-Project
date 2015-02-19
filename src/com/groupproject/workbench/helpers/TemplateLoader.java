@@ -13,16 +13,33 @@ import com.groupproject.workbench.Template;
 public class TemplateLoader {
 	
 	/*
-	 * Get Tempalte - Returns a template that can be used to create a class. 
+	 * Get Template - Returns a template that can be used to create a class. 
 	 */
 	public static Template getTemplate(int type) throws IOException
 	{
-		if(type == 0)
+		String content = ""; 
+		switch(type)
 		{
-			String content = getFile("SampleTemplate.sample");
-			//String content = new String(Files.readAllBytes(Paths.get("/resources/SampleTemplate.sample")));
+		case 0:
+			content = getFile("SampleTemplate.sample");
+			return new Template(content,type);
+		case 1:
+			content = getFile("AbstractTemplate.sample");
+			return new Template(content,type);
+		case 2:
+			content = getFile("InterfaceTemplate.sample");
+			return new Template(content,type);
+		case 3:
+			content = getFile("AppletTemplate.sample");
+			return new Template(content,type);
+		case 4: 
+			content = getFile("UnitTestTemplate.sample");
+			return new Template(content,type);
+		case 5: 
+			content = getFile("EnumTemplate.sample");
 			return new Template(content,type);
 		}
+
 		return null;
 	}
 

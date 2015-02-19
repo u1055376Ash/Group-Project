@@ -196,7 +196,6 @@ public class ObjectBenchView extends ViewPart {
 									//ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName, object);
 								}
 							} catch (Exception e1) {
-								// TODO Auto-generated catch block
 								e1.printStackTrace();
 							} 
 						}

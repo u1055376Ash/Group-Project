@@ -99,24 +99,17 @@ public final class JavaModelHelper {
 	 */
 	public static void newClass(String className, int classType, String myPackage) throws IOException, JavaModelException
 	{
-		switch(classType)
+		Template t = TemplateLoader.getTemplate(classType); 
+		t.setName(className, myPackage);
+		className += ".java";
+		IPackageFragment p = getPackage(myPackage);
+		if(p == null)
 		{
-		case 0:
-			Template t = TemplateLoader.getTemplate(0); 
-			t.setName(className, myPackage);
-			className += ".java";
-			IPackageFragment p = getPackage(myPackage);
-			if(p == null)
-			{
-				System.out.println("No Package Found");
-				return;
-			}
-			p.createCompilationUnit(className, t.getBody(), true, null);
-			p.save(null, true);
-			break;
-		default:
-			break;
+			System.out.println("No Package Found");
+			return;
 		}
+		p.createCompilationUnit(className, t.getBody(), true, null);
+		p.save(null, true);
 	}
 	
 	/*
@@ -140,12 +133,17 @@ public final class JavaModelHelper {
 	 */
 	static void addToClassPath() throws MalformedURLException, Exception
 	{
+		
 		for(IProject p:projects)
 		{
-			for(IResource r:p.members())
+			if(p.isOpen())
 			{
-				addURL(r.getLocation().toFile().toURI().toURL());
+				for(IResource r:p.members())
+				{
+					addURL(r.getLocation().toFile().toURI().toURL());
+				}
 			}
+
 		}
 	}
 	
