@@ -8,6 +8,8 @@ import java.util.List;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
@@ -16,6 +18,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -37,14 +40,13 @@ import com.groupproject.workbench.utility.ObjectBenchUtility;
 public class InspectorView extends ViewPart {
 
 	Boolean enableEditing; 					//Will allow a user to edit values from within the inspector. 
-	
 	Composite myParent; 
 	Composite mainViewArea;					//The main view area 
 	Label header; 							//The header, usually the name of the instance
 	List<Label> fieldNameLabels;			//A list of field names
 	List<Label> fieldTypeLabels;			//A list of field types 
 	List<Label> fieldValueLabels;			//A list of field values 
-	
+	ScrolledComposite sc;					//The scroll control component
 	/*
 	 * Default Constructor 
 	 */
@@ -57,14 +59,13 @@ public class InspectorView extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		myParent = parent;
-		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+		sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 		mainViewArea = new Composite(sc, SWT.NONE);
 		mainViewArea.setLayout(new FormLayout());
-		mainViewArea.setSize(500,1025);
 		sc.setContent(mainViewArea);
-		sc.setExpandHorizontal(true);
 		sc.setMinSize(mainViewArea.computeSize(500, 500));
-		sc.setMinHeight(110);
+		sc.setExpandHorizontal(true);
+		sc.setExpandVertical(true);
 		ObjectBenchUtility.registerInspectorView(this);
 		clear();
 	}
@@ -80,7 +81,7 @@ public class InspectorView extends ViewPart {
 		header = new Label(mainViewArea, SWT.CENTER);
 		header.setText("Instance Inspector");
 		header.setBounds(mainViewArea.getClientArea());
-
+		sc.layout();
 	}
 	/*
 	 * (non-Javadoc)
@@ -118,7 +119,7 @@ public class InspectorView extends ViewPart {
 			FormData labelData = new FormData(70 + (fieldNames.length * 4), SWT.DEFAULT);
 			if(i == 0)
 			{
-				labelData.top = new FormAttachment(30);
+				labelData.top = new FormAttachment(header, 25);
 				labelData.left = new FormAttachment(5);
 				yValue += 25;
 			}
@@ -139,10 +140,6 @@ public class InspectorView extends ViewPart {
 				
 				FormData sizeData = new FormData(30, SWT.DEFAULT);
 				
-
-				
-					//previousLabel = fieldNameLabels.get(i); 
-					
 				sizeData.top = new FormAttachment(previousLabel, 15);
 				sizeData.left = new FormAttachment(8);
 				sizeLabel.setLayoutData(sizeData);
@@ -234,7 +231,7 @@ public class InspectorView extends ViewPart {
 			if(instance.getFieldClass(fieldNames[i]) != null)
 			{
 				final String currentName = fieldNames[i];
-				System.out.println(instance.getFieldClass(fieldNames[i]).getName());
+				//System.out.println(instance.getFieldClass(fieldNames[i]).getName());
 				final Control c = ObjectBenchUtility.getControl(mainViewArea, instance.getFieldClass(fieldNames[i]).getName());
 				if(c == null)
 				{
@@ -266,7 +263,6 @@ public class InspectorView extends ViewPart {
 									try {
 										instance.setValue(currentName,ObjectBenchUtility.getControlValue(c));
 									} catch (Exception e1) {
-										// TODO Auto-generated catch block
 										e1.printStackTrace();
 									}
 									
@@ -277,7 +273,6 @@ public class InspectorView extends ViewPart {
 									try {
 										instance.setValue(currentName,ObjectBenchUtility.getControlValue(c));
 									} catch (Exception e1) {
-										// TODO Auto-generated catch block
 										e1.printStackTrace();
 									}
 									
@@ -291,7 +286,6 @@ public class InspectorView extends ViewPart {
 									try {
 										instance.setValue(currentName,ObjectBenchUtility.getControlValue(c));
 									} catch (Exception e1) {
-										// TODO Auto-generated catch block
 										e1.printStackTrace();
 									}
 									
@@ -302,7 +296,6 @@ public class InspectorView extends ViewPart {
 									try {
 										instance.setValue(currentName,ObjectBenchUtility.getControlValue(c));
 									} catch (Exception e1) {
-										// TODO Auto-generated catch block
 										e1.printStackTrace();
 									}
 									
@@ -343,6 +336,9 @@ public class InspectorView extends ViewPart {
 		}
 
 		mainViewArea.layout();
+		sc.layout();
+		sc.setAlwaysShowScrollBars(true);
+		sc.setMinSize(mainViewArea.computeSize(500, 500 + yValue));
 	}
 	
 	

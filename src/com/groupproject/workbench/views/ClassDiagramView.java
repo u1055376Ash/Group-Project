@@ -92,6 +92,10 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	 */
 	Menu buildContextMenu()
 	{
+		if(activeProjectName == null)
+		{
+			return null;
+		}
 		Menu menu = new Menu(mainViewArea);
 		MenuItem newClassItem = new MenuItem(menu, SWT.CASCADE);
 		MenuItem newPackageItem = new MenuItem(menu, SWT.NONE);
@@ -135,7 +139,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		}
 		try {
 			JavaModelHelper.buildProject(activeProjectName);
-			displayClassView(mainViewArea);
+			//displayClassView(mainViewArea);
 		} catch (Exception e) {e.printStackTrace();}
 	}
 	
@@ -166,6 +170,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			if(!JavaModelHelper.getActiveProjectName().equals(activeProjectName))
 			{
 				activeProjectName = JavaModelHelper.getActiveProjectName();
+				mainViewArea.setMenu(buildContextMenu());
 			}
 		}
 	}
@@ -182,6 +187,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		{
 			updateHeader();
 			createPackageButtons(parent);
+
 		}
 		activePackageName = "";
 		disposeButtons(true);

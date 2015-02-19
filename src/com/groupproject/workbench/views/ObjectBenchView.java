@@ -49,6 +49,7 @@ public class ObjectBenchView extends ViewPart {
 		mainViewArea.setSize(600,100);
 		sc.setContent(mainViewArea);
 		sc.setExpandHorizontal(true);
+		//sc.setExpandVertical(true);
 		sc.setMinSize(mainViewArea.computeSize(1000, 100));
 		sc.setMinHeight(110);
 		ObjectBenchUtility.registerObjectBench(this); //Register this with the ObjectBenchUtility so other classes can access this instance
@@ -201,8 +202,10 @@ public class ObjectBenchView extends ViewPart {
 						}
 						else
 						{
+							Object s = (s = bn.getInstance().callMethod(methodNames[index]))!= null ?  s:null;
+							String str = s != null ? s.toString():"null";
 							MessageDialog msg = new MessageDialog(mainViewArea.getShell(), "Return Value", Window.getDefaultImage(), 
-									"Return Value: " + bn.getInstance().callMethod(methodNames[index]).toString() + " (" + StringHelper.fixType(returnTypes[index]) + ") ", 
+									"Return Value: " + str + " (" + StringHelper.fixType(returnTypes[index]) + ") ", 
 									MessageDialog.INFORMATION, new String[] {"OK"}, 0);
 							if(msg.open() == Window.OK)
 							{
