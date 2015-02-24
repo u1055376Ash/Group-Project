@@ -522,7 +522,8 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 							for(String s:constructorParamaterTypes[index])
 							{
 								//System.out.println(s);
-								Class<?> myClass = ObjectBenchUtility.getClassFromType(s);
+								Class<?> myClass = ObjectBenchUtility.isKnown(s) ? 
+												   ObjectBenchUtility.getClassFromType(s):ObjectBenchUtility.getClassFromType(StringHelper.getQualifiedName(StringHelper.fixType(s), activePackageName));
 								//TODO This whole section needs expanding to account for non-native Java types. 
 								if(myClass == null)
 								{

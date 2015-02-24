@@ -15,9 +15,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaProject;
@@ -81,9 +83,16 @@ public final class JavaModelHelper {
 	public static void buildProject(String projectName) throws CoreException
 	{
 		IProject p = root.getProject(projectName);
-		p.build(0, null);
+		IProgressMonitor pm = null;
+		p.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, pm);
 	}
 	
+	public static void buildActiveProject() throws CoreException
+	{
+
+		IProgressMonitor pm = null;
+		activeProject.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, pm);
+	}
 	
 	/*
 	 * Get Project by Name - Returns a project by its name. 
@@ -666,6 +675,12 @@ public final class JavaModelHelper {
 	 */
 	public static Class<?> getClassFromLoader(String s) throws ClassNotFoundException
 	{
+		try {
+			buildActiveProject();
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return ClassLoader.getSystemClassLoader().loadClass(s);
 	}
 	

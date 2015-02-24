@@ -1,6 +1,5 @@
 package com.groupproject.workbench.views;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +21,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.part.ViewPart;
 
+import com.groupproject.workbench.BenchInstance;
 import com.groupproject.workbench.JavaModelHelper;
 import com.groupproject.workbench.buttons.ObjectBenchButton;
 import com.groupproject.workbench.dialogs.MethodDialog;
@@ -161,9 +161,9 @@ public class ObjectBenchView extends ViewPart {
 						//TODO - Invoke method, if there are parameters display a dialog to take parameters then run the method. 
 						Class<?>[] parameters = null;
 						try {
+							ObjectBenchUtility.setActivePackage(bn.packageName);
 							parameters = ObjectBenchUtility.getParameterTypes(methodTypes[index]);
 						} catch (ClassNotFoundException e2) {
-							// TODO Auto-generated catch block
 							e2.printStackTrace();
 						}
 						
@@ -177,12 +177,13 @@ public class ObjectBenchView extends ViewPart {
 									if(dialog.getReturnCode() != Window.CANCEL)
 									{
 										Object[] objects = dialog.getParameters(); 
-										Object o = bn.getInstance().callMethod(method,objects);
+										Object o = (o = bn.getInstance().callMethod(method,objects)) != null ? o:null;
+										String str = o!= null ? o.toString():"null";
 										//System.out.println(returnTypes[index]);
 										if(!returnTypes[index].equals("V"))
 										{
 											MessageDialog msg = new MessageDialog(mainViewArea.getShell(), "Return Value", Window.getDefaultImage(), 
-													"Return Value: " + o.toString() + " (" + StringHelper.fixType(returnTypes[index]) + ") ", 
+													"Return Value: " + str + " (" + StringHelper.fixType(returnTypes[index]) + ") ", 
 													MessageDialog.INFORMATION, new String[] {"OK"}, 0);
 											if(msg.open() == Window.OK)
 											{
@@ -256,7 +257,7 @@ public class ObjectBenchView extends ViewPart {
 	/*
 	 * Remove Object - Removes an object from the object bench. 
 	 */
-	void removeObject(ObjectBenchButton bn) throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ArrayIndexOutOfBoundsException, NoSuchMethodException
+	void removeObject(ObjectBenchButton bn) throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ArrayIndexOutOfBoundsException, NoSuchMethodException, ClassNotFoundException
 	{
 		objectBenchButtons.remove(bn);
 		bn.dispose();
@@ -264,8 +265,29 @@ public class ObjectBenchView extends ViewPart {
 		mainViewArea.layout();
 	}
 	
-	public Object[] getInstancesOfType(String t)
+	/*
+	 * Get Instances of Type - Gets the instances of a given type.
+	 */
+	public BenchInstance[] getInstancesOfType(String t)
 	{
-		return null;
+		//System.out.println("Looking For: " + t);
+		List<BenchInstance> instances = new ArrayList<BenchInstance>();
+		for(ObjectBenchButton b:objectBenchButtons)
+		{
+			//System.out.println("MyClassName: " + b.className);
+			if(StringHelper.stripExtension(b.className).equals(t))
+			{
+				instances.add(b.getInstance());
+			}
+		}
+		return instances.toArray(new BenchInstance[instances.size()]);
+	}
+	
+	/*
+	 * Get Instances of Type - Gets the instances of a given type.
+	 */	
+	public BenchInstance[] getInstancesOfType(Class<?> c)
+	{
+		return getInstancesOfType(c.getName());
 	}
 }

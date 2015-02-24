@@ -93,7 +93,7 @@ public class InspectorView extends ViewPart {
 	/*
 	 * Update - This method updates the inspector, making it get the active instance. This method reads the active instance and gets all field values
 	 */
-	public void update() throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ArrayIndexOutOfBoundsException, NoSuchMethodException
+	public void update() throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ArrayIndexOutOfBoundsException, NoSuchMethodException, ClassNotFoundException
 	{
 		int yValue = 30; 
 		clear();
@@ -232,7 +232,8 @@ public class InspectorView extends ViewPart {
 			{
 				final String currentName = fieldNames[i];
 				//System.out.println(instance.getFieldClass(fieldNames[i]).getName());
-				final Control c = ObjectBenchUtility.getControl(mainViewArea, instance.getFieldClass(fieldNames[i]).getName());
+				final Control c = ObjectBenchUtility.getControl(mainViewArea, instance.getFieldClass(fieldNames[i]).getSimpleName());
+				//System.out.println("--" + instance.getFieldClass(fieldNames[i]).getName() + "--");
 				if(c == null)
 				{
 					//Do something

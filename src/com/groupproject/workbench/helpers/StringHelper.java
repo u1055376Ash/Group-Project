@@ -79,6 +79,7 @@ public final class StringHelper {
 		}
 		if(className.isEmpty() || packageName.isEmpty() || className == null || packageName == null || className.length() <= 0 || packageName.length() <= 0)
 		{
+			//System.out.println(className + ":::" + packageName);
 			return "";
 		}
 		if(className.contains("."))
@@ -87,7 +88,7 @@ public final class StringHelper {
 			String qualifiedName = packageName + "." + cleanName;
 			return qualifiedName;
 		}
-		return ""; 
+		return packageName + "."  + className; 
 
 	}
 }

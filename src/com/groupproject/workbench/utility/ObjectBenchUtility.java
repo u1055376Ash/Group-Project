@@ -7,12 +7,14 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.ColorDialog;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -26,6 +28,7 @@ import org.eclipse.ui.ide.IDE;
 import com.groupproject.workbench.Activator;
 import com.groupproject.workbench.BenchInstance;
 import com.groupproject.workbench.JavaModelHelper;
+import com.groupproject.workbench.helpers.StringHelper;
 import com.groupproject.workbench.preferences.PreferenceConstants;
 import com.groupproject.workbench.views.InspectorView;
 import com.groupproject.workbench.views.ObjectBenchView;
@@ -162,7 +165,7 @@ public final class ObjectBenchUtility
 	/*
 	 * Set Active Instance - Sets the active instance...
 	 */
-	public static void setActiveInstance(BenchInstance i) throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ArrayIndexOutOfBoundsException, NoSuchMethodException
+	public static void setActiveInstance(BenchInstance i) throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ArrayIndexOutOfBoundsException, NoSuchMethodException, ClassNotFoundException
 	{
 		activeInstance = i; 
 		if(inspectorView != null)
@@ -234,10 +237,72 @@ public final class ObjectBenchUtility
 		{
 			return java.awt.Color.class;
 		}
-		//Class<?> c = Class.forName(s);
 		
+		
+		Class<?> c = JavaModelHelper.getClassFromLoader(s);
+		if(c != null)
+		{
+			return c; 
+		}
 		return null; 
 		
+	}
+	
+	/*
+	 * Is Known - Returns whether the field is known to the plugin natively 
+	 */
+	public static boolean isKnown(String s)
+	{
+		if(s.equals("I"))
+		{
+			return true;
+		}
+		if(s.equals("QString"))
+		{
+			return true;
+		}
+		if(s.equals("QString;"))
+		{
+			return true;
+		}
+		if(s.equals("String"))
+		{
+			return true;
+		}
+		if(s.equals("B"))
+		{
+			return true;
+		}
+		if(s.equals("S"))
+		{
+			return true;
+		}
+		if(s.equals("J"))
+		{
+			return true;
+		}
+		if(s.equals("F"))
+		{
+			return true;
+		}
+		if(s.equals("D"))
+		{
+			return true;
+		}
+		if(s.equals("Z"))
+		{
+			return true;
+		}
+		if(s.equals("C"))
+		{
+			return true;
+		}
+		if(s.equals("QColor;"))
+		{
+			return true;
+		}
+		
+		return false; 
 	}
 	
 	public static Class<?>[] getParameterTypes(String[] types) throws ClassNotFoundException
@@ -245,7 +310,7 @@ public final class ObjectBenchUtility
 		Class<?>[] classes = new Class<?>[types.length];
 		for(int i = 0; i<types.length;i++)
 		{
-			classes[i] = getClassFromType(types[i]);
+			classes[i] = isKnown(types[i]) ? getClassFromType(types[i]): getClassFromType(StringHelper.getQualifiedName(StringHelper.fixType(types[i]), activePackage));
 		}
 		
 		return classes; 
@@ -254,7 +319,7 @@ public final class ObjectBenchUtility
 	/*
 	 * Get Control - Gets a control based on a string type. 
 	 */
-	public static Control getControl(final Composite control, String s)
+	public static Control getControl(final Composite control, final String s)
 	{
 		if(s.equals("I") || s.equals("int") || s.equals("java.lang.Integer"))
 		{
@@ -386,11 +451,52 @@ public final class ObjectBenchUtility
 		}
 		
 		/*
-		 * Failing this object isn't a primitive type we need to try and see if there are any instances on the object bench. 
+		 * Failing this object isn't a primitive type (or known) we need to try and see if there are any instances on the object bench. 
 		 */
+		
+		final BenchInstance[] instances = ObjectBenchUtility.getObjectBench().getInstancesOfType(s);
+		if(instances != null && instances.length > 0)
+		{
+			final Combo comboBox = new Combo(control, SWT.READ_ONLY);
+			comboBox.setEnabled(true);
+			comboBox.setData("typeKey", "combo");
+			comboBox.setData("classData", s);
+			for(int i = 0; i< instances.length; i++)
+			{
+				comboBox.add(instances[i].className + " - " + i, i);
+
+			}
+			comboBox.addSelectionListener(new SelectionListener(){
+
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					int current = comboBox.getSelectionIndex(); 
+					for(int i = 0; i < instances.length; i++)
+					{
+						if(current == i)
+						{
+							comboBox.setData("typeData", instances[i].myInstance);
+
+						}
+					}
+
+				}
+
+				@Override
+				public void widgetDefaultSelected(SelectionEvent e) {
+
+				}
+				
+			});
+			
+			return comboBox;
+		}
 		return null; 
 	}
 	
+	/*
+	 * Get Control Value - Gets the value stored by a control. 
+	 */
 	public static Object getControlValue(Control c)
 	{
 		String s = (String)c.getData("typeKey");
@@ -442,9 +548,18 @@ public final class ObjectBenchUtility
 			
 		}
 		
+		if(c.getData("typeData") != null)
+		{
+			o = c.getData("typeData");
+			//return o;
+		}
+		
 		return o;
 	}
 	
+	/*
+	 * Set Control Value - Sets the value stored by a control. 
+	 */
 	public static void setControlValue(Control c, Object o)
 	{
 		String s = (String)c.getData("typeKey");
@@ -465,7 +580,7 @@ public final class ObjectBenchUtility
 		if(s.equals("float"))
 		{
 			Spinner spin = (Spinner)c;
-			spin.setValues((int)o, 0, Integer.MAX_VALUE, 4, 1, 3);
+			spin.setValues((int) Float.parseFloat(o.toString()), 0, Integer.MAX_VALUE, 4, 1, 3);
 		}
 		if(s.equals("byte"))
 		{
@@ -475,7 +590,7 @@ public final class ObjectBenchUtility
 		if(s.equals("long"))
 		{
 			Spinner spin = (Spinner)c;
-			spin.setValues((int)o, 0, Integer.MAX_VALUE, 4, 1, 3);
+			spin.setValues((int)o, 0, Byte.MAX_VALUE, 4, 1, 3);
 		}
 		if(s.equals("char"))
 		{
@@ -491,6 +606,22 @@ public final class ObjectBenchUtility
 		{
 			Button b = (Button)c;
 			b.setSelection((boolean)o);
+		}
+		if(s.equals("combo"))
+		{
+			Combo combo = (Combo)c;
+			
+			final BenchInstance[] instances = ObjectBenchUtility.getObjectBench().getInstancesOfType(combo.getData("classData").toString());
+			//int current = combo.getSelectionIndex(); 
+			for(int i = 0; i < instances.length; i++)
+			{
+				if(instances[i].myInstance.equals(o))
+				{
+					combo.select(i);
+					//combo.setData("typeData", instances[i].myInstance);
+				}
+			}
+			
 		}
 	}
 }

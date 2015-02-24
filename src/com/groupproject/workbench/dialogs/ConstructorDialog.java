@@ -73,7 +73,7 @@ public class ConstructorDialog  extends Dialog{
 			
 			Label lbl = new Label(container,SWT.NONE);
 			lbl.setText(c.getName());
-			Control control = ObjectBenchUtility.getControl(container, c.getName()); //Gets a control from the utility. 
+			Control control = ObjectBenchUtility.getControl(container, c.getSimpleName()); //Gets a control from the utility. 
 			controls.add(control);
 			GridData gD = new GridData();
 			gD.grabExcessHorizontalSpace = true; 

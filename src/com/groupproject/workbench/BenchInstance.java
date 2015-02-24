@@ -24,7 +24,8 @@ public class BenchInstance {
 	{
 		className = c;
 		packageName = p; 
-		myClass = JavaModelHelper.getClassFromLoader(StringHelper.getQualifiedName(c, p));
+		update();
+		//myClass = JavaModelHelper.getClassFromLoader(StringHelper.getQualifiedName(c, p));
 		Instantiate();
 	}
 	
@@ -32,7 +33,8 @@ public class BenchInstance {
 	{
 		className = c;
 		packageName = p; 
-		myClass = JavaModelHelper.getClassFromLoader(StringHelper.getQualifiedName(c, p));
+		update();
+		//myClass = JavaModelHelper.getClassFromLoader(StringHelper.getQualifiedName(c, p));
 		myInstance = o; 
 	}
 	
@@ -144,10 +146,11 @@ public class BenchInstance {
 
 	}
 	
-	public Class<?> getFieldClass(String fieldName) throws NoSuchFieldException, SecurityException
+	public Class<?> getFieldClass(String fieldName) throws NoSuchFieldException, SecurityException, ClassNotFoundException
 	{
 		if(myInstance != null)
 		{
+			update();
 			Field field = myClass.getDeclaredField(fieldName);
 			field.setAccessible(true);
 			return field.getType();
@@ -158,10 +161,11 @@ public class BenchInstance {
 	/*
 	 * Get Field - This method gets the object associated with a field. 
 	 */
-	public Object getField(String fieldName) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException
+	public Object getField(String fieldName) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException
 	{
 		if(myInstance != null)
 		{
+			update();
 			Field field = myClass.getDeclaredField(fieldName);
 			field.setAccessible(true);
 			Object obj = field.get(myInstance);
@@ -216,5 +220,8 @@ public class BenchInstance {
 		myInstance = o; 
 	}
 	
-
+	 void update() throws ClassNotFoundException
+	{
+		myClass = JavaModelHelper.getClassFromLoader(StringHelper.getQualifiedName(className, packageName));
+	}
 }
