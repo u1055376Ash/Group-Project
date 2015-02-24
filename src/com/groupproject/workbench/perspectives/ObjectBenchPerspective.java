@@ -29,6 +29,7 @@ public class ObjectBenchPerspective implements IPerspectiveFactory {
 	
 	private static final String RIGHT  = "right";
 	
+	private static IPageLayout theLayout;
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui.IPageLayout)
@@ -36,6 +37,11 @@ public class ObjectBenchPerspective implements IPerspectiveFactory {
 	@Override
 	public void createInitialLayout(IPageLayout myLayout) {
 		
+		
+		//String editorArea = myLayout.getEditorArea();
+		myLayout.setEditorAreaVisible(false);
+		theLayout = myLayout;
+		//myLayout.addStandaloneView(Navigation.ID,false, relationship, ratio, refId);
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		//page.hideView(page.getViewReferences()[0]);
 		
@@ -45,6 +51,14 @@ public class ObjectBenchPerspective implements IPerspectiveFactory {
 		myLayout.addView(INSPECTOR_ID, IPageLayout.LEFT, 0.3f, myLayout.getEditorArea());
 		
 
+	}
+	
+	public static void hideEditor()
+	{
+		if(theLayout != null)
+		{
+			theLayout.setEditorAreaVisible(false);
+		}
 	}
 
 }

@@ -26,6 +26,7 @@ import com.groupproject.workbench.JavaModelHelper;
 import com.groupproject.workbench.buttons.ObjectBenchButton;
 import com.groupproject.workbench.dialogs.MethodDialog;
 import com.groupproject.workbench.helpers.StringHelper;
+import com.groupproject.workbench.perspectives.ObjectBenchPerspective;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 
 /*
@@ -55,6 +56,10 @@ public class ObjectBenchView extends ViewPart {
 		ObjectBenchUtility.registerObjectBench(this); //Register this with the ObjectBenchUtility so other classes can access this instance
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
 	@Override
 	public void setFocus() {}
 

@@ -833,4 +833,13 @@ public final class JavaModelHelper {
 	      Object adapter = adaptable.getAdapter(IResource.class);
 	      return (IResource) adapter;
 	   }
+	 
+	 /*
+	  * Is Project Open - Checks whether a specified project is open. 
+	  */
+	 public static boolean isProjectOpen(String s) throws MalformedURLException, Exception
+	 {
+		 IProject p = getProject(s);
+		 return p.isOpen();
+	 }
 }

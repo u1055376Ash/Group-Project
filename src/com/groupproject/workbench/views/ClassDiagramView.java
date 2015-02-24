@@ -32,6 +32,7 @@ import com.groupproject.workbench.dialogs.ConstructorDialog;
 import com.groupproject.workbench.dialogs.NewClassDialog;
 import com.groupproject.workbench.dialogs.NewPackageDialog;
 import com.groupproject.workbench.helpers.StringHelper;
+import com.groupproject.workbench.perspectives.ObjectBenchPerspective;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 
 /*
@@ -183,15 +184,22 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		JavaModelHelper.Initialise();
 		//activeProjectName = JavaModelHelper.getActiveProjectName(); 
 		checkProjectName();
-		if(activeProjectName != null)
+		if(activeProjectName != null && JavaModelHelper.isProjectOpen(activeProjectName))
 		{
 			updateHeader();
 			createPackageButtons(parent);
 
+			//activePackageName = "";
+			disposeButtons(true);
+			createClassButtons(parent, true);
+			return;
 		}
-		activePackageName = "";
-		disposeButtons(true);
-		createClassButtons(parent, true);
+		else
+		{
+			updateHeader();
+			activePackageName = "";
+			disposeButtons(true);
+		}
 	}
 	
 	/*
@@ -219,15 +227,24 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	/*
 	 * Update Header - Updates the header
 	 */
-	private void updateHeader() 
+	private void updateHeader() throws MalformedURLException, Exception 
 	{
 		if(state == 0)
 		{
+			viewHeader.setSize(1000,30);
 			//activeProjectName = JavaModelHelper.getActiveProjectName(); 
 			checkProjectName();
 			if(activeProjectName != null)
 			{
-				viewHeader.setText("Current Project: " + activeProjectName);
+				if(JavaModelHelper.isProjectOpen(activeProjectName))
+				{
+					viewHeader.setText("Current Project: " + activeProjectName);
+				}
+				else
+				{
+					viewHeader.setText("Current Project: " + activeProjectName + " (Closed)");
+				}
+				
 			}
 			else
 			{
@@ -663,9 +680,17 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		parent.getShell().layout();
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
 	@Override
-	public void setFocus() {}
+	public void setFocus() {ObjectBenchPerspective.hideEditor();}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
 	@Override
 	public void dispose()
 	{

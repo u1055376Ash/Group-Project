@@ -53,7 +53,6 @@ public class ConstructorDialog  extends Dialog{
 		container.setLayout(layout);
 		controls = new ArrayList<Control>();
 		parseParameters();
-		
 		return container;
 	}
 	
@@ -70,7 +69,6 @@ public class ConstructorDialog  extends Dialog{
 		for(Class<?> c:constructor.getParameterTypes())
 		{
 			//System.out.println(c.getName());
-			
 			Label lbl = new Label(container,SWT.NONE);
 			lbl.setText(c.getName());
 			Control control = ObjectBenchUtility.getControl(container, c.getSimpleName()); //Gets a control from the utility. 
@@ -84,12 +82,15 @@ public class ConstructorDialog  extends Dialog{
 				control.setLayoutData(gD);
 			}
 
-			
 		}
 		container.layout();
 		
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
+	 */
 	@Override
 	protected void okPressed()
 	{
