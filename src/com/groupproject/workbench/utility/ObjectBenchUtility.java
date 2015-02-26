@@ -391,8 +391,8 @@ public final class ObjectBenchUtility
 			spinner.setMinimum(0);
 			spinner.setMaximum((int) Double.MAX_VALUE);
 			spinner.setSelection(0);
-			spinner.setIncrement(1);
-			spinner.setPageIncrement(10);
+			spinner.setIncrement(100);
+			spinner.setPageIncrement(1000);
 			spinner.setData("typeKey", "double");
 			return spinner; 
 		}
@@ -581,7 +581,7 @@ public final class ObjectBenchUtility
 		if(s.equals("float"))
 		{
 			Spinner spin = (Spinner)c;
-			spin.setValues((int) Float.parseFloat(o.toString()), 0, Integer.MAX_VALUE, 4, 1, 3);
+			spin.setValues((int) Float.parseFloat(o.toString()), 0, Integer.MAX_VALUE, 3, 1, 3);
 		}
 		if(s.equals("byte"))
 		{

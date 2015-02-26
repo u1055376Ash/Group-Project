@@ -52,6 +52,7 @@ public class ObjectBenchView extends ViewPart implements IResourceChangeListener
 		mainViewArea = new Composite(sc, SWT.NONE);
 		mainViewArea.setLayout(new FormLayout());
 		mainViewArea.setSize(600,100);
+		mainViewArea.setMenu(buildContextMenu());
 		sc.setContent(mainViewArea);
 		sc.setExpandHorizontal(true);
 		//sc.setExpandVertical(true);
@@ -59,7 +60,49 @@ public class ObjectBenchView extends ViewPart implements IResourceChangeListener
 		sc.setMinHeight(110);
 		ObjectBenchUtility.registerObjectBench(this); //Register this with the ObjectBenchUtility so other classes can access this instance
 	}
+	/*
+	 * Build Context Menu - Builds the context menu for the class view. 
+	 */
+	Menu buildContextMenu()
+	{
+		
+		Menu menu = new Menu(mainViewArea);
+		MenuItem clearItem = new MenuItem(menu, SWT.CASCADE);
+		clearItem.setText("Clear Object Bench");
 
+		
+		clearItem.addSelectionListener(new SelectionListener(){
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {clearBench();}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+			
+		});
+		
+		
+		return menu; 
+	}
+	
+	/*
+	 * Clear Bench - Clears the Object Bench of Instances
+	 */
+	void clearBench()
+	{
+		if(objectBenchButtons != null)
+		{
+			for(ObjectBenchButton b:objectBenchButtons){
+				try {
+					removeObject(b,false);
+				} catch (Exception e) {
+					e.printStackTrace();
+				} 
+			}
+			objectBenchButtons.removeAll(objectBenchButtons);
+			objectBenchButtons = new ArrayList<ObjectBenchButton>();
+		}
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
@@ -274,6 +317,23 @@ public class ObjectBenchView extends ViewPart implements IResourceChangeListener
 		mainViewArea.layout();
 	}
 	
+	void removeObject(ObjectBenchButton bn, boolean quick) throws ArrayIndexOutOfBoundsException, JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, ClassNotFoundException, MalformedURLException
+	{
+		if(quick)
+		{
+			removeObject(bn);
+		}
+		else
+		{
+			bn.dispose();
+			ObjectBenchUtility.setActiveInstance(null);
+			mainViewArea.layout();
+		}
+		
+	}
+	/*
+	 * Remove Instance - Removes an instance from the object bench.
+	 */
 	public void removeInstance(BenchInstance b) throws ArrayIndexOutOfBoundsException, JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, ClassNotFoundException, MalformedURLException
 	{
 		ObjectBenchButton button = null; 
@@ -289,6 +349,7 @@ public class ObjectBenchView extends ViewPart implements IResourceChangeListener
 			removeObject(button);
 		}
 	}
+	
 	/*
 	 * Get Instances of Type - Gets the instances of a given type.
 	 */
