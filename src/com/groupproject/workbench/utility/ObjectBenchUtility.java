@@ -625,4 +625,65 @@ public final class ObjectBenchUtility
 			
 		}
 	}
+	
+	/*
+	 * Delete File - Deletes a file, usually used to remove classes 
+	 */
+	public static void DeleteFile(File file)
+	{
+		if(file == null)
+		{
+			return;
+		}
+	    // A File object to represent the filename
+	    File f = file;
+
+	    // Make sure the file or directory exists and isn't write protected
+	    if (!f.exists())
+	      throw new IllegalArgumentException(
+	          "Delete: no such file or directory");
+
+	    if (!f.canWrite())
+	      throw new IllegalArgumentException("Delete: write protected");
+
+	    // If it is a directory, make sure it is empty
+	    if (f.isDirectory()) {
+	      String[] files = f.list();
+	      if (files.length > 0)
+	        throw new IllegalArgumentException(
+	            "Delete: directory not empty: ");
+	    }
+
+	    // Attempt to delete it
+	    boolean success = f.delete();
+
+	    if (!success)
+	      throw new IllegalArgumentException("Delete: deletion failed");
+	 }
+	
+	/*
+	 * Delete Folder - Deletes a folder, usually used to delete packages. 
+	 */
+	public static boolean deleteFolder(File file)
+	{
+		if(file == null)
+		{
+			return false;
+		}
+	    if(file.exists()){
+	        File[] files = file.listFiles();
+	        if(null!=files){
+	            for(int i=0; i<files.length; i++) {
+	                if(files[i].isDirectory()) {
+	                    deleteFolder(files[i]);
+	                }
+	                else {
+	                    files[i].delete();
+	                }
+	            }
+	        }
+	    }
+	    return(file.delete());
+	 }
+	
 }

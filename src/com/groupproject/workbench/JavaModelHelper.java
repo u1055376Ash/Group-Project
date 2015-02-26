@@ -48,8 +48,8 @@ public final class JavaModelHelper {
 	
 	private static IProject activeProject;						//The active project
 //	private static IPackageFragment activePackage;				//The active package
-	private static URLClassLoader classLoader;
-	private static List<URL> myUrls; 
+	private static URLClassLoader classLoader;					//The classloader used to load classes
+	private static List<URL> myUrls; 							//A list of locations of classes loaded by the class loader
 	
 	/*
 	 * Constructor
@@ -203,6 +203,7 @@ public final class JavaModelHelper {
 		return null; 
 	}
 	
+
 	/*
 	 * Get Class File - This method returns a classes source file. 
 	 */
@@ -219,6 +220,33 @@ public final class JavaModelHelper {
 	{
 		IFile myFile = getClassIFile(myPackage,myClassName);
 		return myFile.getRawLocation().toString();
+	}
+	
+	/*
+	 * Get Package Folder File - Returns a file reference of a package folder. 
+	 */
+	public static File getPackageFolderFile(String packageName) throws JavaModelException
+	{
+		IFolder fol = getPackageIFile(packageName);
+		return fol.getRawLocation().makeAbsolute().toFile();
+	}
+	
+	/*
+	 * Get Package IFile - Returns the underlying resource of a package. 
+	 */
+	private static IFolder getPackageIFile(String pk) throws JavaModelException
+	{
+		IPackageFragment p = getPackage(pk);
+		if(p != null)
+		{
+			IResource res = p.getUnderlyingResource();
+			if(res.getType() == IResource.FOLDER)
+			{
+				IFolder fol = (IFolder)res;
+				return fol; 
+			}
+		}
+		return null;
 	}
 	
 	/*

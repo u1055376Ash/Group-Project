@@ -4,6 +4,9 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.window.Window;
@@ -53,12 +56,11 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	private SquareButton newPackageButton;				//The reference to the "new package" button.
 	private int state = 0; 								//The state that the view is in Package Viewing = 0 | Class Viewing = 1 
 	//TODO - Maybe remove state and add a simple boolean switch? Or remove altogether now? 
+	
 	/*
 	 * Default Constructor 
 	 */
-	public ClassDiagramView() {
-
-	}
+	public ClassDiagramView() {	}
 
 	/*
 	 * Create Part Control - Sets up the view. 
@@ -600,8 +602,83 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 		
+		MenuItem renameClassItem = new MenuItem(popupMenu, SWT.CASCADE);
+		renameClassItem.setText("Rename Class");
+		renameClassItem.addSelectionListener(new SelectionListener(){
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+			
+		});
+		MenuItem deleteClassItem = new MenuItem(popupMenu, SWT.CASCADE);
+		deleteClassItem.setText("Delete Class");
+		deleteClassItem.addSelectionListener(new SelectionListener(){
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					ObjectBenchUtility.DeleteFile(JavaModelHelper.getClassFile(bn.packageName, bn.className));
+					ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE,null);
+					fullRefresh();
+					refresh();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				} 
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+			
+		});
 		return popupMenu;
 		
+	}
+	
+	/*
+	 * Create Package Menu - Creates a menu for package buttons. 
+	 */
+	public Menu createPackageMenu(final PackageButton b)
+	{
+		Menu popupMenu = new Menu(b);
+		MenuItem renameClassItem = new MenuItem(popupMenu, SWT.CASCADE);
+		renameClassItem.setText("Rename Package");
+		renameClassItem.addSelectionListener(new SelectionListener(){
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+			
+		});
+		MenuItem deleteClassItem = new MenuItem(popupMenu, SWT.CASCADE);
+		deleteClassItem.setText("Delete Package");
+		deleteClassItem.addSelectionListener(new SelectionListener(){
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					ObjectBenchUtility.deleteFolder(JavaModelHelper.getPackageFolderFile(b.packageValue));//ObjectBenchUtility.DeleteFile(JavaModelHelper.getClassFile(bn.packageName, bn.className));
+					ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE,null);
+					fullRefresh();
+					refresh();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				} 
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+			
+		});
+		return popupMenu;
 	}
 	
 	/*
@@ -628,6 +705,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 				if(createNew)
 				{
 					packageButtons.add(new PackageButton(parent,SWT.NONE,packages[i],i,(JavaModelHelper.getNumberOfClassesFromPackage(packages[i]) <= 0)));
+					packageButtons.get(i).setMenu(createPackageMenu(packageButtons.get(i)));
 					packageButtons.get(i).setText(packages[i] +"\n"
 							+ "\n Classes: " + JavaModelHelper.getNumberOfClassesFromPackage(packages[i]) );
 					//System.out.println("Button Made: " + packages[i]);
@@ -739,6 +817,22 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	}
 	
 	/*
+	 * Full Refresh - Performs a full refresh of the screen, good for checking state changes. 
+	 */
+	public void fullRefresh() throws MalformedURLException, Exception
+	{
+		if(state == 0)
+		{
+			viewPackages();
+			displayPackageView(mainViewArea);	
+		}
+		if(state == 1)
+		{
+			displayClassView(mainViewArea);
+		}
+	}
+	
+	/*
 	 * View Classes - Switches the system over to view classes 
 	 */
 	private void viewClasses(String mypackage) throws MalformedURLException, Exception
@@ -793,9 +887,6 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 				button.dispose();
 			}
 			packageButtons = new ArrayList<PackageButton>();
-		
-
-
 		}
 		for(ClassButton button:classButtons)
 		{
@@ -806,8 +897,6 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			{
 					if(!upButton.isDisposed())
 					{
-						//upButton.setVisible(false);
-						//System.out.println("Disposing up button");
 						upButton.dispose();
 					}
 			}
@@ -825,9 +914,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 					newPackageButton.dispose();
 				}
 			}
-
 	}
 	
-
 }
 

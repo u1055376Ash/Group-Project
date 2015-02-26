@@ -35,11 +35,12 @@ import com.groupproject.workbench.utility.ObjectBenchUtility;
 
 /*
  * Object Bench View - This is the view for the object bench. This class controls all instances of user classes and stores them in ObjectBenchButton.
+ * OLD - implements IResourceChangeListener
  */
-public class ObjectBenchView extends ViewPart implements IResourceChangeListener {
+public class ObjectBenchView extends ViewPart  {
 
-	private List<ObjectBenchButton> objectBenchButtons; 
-	private Composite mainViewArea;
+	private List<ObjectBenchButton> objectBenchButtons; 					//The list of buttons on the object bench.
+	private Composite mainViewArea;											//A reference to the main view area.
 	
 	/*
 	 * Default Constructor
@@ -60,6 +61,7 @@ public class ObjectBenchView extends ViewPart implements IResourceChangeListener
 		sc.setMinHeight(110);
 		ObjectBenchUtility.registerObjectBench(this); //Register this with the ObjectBenchUtility so other classes can access this instance
 	}
+	
 	/*
 	 * Build Context Menu - Builds the context menu for the class view. 
 	 */
@@ -111,6 +113,33 @@ public class ObjectBenchView extends ViewPart implements IResourceChangeListener
 	public void setFocus() {}
 
 	/*
+	 * Layout Buttons - Layout the buttons on the bench
+	 */
+	public void layoutButtons()
+	{
+		for(int i = 0; i<objectBenchButtons.size();i++)
+		{
+			FormData buttonData = new FormData(90+(objectBenchButtons.get(i).getText().length() *3),80);
+			if(i == 0)
+			{
+				buttonData.left = new FormAttachment(2);
+				buttonData.top = new FormAttachment(2);
+			}
+			else
+			{
+				if(i > 0)
+				{
+					buttonData.left = new FormAttachment(objectBenchButtons.get(i-1),15,SWT.RIGHT);
+					buttonData.bottom = new FormAttachment(objectBenchButtons.get(i-1),0,SWT.BOTTOM);
+					buttonData.top = new FormAttachment(objectBenchButtons.get(i-1),0,SWT.TOP);
+				}
+			}
+			objectBenchButtons.get(i).setLayoutData(buttonData);
+		}
+		mainViewArea.layout();
+		mainViewArea.getShell().open();
+	}
+	/*
 	 * Add Object - This method adds an instance to the object bench. The object is created from its name, package and an object representing the instance. 
 	 */
 	public void addObject(String className, String packageName, Object instance) throws Exception
@@ -124,31 +153,10 @@ public class ObjectBenchView extends ViewPart implements IResourceChangeListener
 		entryString = entryString.substring(0,entryString.lastIndexOf('.')); //strip extension TODO - use the strip extension found in StringHelper class
 		entryString += " (Instance) ";
 		//Create an ObjectBenchButton to represent instance. 
-		ObjectBenchButton newButton = new ObjectBenchButton(mainViewArea,SWT.NONE,className,objectBenchButtons.size(), packageName, instance);
+		final ObjectBenchButton newButton = new ObjectBenchButton(mainViewArea,SWT.NONE,className,objectBenchButtons.size(), packageName, instance);
 		newButton.setText(entryString);
-		objectBenchButtons.add(newButton);
-		//Position button object. 
-		FormData buttonData = new FormData(90+(entryString.length() * 3),80);
-		final int i = objectBenchButtons.size()-1; //dirty hack for button listener
-		if(i == 0)
-		{
-			//System.out.println("First");
-			buttonData.left = new FormAttachment(2);
-			buttonData.top = new FormAttachment(2);
-		}
-		else
-		{
-			if(i > 0)
-			{
-				//System.out.println("Another");
-				buttonData.left = new FormAttachment(objectBenchButtons.get(i-1),15,SWT.RIGHT);
-				buttonData.bottom = new FormAttachment(objectBenchButtons.get(i-1),0,SWT.BOTTOM);
-				buttonData.top = new FormAttachment(objectBenchButtons.get(i-1),0,SWT.TOP);
-			}
-		}
-		objectBenchButtons.get(i).setLayoutData(buttonData);
 		//Set up the listener for the buttons. 
-		objectBenchButtons.get(i).addMouseListener(new MouseListener(){
+		newButton.addMouseListener(new MouseListener(){
 
 			@Override
 			public void mouseDoubleClick(MouseEvent e) {}
@@ -158,17 +166,13 @@ public class ObjectBenchView extends ViewPart implements IResourceChangeListener
 			@Override
 			public void mouseUp(MouseEvent e) {
 				try {
-					ObjectBenchUtility.setActiveInstance(objectBenchButtons.get(i).getInstance());
+					ObjectBenchUtility.setActiveInstance(newButton.getInstance());
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				} 
-			
 			}
-
 		});
-		
-		objectBenchButtons.get(i).setMenu(buildMenuForClass(objectBenchButtons.get(i)));
-		
+		newButton.setMenu(buildMenuForClass(newButton));
 		//TODO - in final build remove this code.
 //		Class<?> myClass = ObjectBenchButtons.get(i).getMyClass();
 //
@@ -181,10 +185,8 @@ public class ObjectBenchView extends ViewPart implements IResourceChangeListener
 //			Constructor<?> myConstructor = myClass.getConstructor(parameters);
 //			//ObjectBenchButtons.get(i).setInstance((Object)myConstructor.newInstance());//do fuck all for now.
 //		}
-
-		
-		mainViewArea.layout();
-		mainViewArea.getShell().open();
+		objectBenchButtons.add(newButton);
+		layoutButtons();
 	}
 	
 	/*
@@ -303,7 +305,6 @@ public class ObjectBenchView extends ViewPart implements IResourceChangeListener
 			
 		});
 		return popupMenu;
-		
 	}
 	
 	/*
@@ -314,9 +315,12 @@ public class ObjectBenchView extends ViewPart implements IResourceChangeListener
 		objectBenchButtons.remove(bn);
 		bn.dispose();
 		ObjectBenchUtility.setActiveInstance(null);
-		mainViewArea.layout();
+		layoutButtons();
 	}
 	
+	/*
+	 * Remove Object(Dirty) - This removes an object from the bench without removing it from the collection.
+	 */
 	void removeObject(ObjectBenchButton bn, boolean quick) throws ArrayIndexOutOfBoundsException, JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, ClassNotFoundException, MalformedURLException
 	{
 		if(quick)
@@ -377,38 +381,38 @@ public class ObjectBenchView extends ViewPart implements IResourceChangeListener
 	}
 	
 
-	@Override
-	      public void resourceChanged(IResourceChangeEvent event) {
-	          IResource res = event.getResource();
-	          switch (event.getType()) {
-	             case IResourceChangeEvent.PRE_CLOSE:
-
-	                break;
-	             case IResourceChangeEvent.PRE_DELETE:
-
-	                break;
-	             case IResourceChangeEvent.POST_CHANGE:
-
-	                break;
-	             case IResourceChangeEvent.PRE_BUILD:
-	            	 
-	                 break;
-	             case IResourceChangeEvent.POST_BUILD:
-	            	 for(ObjectBenchButton b:objectBenchButtons)
-	            	 {
-	            		 try {
-							if(b.getInstance().checkDelete())
-							 {
-								 removeObject(b);
-							 }
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} 
-	            	 }
-	            	 break;
-	          }
-	       }
+//	@Override
+//	      public void resourceChanged(IResourceChangeEvent event) {
+//	          IResource res = event.getResource();
+//	          switch (event.getType()) {
+//	             case IResourceChangeEvent.PRE_CLOSE:
+//
+//	                break;
+//	             case IResourceChangeEvent.PRE_DELETE:
+//
+//	                break;
+//	             case IResourceChangeEvent.POST_CHANGE:
+//
+//	                break;
+//	             case IResourceChangeEvent.PRE_BUILD:
+//	            	 
+//	                 break;
+//	             case IResourceChangeEvent.POST_BUILD:
+//	            	 for(ObjectBenchButton b:objectBenchButtons)
+//	            	 {
+//	            		 try {
+//							if(b.getInstance().checkDelete())
+//							 {
+//								 removeObject(b);
+//							 }
+//						} catch (Exception e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						} 
+//	            	 }
+//	            	 break;
+//	          }
+//	       }
 		
 	
 }

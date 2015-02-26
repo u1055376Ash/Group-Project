@@ -37,8 +37,8 @@ public class NewPackageDialog extends Dialog{
 		container.setLayoutData(new GridData(GridData.FILL_BOTH));
 		GridLayout layout = new GridLayout(1,false); 
 		layout.marginBottom = 10;
-		//container.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true, true));
 		container.setLayout(layout);
+
 		drawGUI();
 		return container;
 	}
@@ -51,17 +51,14 @@ public class NewPackageDialog extends Dialog{
 		container.getShell().setText("New Package");
 		Label newPackageLabel = new Label(container,SWT.BOLD);
 		newPackageLabel.setText("New Package");
+		packageNameValue = new Text(container, SWT.SINGLE|SWT.BORDER);
 		Font labelFont = new Font(container.getDisplay(),"Ariel", 12, SWT.BOLD);
 		newPackageLabel.setFont(labelFont);
-
-		packageNameValue = new Text(container, SWT.DEFAULT);
-		packageNameValue.setText("my.new.package");
+		packageNameValue.setText("com.testing.newPackage");
 		packageNameValue.setEditable(true);
-
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
 		data.minimumWidth = 100;
 		packageNameValue.setLayoutData(data);
-
 		container.layout();
 	}
 

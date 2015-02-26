@@ -58,7 +58,7 @@ public class NewClassDialog extends Dialog {
 		Font labelFont = new Font(container.getDisplay(),"Ariel", 12, SWT.BOLD);
 		newClassLabel.setFont(labelFont);
 		
-		classNameField = new Text(container, SWT.DEFAULT);
+		classNameField = new Text(container, SWT.SINGLE|SWT.BORDER);
 		classNameField.setText("MyNewClass");
 		classNameField.setEditable(true);
 		
