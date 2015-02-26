@@ -48,7 +48,8 @@ public final class JavaModelHelper {
 	
 	private static IProject activeProject;						//The active project
 //	private static IPackageFragment activePackage;				//The active package
-	
+	private static URLClassLoader classLoader;
+	private static List<URL> myUrls; 
 	
 	/*
 	 * Constructor
@@ -67,6 +68,7 @@ public final class JavaModelHelper {
 	 */
 	public static void Initialise() throws MalformedURLException, Exception
 	{
+		myUrls = new ArrayList<URL>();
 		workspace = ResourcesPlugin.getWorkspace(); 
 		root = workspace.getRoot();
 		projects = root.getProjects();
@@ -75,6 +77,7 @@ public final class JavaModelHelper {
 			activeProject = projects[0];
 		}
 		addToClassPath();
+		//myUrls = 
 	}
 	
 	/*
@@ -673,7 +676,7 @@ public final class JavaModelHelper {
 	 * Get Class From Loader - This tiny method solves the reflection problem as a result of the dual VM setup in Eclipse. 
 	 * This method allows us to get the Class object from a qualified class name. 
 	 */
-	public static Class<?> getClassFromLoader(String s) throws ClassNotFoundException
+	public static Class<?> getClassFromLoader(String s) throws ClassNotFoundException, MalformedURLException
 	{
 		try {
 			buildActiveProject();
@@ -681,7 +684,15 @@ public final class JavaModelHelper {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return ClassLoader.getSystemClassLoader().loadClass(s);
+		
+//		URL[] urls= null;
+//		File dir = new File(System.getProperty("user.dir") + File.separator + "dir" + File.separator);
+//		URL url = dir.toURI().toURL();
+//		urls = new URL[] {url};
+//		ClassLoader cl = new URLClassLoader(urls);
+//		return cl.loadClass(s);
+		return classLoader.loadClass(s);
+		//return ClassLoader.getSystemClassLoader().loadClass(s);
 	}
 	
 	/*
@@ -695,7 +706,7 @@ public final class JavaModelHelper {
 	/*
 	 * Get Superclass - Gets the superclass of a given class. 
 	 */
-	public static Class<?> getSuperClass(String s) throws ClassNotFoundException
+	public static Class<?> getSuperClass(String s) throws ClassNotFoundException, MalformedURLException
 	{
 		Class<?> c = getClassFromLoader(s);
 		return getSuperclass(c);
@@ -806,14 +817,18 @@ public final class JavaModelHelper {
 	 * Add URL - Adds a URL to the class path. 
 	 */
 	public static void addURL(URL url) throws Exception{
-		//DEPRECIATED.
-		//TODO - Check links for safe removal. 
-		URLClassLoader classLoader = (URLClassLoader)ClassLoader.getSystemClassLoader(); 
+//		Class<URLClassLoader> myClass = URLClassLoader.class; 
+//		Method method = myClass.getDeclaredMethod("addURL", new Class[]{URL.class});
+//		method.setAccessible(true);
+//		method.invoke(classLoader, new Object[]{url});
+		myUrls.add(url);
 		Class<URLClassLoader> myClass = URLClassLoader.class; 
-		
-		Method method = myClass.getDeclaredMethod("addURL", new Class[]{URL.class});
-		method.setAccessible(true);
-		method.invoke(classLoader, new Object[]{url});
+     	URL[] urls = myUrls.toArray(new URL[myUrls.size()]);		
+     	classLoader = new URLClassLoader(urls);
+		//Method method = myClass.getDeclaredMethod("addURL", new Class[]{URL.class});
+		//method.setAccessible(true);
+		//method.invoke(classLoader, new Object[]{url});
+	//return cl.loadClass(s);
 		
 	}
 	

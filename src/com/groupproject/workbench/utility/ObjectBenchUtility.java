@@ -1,6 +1,7 @@
 package com.groupproject.workbench.utility;
 
 import java.io.File;
+import java.net.MalformedURLException;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -165,7 +166,7 @@ public final class ObjectBenchUtility
 	/*
 	 * Set Active Instance - Sets the active instance...
 	 */
-	public static void setActiveInstance(BenchInstance i) throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ArrayIndexOutOfBoundsException, NoSuchMethodException, ClassNotFoundException
+	public static void setActiveInstance(BenchInstance i) throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ArrayIndexOutOfBoundsException, NoSuchMethodException, ClassNotFoundException, MalformedURLException
 	{
 		activeInstance = i; 
 		if(inspectorView != null)
@@ -185,7 +186,7 @@ public final class ObjectBenchUtility
 	/*
 	 * Get Class From Type - Returns a class type from a string.
 	 */
-	public static Class<?> getClassFromType(String s) throws ClassNotFoundException
+	public static Class<?> getClassFromType(String s) throws ClassNotFoundException, MalformedURLException
 	{
 		//TODO - Extend this so user classes can be found. 
 		System.out.println(":"+s+":");
@@ -305,7 +306,7 @@ public final class ObjectBenchUtility
 		return false; 
 	}
 	
-	public static Class<?>[] getParameterTypes(String[] types) throws ClassNotFoundException
+	public static Class<?>[] getParameterTypes(String[] types) throws ClassNotFoundException, MalformedURLException
 	{
 		Class<?>[] classes = new Class<?>[types.length];
 		for(int i = 0; i<types.length;i++)

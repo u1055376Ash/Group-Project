@@ -3,6 +3,7 @@
  */
 package com.groupproject.workbench.perspectives;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.eclipse.ui.IWorkbenchPage;
@@ -44,7 +45,6 @@ public class ObjectBenchPerspective implements IPerspectiveFactory {
 		//myLayout.addStandaloneView(Navigation.ID,false, relationship, ratio, refId);
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		//page.hideView(page.getViewReferences()[0]);
-		
 		myLayout.addView(OBJECT_BENCH_ID, IPageLayout.BOTTOM, 0.8f, myLayout.getEditorArea());
 		myLayout.addView(IPageLayout.ID_PROJECT_EXPLORER, IPageLayout.LEFT, 0.2f, myLayout.getEditorArea());
 		myLayout.addView(CLASS_DIAGRAM_ID, IPageLayout.LEFT,0.6f,myLayout.getEditorArea());
@@ -53,11 +53,29 @@ public class ObjectBenchPerspective implements IPerspectiveFactory {
 
 	}
 	
+	/*
+	 * Hide Editor - Hides the empty window. 
+	 */
 	public static void hideEditor()
 	{
+		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().setEditorAreaVisible(false);
 		if(theLayout != null)
 		{
+			System.out.println("Hiding");
 			theLayout.setEditorAreaVisible(false);
+		}
+	}
+	
+	/*
+	 * Show Window - Shows the empty window to be used for the code editor. 
+	 */
+	public static void showEditor()
+	{
+		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().setEditorAreaVisible(true);
+		if(theLayout != null)
+		{
+			System.out.println("Showing");
+			theLayout.setEditorAreaVisible(true);
 		}
 	}
 

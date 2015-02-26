@@ -360,7 +360,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	 * Create Class Buttons - This is the method that draws the class icons. 
 	 *TODO - Add dependencies here! 
 	 */
-	public void createClassButtons(Composite parent, Boolean pushDown) throws JavaModelException, ClassNotFoundException
+	public void createClassButtons(Composite parent, Boolean pushDown) throws MalformedURLException, Exception
 	{
 		if(upButton == null || upButton.isDisposed() && !activePackageName.equals(""))
 			{
@@ -377,6 +377,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		
 		for(int i = 0; i < classes.length;i++) 
 		{
+			JavaModelHelper.addToClassPath(classes[i], activePackageName); 
 			String entryString = classes[i];
 			entryString = entryString.substring(0,entryString.lastIndexOf('.'));
 			final int currentClassId = i; 
@@ -394,6 +395,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 
 						@Override
 						public void mouseDoubleClick(MouseEvent e) {
+							ObjectBenchPerspective.showEditor();
 							ObjectBenchUtility.openClassInEditor(activePackageName,classes[currentClassId]);
 						}
 
@@ -410,7 +412,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			{
 				//Create a new class button. 
 				try {
-					JavaModelHelper.addToClassPath(classes[i], activePackageName); //This makes sure that the class is added to the class path
+					//JavaModelHelper.addToClassPath(classes[i], activePackageName); //This makes sure that the class is added to the class path
 					//TODO This may cause problems later on, may need to have a method that does this before drawing the buttons.
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -459,7 +461,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	/*
 	 * Check Super Class - Checks if the class is inherited. 
 	 */
-	void checkSuperClass(ClassButton b) throws ClassNotFoundException
+	void checkSuperClass(ClassButton b) throws Exception
 	{
 		Class<?> superClass = JavaModelHelper.getSuperclass(b.getMyClass()); 
 		if(superClass != null)
@@ -826,7 +828,6 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 
 	}
 	
-
 
 }
 

@@ -1,5 +1,7 @@
 package com.groupproject.workbench.buttons;
 
+import java.net.MalformedURLException;
+
 import org.eclipse.swt.widgets.Composite;
 
 import com.groupproject.workbench.BenchInstance;
@@ -15,13 +17,13 @@ public class ObjectBenchButton extends ClassButton {
 	 * Constructors
 	 */
 	public ObjectBenchButton(Composite parent, int style, String cn, int id,
-			String pn) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+			String pn) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException {
 		super(parent, style, cn, id, pn);
 		myInstance = new BenchInstance(cn,pn);
 	}
 	
 	public ObjectBenchButton(Composite parent, int style, String cn, int id,
-			String pn, Object instance) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+			String pn, Object instance) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException {
 		super(parent, style, cn, id, pn);
 		myInstance = new BenchInstance(cn,pn,instance);
 	}
@@ -38,7 +40,7 @@ public class ObjectBenchButton extends ClassButton {
 	/*
 	 * Set Instance - Creates and sets a new instance based on class name and package. 
 	 */
-	public void setInstance(String cN, String pN) throws ClassNotFoundException, InstantiationException, IllegalAccessException
+	public void setInstance(String cN, String pN) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException
 	{
 		myInstance = new BenchInstance(cN,pN);
 	}

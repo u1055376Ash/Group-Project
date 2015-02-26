@@ -1,9 +1,13 @@
 package com.groupproject.workbench.views;
 
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
@@ -32,7 +36,7 @@ import com.groupproject.workbench.utility.ObjectBenchUtility;
 /*
  * Object Bench View - This is the view for the object bench. This class controls all instances of user classes and stores them in ObjectBenchButton.
  */
-public class ObjectBenchView extends ViewPart {
+public class ObjectBenchView extends ViewPart implements IResourceChangeListener {
 
 	private List<ObjectBenchButton> objectBenchButtons; 
 	private Composite mainViewArea;
@@ -168,7 +172,7 @@ public class ObjectBenchView extends ViewPart {
 						try {
 							ObjectBenchUtility.setActivePackage(bn.packageName);
 							parameters = ObjectBenchUtility.getParameterTypes(methodTypes[index]);
-						} catch (ClassNotFoundException e2) {
+						} catch (Exception e2) {
 							e2.printStackTrace();
 						}
 						
@@ -262,7 +266,7 @@ public class ObjectBenchView extends ViewPart {
 	/*
 	 * Remove Object - Removes an object from the object bench. 
 	 */
-	void removeObject(ObjectBenchButton bn) throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ArrayIndexOutOfBoundsException, NoSuchMethodException, ClassNotFoundException
+	void removeObject(ObjectBenchButton bn) throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ArrayIndexOutOfBoundsException, NoSuchMethodException, ClassNotFoundException, MalformedURLException
 	{
 		objectBenchButtons.remove(bn);
 		bn.dispose();
@@ -270,6 +274,21 @@ public class ObjectBenchView extends ViewPart {
 		mainViewArea.layout();
 	}
 	
+	public void removeInstance(BenchInstance b) throws ArrayIndexOutOfBoundsException, JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, ClassNotFoundException, MalformedURLException
+	{
+		ObjectBenchButton button = null; 
+		for(ObjectBenchButton o:objectBenchButtons)
+		{
+			if(o.getInstance().equals(b))
+			{
+				button = o;
+			}
+		}
+		if(button != null)
+		{
+			removeObject(button);
+		}
+	}
 	/*
 	 * Get Instances of Type - Gets the instances of a given type.
 	 */
@@ -295,4 +314,40 @@ public class ObjectBenchView extends ViewPart {
 	{
 		return getInstancesOfType(c.getName());
 	}
+	
+
+	@Override
+	      public void resourceChanged(IResourceChangeEvent event) {
+	          IResource res = event.getResource();
+	          switch (event.getType()) {
+	             case IResourceChangeEvent.PRE_CLOSE:
+
+	                break;
+	             case IResourceChangeEvent.PRE_DELETE:
+
+	                break;
+	             case IResourceChangeEvent.POST_CHANGE:
+
+	                break;
+	             case IResourceChangeEvent.PRE_BUILD:
+	            	 
+	                 break;
+	             case IResourceChangeEvent.POST_BUILD:
+	            	 for(ObjectBenchButton b:objectBenchButtons)
+	            	 {
+	            		 try {
+							if(b.getInstance().checkDelete())
+							 {
+								 removeObject(b);
+							 }
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} 
+	            	 }
+	            	 break;
+	          }
+	       }
+		
+	
 }

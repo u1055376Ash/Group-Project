@@ -1,6 +1,7 @@
 package com.groupproject.workbench.views;
 
 import java.lang.reflect.Array;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -93,7 +94,7 @@ public class InspectorView extends ViewPart {
 	/*
 	 * Update - This method updates the inspector, making it get the active instance. This method reads the active instance and gets all field values
 	 */
-	public void update() throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ArrayIndexOutOfBoundsException, NoSuchMethodException, ClassNotFoundException
+	public void update() throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ArrayIndexOutOfBoundsException, NoSuchMethodException, ClassNotFoundException, MalformedURLException
 	{
 		int yValue = 30; 
 		clear();

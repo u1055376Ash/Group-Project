@@ -75,7 +75,7 @@ public class ClassButton extends SquareButton{
 	/*
 	 * Get My Class - Returns an object representing the class referenced in this button. 
 	 */
-	public Class<?> getMyClass() throws ClassNotFoundException
+	public Class<?> getMyClass() throws Exception
 	{
 
 		Class<?> c  = JavaModelHelper.getClassFromLoader(StringHelper.getQualifiedName(className, packageName));

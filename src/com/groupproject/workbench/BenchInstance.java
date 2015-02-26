@@ -2,8 +2,12 @@ package com.groupproject.workbench;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+
+import org.eclipse.jdt.core.JavaModelException;
 
 import com.groupproject.workbench.helpers.StringHelper;
+import com.groupproject.workbench.utility.ObjectBenchUtility;
 /*
  * The class that controls an instance of a users class.
  * Contains methods to access fields of an instantiated class and call methods related to the class. 
@@ -17,10 +21,11 @@ public class BenchInstance {
 	public Class<?> myClass; 									//Class variable
 	public Object myInstance; 									//Reference to the created Object instance.
 	
+	boolean markForDeletion;
 	/*
 	 * Constructors 
 	 */
-	public BenchInstance(String c, String p) throws ClassNotFoundException, InstantiationException, IllegalAccessException
+	public BenchInstance(String c, String p) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException
 	{
 		className = c;
 		packageName = p; 
@@ -29,7 +34,7 @@ public class BenchInstance {
 		Instantiate();
 	}
 	
-	public BenchInstance(String c, String p, Object o) throws ClassNotFoundException, InstantiationException, IllegalAccessException
+	public BenchInstance(String c, String p, Object o) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException
 	{
 		className = c;
 		packageName = p; 
@@ -38,7 +43,7 @@ public class BenchInstance {
 		myInstance = o; 
 	}
 	
-	public BenchInstance() throws ClassNotFoundException, InstantiationException, IllegalAccessException
+	public BenchInstance() throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException
 	{
 		this("DefaultClass","DefaultPackage");
 	}
@@ -125,11 +130,15 @@ public class BenchInstance {
 	/*
 	 * Get Value - Gets the value of a requested field and returns it as a String. 
 	 */
-	public String getValue(String fieldName) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException
+	public String getValue(String fieldName) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ArrayIndexOutOfBoundsException, JavaModelException, NoSuchMethodException, ClassNotFoundException, MalformedURLException
 	{
 		if(myInstance != null)
 		{
-			Field field = myClass.getDeclaredField(fieldName);
+			Field field = getMyField(fieldName);
+			if(field == null)
+			{
+				return null; 
+			}
 			field.setAccessible(true);
 			Object obj = field.get(myInstance);//.toString();
 			String value = "null";
@@ -146,30 +155,51 @@ public class BenchInstance {
 
 	}
 	
-	public Class<?> getFieldClass(String fieldName) throws NoSuchFieldException, SecurityException, ClassNotFoundException
+	public Class<?> getFieldClass(String fieldName) throws NoSuchFieldException, SecurityException, ClassNotFoundException, MalformedURLException, ArrayIndexOutOfBoundsException, JavaModelException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException
 	{
 		if(myInstance != null)
 		{
 			update();
-			Field field = myClass.getDeclaredField(fieldName);
+			Field field = getMyField(fieldName);
+			if(field == null)
+			{
+				return null;
+			}
 			field.setAccessible(true);
 			return field.getType();
 		}
 		return null;
 	}
 	
+	Field getMyField(String name) throws ArrayIndexOutOfBoundsException, JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, ClassNotFoundException, MalformedURLException
+	{
+		Field field;
+		try {
+			field = myClass.getDeclaredField(name);
+			field.setAccessible(true);
+			return field;
+		} catch (NoSuchFieldException e) {
+			ObjectBenchUtility.getObjectBench().removeInstance(this);
+			return null;
+		}
+	}
+	
 	/*
 	 * Get Field - This method gets the object associated with a field. 
 	 */
-	public Object getField(String fieldName) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException
+	public Object getField(String fieldName) throws SecurityException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException, MalformedURLException, NoSuchFieldException, ArrayIndexOutOfBoundsException, JavaModelException, NoSuchMethodException
 	{
 		if(myInstance != null)
 		{
 			update();
-			Field field = myClass.getDeclaredField(fieldName);
-			field.setAccessible(true);
+			Field field = getMyField(fieldName);
+			if(field == null)
+			{
+				return null; 
+			}
 			Object obj = field.get(myInstance);
 			return obj;
+
 		}
 		return null;
 	}
@@ -179,7 +209,7 @@ public class BenchInstance {
 	 */
 	public void setValue(String fieldName, Object value) throws Exception
 	{
-		Field field = myClass.getDeclaredField(fieldName); 
+		Field field = getMyField(fieldName);
 		field.setAccessible(true);
 		field.set(myInstance, value);
 	}
@@ -220,8 +250,28 @@ public class BenchInstance {
 		myInstance = o; 
 	}
 	
-	 void update() throws ClassNotFoundException
+	 void update() throws ClassNotFoundException, MalformedURLException
 	{
-		myClass = JavaModelHelper.getClassFromLoader(StringHelper.getQualifiedName(className, packageName));
+		 if(myClass == null)
+		 {
+			 myClass = JavaModelHelper.getClassFromLoader(StringHelper.getQualifiedName(className, packageName));
+			 return;
+		 }
+		 if(myClass.equals(JavaModelHelper.getClassFromLoader(StringHelper.getQualifiedName(className, packageName))))
+		 {
+			 myClass = JavaModelHelper.getClassFromLoader(StringHelper.getQualifiedName(className, packageName));
+			 markForDeletion = false; 
+		 }
+		 else
+		 {
+			 markForDeletion = true;
+		 }
+
 	}
+	 
+	 public boolean checkDelete() throws ClassNotFoundException, MalformedURLException
+	 {
+		 update();
+		 return markForDeletion;
+	 }
 }
