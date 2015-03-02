@@ -88,6 +88,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		viewHeader = new Label(mainViewArea,0);
 		mainViewArea.setMenu(buildContextMenu());
 		getViewSite().getPage().addSelectionListener(this); //Listens to the project resource explorer
+		ObjectBenchPerspective.hideEditor();
 	}
 	
 	/*
@@ -142,6 +143,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		}
 		try {
 			JavaModelHelper.buildProject(activeProjectName);
+			fullRefresh();
 			//displayClassView(mainViewArea);
 		} catch (Exception e) {e.printStackTrace();}
 	}
@@ -157,6 +159,11 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		{
 			
 		}
+		try {
+			JavaModelHelper.buildProject(activeProjectName);
+			fullRefresh();
+			//displayClassView(mainViewArea);
+		} catch (Exception e) {e.printStackTrace();}
 	}
 
 	/*
@@ -379,7 +386,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		
 		for(int i = 0; i < classes.length;i++) 
 		{
-			JavaModelHelper.addToClassPath(classes[i], activePackageName); 
+			
 			String entryString = classes[i];
 			entryString = entryString.substring(0,entryString.lastIndexOf('.'));
 			final int currentClassId = i; 

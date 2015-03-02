@@ -390,8 +390,8 @@ public final class ObjectBenchUtility
 			spinner.setDigits(3);
 			spinner.setMinimum(0);
 			spinner.setMaximum((int) Double.MAX_VALUE);
-			spinner.setSelection(0);
-			spinner.setIncrement(100);
+			spinner.setSelection(3472);
+			spinner.setIncrement(10);
 			spinner.setPageIncrement(1000);
 			spinner.setData("typeKey", "double");
 			return spinner; 
@@ -489,10 +489,14 @@ public final class ObjectBenchUtility
 				}
 				
 			});
-			
 			return comboBox;
 		}
 		return null; 
+	}
+	
+	public static Combo addConstructorsToCombo(Combo c, String className, String packageName)
+	{
+		return c;
 	}
 	
 	/*
@@ -500,6 +504,10 @@ public final class ObjectBenchUtility
 	 */
 	public static Object getControlValue(Control c)
 	{
+		if(c == null)
+		{
+			return null;
+		}
 		String s = (String)c.getData("typeKey");
 		Object o = null;
 		if(s.equals("int"))
@@ -581,7 +589,7 @@ public final class ObjectBenchUtility
 		if(s.equals("float"))
 		{
 			Spinner spin = (Spinner)c;
-			spin.setValues((int) Float.parseFloat(o.toString()), 0, Integer.MAX_VALUE, 3, 1, 3);
+			spin.setValues((int) (Float.parseFloat(o.toString()) * 1000), 0, Integer.MAX_VALUE, 3, 1, 3);
 		}
 		if(s.equals("byte"))
 		{

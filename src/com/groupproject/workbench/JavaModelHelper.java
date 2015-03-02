@@ -639,7 +639,7 @@ public final class JavaModelHelper {
 	/*
 	 * Get Class Names - Returns a collection of class names from a given package. 
 	 */
-	public static String[] getClassNames(String myPackage) throws JavaModelException, ClassNotFoundException
+	public static String[] getClassNames(String myPackage) throws MalformedURLException, Exception
 	{
 		IPackageFragment localPackage = getPackage(myPackage);
 		if(localPackage == null)
@@ -651,6 +651,7 @@ public final class JavaModelHelper {
 		for(int i = 0; i<classes.length;i++)
 		{
 			strings[i] = classes[i].getElementName();
+			addToClassPath(classes[i].getElementName(), myPackage); 
 			//addToClassPath(StringHelper.stripExtension(localPackage.getElementName() + "." + strings[i]));
 		}
 		return strings;

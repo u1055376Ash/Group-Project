@@ -360,6 +360,10 @@ public class ObjectBenchView extends ViewPart  {
 	public BenchInstance[] getInstancesOfType(String t)
 	{
 		//System.out.println("Looking For: " + t);
+		if(objectBenchButtons == null)
+		{
+			return null; 
+		}
 		List<BenchInstance> instances = new ArrayList<BenchInstance>();
 		for(ObjectBenchButton b:objectBenchButtons)
 		{
