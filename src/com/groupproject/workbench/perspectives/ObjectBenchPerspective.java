@@ -3,7 +3,6 @@
  */
 package com.groupproject.workbench.perspectives;
 
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.eclipse.ui.IWorkbenchPage;
@@ -38,19 +37,14 @@ public class ObjectBenchPerspective implements IPerspectiveFactory {
 	@Override
 	public void createInitialLayout(IPageLayout myLayout) {
 		
-		
-		//String editorArea = myLayout.getEditorArea();
+
 		myLayout.setEditorAreaVisible(false);
 		theLayout = myLayout;
-		//myLayout.addStandaloneView(Navigation.ID,false, relationship, ratio, refId);
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		//page.hideView(page.getViewReferences()[0]);
 		myLayout.addView(OBJECT_BENCH_ID, IPageLayout.BOTTOM, 0.8f, myLayout.getEditorArea());
 		myLayout.addView(IPageLayout.ID_PROJECT_EXPLORER, IPageLayout.LEFT, 0.2f, myLayout.getEditorArea());
 		myLayout.addView(CLASS_DIAGRAM_ID, IPageLayout.LEFT,0.6f,myLayout.getEditorArea());
 		myLayout.addView(INSPECTOR_ID, IPageLayout.LEFT, 0.3f, myLayout.getEditorArea());
-		
-
 	}
 	
 	/*
@@ -61,7 +55,7 @@ public class ObjectBenchPerspective implements IPerspectiveFactory {
 		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().setEditorAreaVisible(false);
 		if(theLayout != null)
 		{
-			System.out.println("Hiding");
+			//System.out.println("Hiding");
 			theLayout.setEditorAreaVisible(false);
 		}
 	}
@@ -74,7 +68,7 @@ public class ObjectBenchPerspective implements IPerspectiveFactory {
 		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().setEditorAreaVisible(true);
 		if(theLayout != null)
 		{
-			System.out.println("Showing");
+			//System.out.println("Showing");
 			theLayout.setEditorAreaVisible(true);
 		}
 	}

@@ -2,7 +2,6 @@ package com.groupproject.workbench;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -107,7 +106,6 @@ public final class JavaModelHelper {
 	
 	/*
 	 * New Class - Creates a new class
-	 *TODO - Extend this method to include different class types from template.
 	 */
 	public static void newClass(String className, int classType, String myPackage) throws IOException, JavaModelException
 	{
@@ -173,8 +171,17 @@ public final class JavaModelHelper {
 	 */
 	public static ICompilationUnit[] getClasses(IProject project)  throws JavaModelException
 	{
-		//TODO Implement this method, can use the other version for ease. 
-		return null; 
+		List<ICompilationUnit> classes = new ArrayList<ICompilationUnit>();
+		IJavaProject javaProject = getJavaProject(project);
+		IPackageFragment[] packages = javaProject.getPackageFragments();
+		for(IPackageFragment p:packages)
+		{
+			for(ICompilationUnit u:getClasses(p))
+			{
+				classes.add(u);
+			}
+		}
+		return classes.toArray(new ICompilationUnit[classes.size()]); 
 	}
 	
 	/*
@@ -251,7 +258,6 @@ public final class JavaModelHelper {
 	
 	/*
 	 * Get Class - Returns the compilation unit of the class. 
-	 * TODO - Refactor this method to better reflect what is returned. 
 	 */
 	public static ICompilationUnit getClass(String mypackage, String name) throws JavaModelException
 	{
@@ -629,10 +635,18 @@ public final class JavaModelHelper {
 	/*
 	 * Get Class Fields - Gets a collection of fields from a given class. 
 	 */
-	private static IField[] getClassFields(String myPacakge, String myClass)
+	private static IField[] getClassFields(String myPackage, String myClass) throws JavaModelException
 	{
-		//TODO - Implement this method. 
-		return null;
+		List<IField> fields = new ArrayList<IField>();
+		ICompilationUnit unit = getClass(myPackage,myClass);
+		for(IType type:unit.getTypes())
+		{
+			for(IField field:type.getFields())
+			{
+				fields.add(field);
+			}
+		}
+		return fields.toArray(new IField[fields.size()]);
 		
 	}
 	
@@ -652,7 +666,6 @@ public final class JavaModelHelper {
 		{
 			strings[i] = classes[i].getElementName();
 			addToClassPath(classes[i].getElementName(), myPackage); 
-			//addToClassPath(StringHelper.stripExtension(localPackage.getElementName() + "." + strings[i]));
 		}
 		return strings;
 		
@@ -695,10 +708,7 @@ public final class JavaModelHelper {
 	 */
 	static void addToClassPath(String s) throws ClassNotFoundException
 	{
-		//TODO - Look at maybe removing this method as it may now be depreciated. 
 		ClassLoader.getSystemClassLoader().loadClass(s);
-		//System.out.println(s);
-		//ResourceBundle.getBundle(s,Locale.getDefault(), ClassLoader.getSystemClassLoader());
 	}
 	
 	/*
@@ -710,7 +720,6 @@ public final class JavaModelHelper {
 		try {
 			buildActiveProject();
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -846,19 +855,9 @@ public final class JavaModelHelper {
 	 * Add URL - Adds a URL to the class path. 
 	 */
 	public static void addURL(URL url) throws Exception{
-//		Class<URLClassLoader> myClass = URLClassLoader.class; 
-//		Method method = myClass.getDeclaredMethod("addURL", new Class[]{URL.class});
-//		method.setAccessible(true);
-//		method.invoke(classLoader, new Object[]{url});
 		myUrls.add(url);
-		Class<URLClassLoader> myClass = URLClassLoader.class; 
      	URL[] urls = myUrls.toArray(new URL[myUrls.size()]);		
      	classLoader = new URLClassLoader(urls);
-		//Method method = myClass.getDeclaredMethod("addURL", new Class[]{URL.class});
-		//method.setAccessible(true);
-		//method.invoke(classLoader, new Object[]{url});
-	//return cl.loadClass(s);
-		
 	}
 	
 	/*

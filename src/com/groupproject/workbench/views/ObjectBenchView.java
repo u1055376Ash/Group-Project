@@ -5,9 +5,6 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
@@ -30,12 +27,10 @@ import com.groupproject.workbench.JavaModelHelper;
 import com.groupproject.workbench.buttons.ObjectBenchButton;
 import com.groupproject.workbench.dialogs.MethodDialog;
 import com.groupproject.workbench.helpers.StringHelper;
-import com.groupproject.workbench.perspectives.ObjectBenchPerspective;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 
 /*
  * Object Bench View - This is the view for the object bench. This class controls all instances of user classes and stores them in ObjectBenchButton.
- * OLD - implements IResourceChangeListener
  */
 public class ObjectBenchView extends ViewPart  {
 
@@ -45,8 +40,12 @@ public class ObjectBenchView extends ViewPart  {
 	/*
 	 * Default Constructor
 	 */
-	public ObjectBenchView() {	}
+	public ObjectBenchView() {}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	public void createPartControl(Composite parent) {
 		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
@@ -56,7 +55,6 @@ public class ObjectBenchView extends ViewPart  {
 		mainViewArea.setMenu(buildContextMenu());
 		sc.setContent(mainViewArea);
 		sc.setExpandHorizontal(true);
-		//sc.setExpandVertical(true);
 		sc.setMinSize(mainViewArea.computeSize(1000, 100));
 		sc.setMinHeight(110);
 		ObjectBenchUtility.registerObjectBench(this); //Register this with the ObjectBenchUtility so other classes can access this instance
@@ -150,7 +148,8 @@ public class ObjectBenchView extends ViewPart  {
 			objectBenchButtons = new ArrayList<ObjectBenchButton>(); 
 		}
 		String entryString = className;
-		entryString = entryString.substring(0,entryString.lastIndexOf('.')); //strip extension TODO - use the strip extension found in StringHelper class
+		entryString = StringHelper.stripExtension(entryString);
+		//entryString = entryString.substring(0,entryString.lastIndexOf('.')); 
 		entryString += " (Instance) ";
 		//Create an ObjectBenchButton to represent instance. 
 		final ObjectBenchButton newButton = new ObjectBenchButton(mainViewArea,SWT.NONE,className,objectBenchButtons.size(), packageName, instance);
@@ -173,18 +172,6 @@ public class ObjectBenchView extends ViewPart  {
 			}
 		});
 		newButton.setMenu(buildMenuForClass(newButton));
-		//TODO - in final build remove this code.
-//		Class<?> myClass = ObjectBenchButtons.get(i).getMyClass();
-//
-//		if(parameters.length == 0)
-//		{
-//			//ObjectBenchButtons.get(i).setInstance(myClass.newInstance());
-//		}
-//		else
-//		{
-//			Constructor<?> myConstructor = myClass.getConstructor(parameters);
-//			//ObjectBenchButtons.get(i).setInstance((Object)myConstructor.newInstance());//do fuck all for now.
-//		}
 		objectBenchButtons.add(newButton);
 		layoutButtons();
 	}
@@ -192,7 +179,6 @@ public class ObjectBenchView extends ViewPart  {
 	/*
 	 * Build Menu For Class - This method builds the right-click menu for an instance. 
 	 * This method reads the methods of a class. 
-	 * TODO - This method still needs to ascertain the parameters of a method and implement a means to call the method on click. 
 	 */
 	private Menu buildMenuForClass(final ObjectBenchButton bn) throws JavaModelException, Exception
 	{
@@ -212,7 +198,6 @@ public class ObjectBenchView extends ViewPart  {
 
 					@Override
 					public void widgetSelected(SelectionEvent e) {
-						//TODO - Invoke method, if there are parameters display a dialog to take parameters then run the method. 
 						Class<?>[] parameters = null;
 						try {
 							ObjectBenchUtility.setActivePackage(bn.packageName);
@@ -289,6 +274,10 @@ public class ObjectBenchView extends ViewPart  {
 		removeItem.setText("Remove");
 		removeItem.addSelectionListener(new SelectionListener(){
 
+			/*
+			 * (non-Javadoc)
+			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try{
@@ -410,7 +399,6 @@ public class ObjectBenchView extends ViewPart  {
 //								 removeObject(b);
 //							 }
 //						} catch (Exception e) {
-//							// TODO Auto-generated catch block
 //							e.printStackTrace();
 //						} 
 //	            	 }

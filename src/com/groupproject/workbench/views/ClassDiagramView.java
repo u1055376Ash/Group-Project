@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.window.Window;
@@ -41,7 +40,6 @@ import com.groupproject.workbench.utility.ObjectBenchUtility;
 /*
  * Class Diagram View - This is the class taht holds the Class Diagram view. 
  * 
- *TODO - This class needs quite a bit of clean-up, possibly splitting some of it into re-usable sub-classes. 
  */
 public class ClassDiagramView extends ViewPart implements ISelectionListener{
 
@@ -55,7 +53,6 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	private SquareButton newClassButton;				//The reference to the "new class" button.
 	private SquareButton newPackageButton;				//The reference to the "new package" button.
 	private int state = 0; 								//The state that the view is in Package Viewing = 0 | Class Viewing = 1 
-	//TODO - Maybe remove state and add a simple boolean switch? Or remove altogether now? 
 	
 	/*
 	 * Default Constructor 
@@ -108,19 +105,35 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		
 		newClassItem.addSelectionListener(new SelectionListener(){
 
+			/*
+			 * (non-Javadoc)
+			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {addClass();}
-
+			
+			/*
+			 * (non-Javadoc)
+			 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {}
 			
 		});
 		
 		newPackageItem.addSelectionListener(new SelectionListener(){
-
+			
+			/*
+			 * (non-Javadoc)
+			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {addPackage();}
-
+			
+			/*
+			 * (non-Javadoc)
+			 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {}
 			
@@ -132,37 +145,27 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	
 	/*
 	 * Add Class - Displays the dialog to add a class to the active project. 
-	 * TODO - Add more error handling. 
 	 */
 	void addClass()
 	{
 		NewClassDialog dialog = new NewClassDialog(mainViewArea.getShell(), activePackageName);
-		if(dialog.open() == Window.OK)
-		{
-			//
-		}
+		if(dialog.open() == Window.OK){}
 		try {
 			JavaModelHelper.buildProject(activeProjectName);
 			fullRefresh();
-			//displayClassView(mainViewArea);
 		} catch (Exception e) {e.printStackTrace();}
 	}
 	
 	/*
 	 * Add Package - Displays the dialog to add a package to the active project. 
-	 *TODO - Add more error handling. 
 	 */
 	void addPackage()
 	{
 		NewPackageDialog dialog = new NewPackageDialog(mainViewArea.getShell());
-		if(dialog.open() == Window.OK)
-		{
-			
-		}
+		if(dialog.open() == Window.OK){}
 		try {
 			JavaModelHelper.buildProject(activeProjectName);
 			fullRefresh();
-			//displayClassView(mainViewArea);
 		} catch (Exception e) {e.printStackTrace();}
 	}
 
@@ -197,8 +200,6 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		{
 			updateHeader();
 			createPackageButtons(parent);
-
-			//activePackageName = "";
 			disposeButtons(true);
 			createClassButtons(parent, true);
 			return;
@@ -228,7 +229,8 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		}
 		else
 		{
-			System.out.println("No Active Project...");
+			//Use for debugging
+			//System.out.println("No Active Project...");
 		}
 		
 	}
@@ -285,15 +287,17 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		upButton.setText("UP");
 		upButton.addMouseListener(new MouseListener(){
 
+			/*
+			 * (non-Javadoc)
+			 * @see org.eclipse.swt.events.MouseListener#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
+			 */
 			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 				try {
 					viewPackages();
 				} catch (MalformedURLException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 				
@@ -367,7 +371,6 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	
 	/*
 	 * Create Class Buttons - This is the method that draws the class icons. 
-	 *TODO - Add dependencies here! 
 	 */
 	public void createClassButtons(Composite parent, Boolean pushDown) throws MalformedURLException, Exception
 	{
@@ -420,12 +423,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			if(createNew)
 			{
 				//Create a new class button. 
-				try {
-					//JavaModelHelper.addToClassPath(classes[i], activePackageName); //This makes sure that the class is added to the class path
-					//TODO This may cause problems later on, may need to have a method that does this before drawing the buttons.
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				} 
+
 				//Add the button
 				classButtons.add(new ClassButton(parent,SWT.NONE,classes[i],i,activePackageName));
 				classButtons.get(i).setText(entryString);
@@ -490,7 +488,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	 */
 	void checkDependencies(ClassButton b)
 	{
-		//TODO - Implement a check to see if te class uses any other class in the same diagram. 
+		//TODO - Implement a check to see if the class uses any other class in the same diagram. 
 	}
 	
 	/*
@@ -512,7 +510,6 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	/*
 	 * Build Menu for Class - This method builds the right click menu for a class.
 	 * Here we get all of the constructor information.
-	 * TODO - This method needs cleaning and maybe moving into the utility class. 
 	 */
 	private Menu buildMenuForClass(final String selectedClass, final ClassButton bn) throws JavaModelException
 	{
@@ -552,15 +549,10 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 								//System.out.println(s);
 								Class<?> myClass = ObjectBenchUtility.isKnown(s) ? 
 												   ObjectBenchUtility.getClassFromType(s):ObjectBenchUtility.getClassFromType(StringHelper.getQualifiedName(StringHelper.fixType(s), activePackageName));
-								//TODO This whole section needs expanding to account for non-native Java types. 
 								if(myClass == null)
 								{
-									//Need to add method to the JavaModelHelper to check if a classname exists. 
-									//myClass = JavaModelHelper.getClassFromLoader(StringHelper.getQualifiedName(s, activePackageName));
-								}
-								if(myClass == null)
-								{
-									//myClass = Class.forName(s); //This is going to cause more trouble than its worth. 
+									System.out.println("Class-Not-Found");
+									continue;
 								}
 								classes.add(myClass);
 							}
@@ -572,9 +564,6 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 									object = dialog.getInstance();
 									ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName, object);
 								}
-
-								//System.out.println("IM IN");
-								//ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName, object);
 							}
 						}
 						else
@@ -585,7 +574,6 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 						
 					} catch (Exception e1) {
 						e1.printStackTrace();
-						//I'll confess there were about 10 catch clauses here before.
 					} 
 				}
 
@@ -615,7 +603,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				
+
 			}
 
 			@Override
@@ -735,7 +723,6 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 							try {
 								viewClasses(packages[currentNumber]);
 							} catch (Exception e1) {
-								// TODO Auto-generated catch block
 								e1.printStackTrace();
 							} 
 						}
@@ -760,7 +747,6 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			}
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
 		parent.layout();

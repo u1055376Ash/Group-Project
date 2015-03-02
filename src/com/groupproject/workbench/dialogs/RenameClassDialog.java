@@ -7,7 +7,6 @@ public class RenameClassDialog extends Dialog{
 
 	protected RenameClassDialog(Shell parentShell) {
 		super(parentShell);
-		// TODO Auto-generated constructor stub
 	}
 
 }

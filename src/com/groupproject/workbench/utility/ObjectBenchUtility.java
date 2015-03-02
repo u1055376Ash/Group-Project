@@ -8,7 +8,6 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -107,11 +106,8 @@ public final class ObjectBenchUtility
 				IFileStore fileStore = EFS.getLocalFileSystem().getStore(file.toURI());
 				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				try{
-					//page.toggleZoom(page.getActivePartReference());
-					
 					IDE.openEditorOnFileStore(page, fileStore);
 					page.setPartState(page.getActivePartReference(), IWorkbenchPage.STATE_MAXIMIZED);
-					//page.getActivePart().getSite().getShell().setMaximized(true);
 				}catch(PartInitException e2){
 					e2.printStackTrace();
 				}
@@ -127,8 +123,6 @@ public final class ObjectBenchUtility
 	 */
 	public static Color getColorFromString(String s)
 	{
-		
-		//TODO - Refactor this to getColorFromPreferences(String s)
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		String color = store.getString(s);
 		String[] values = color.split(",");
@@ -188,7 +182,6 @@ public final class ObjectBenchUtility
 	 */
 	public static Class<?> getClassFromType(String s) throws ClassNotFoundException, MalformedURLException
 	{
-		//TODO - Extend this so user classes can be found. 
 		System.out.println(":"+s+":");
 		if(s.equals("I"))
 		{
@@ -306,6 +299,9 @@ public final class ObjectBenchUtility
 		return false; 
 	}
 	
+	/*
+	 * Get Parameter Types - This method returns all of the known types required for creating a class. Takes an array of names and returns respective classes. 
+	 */
 	public static Class<?>[] getParameterTypes(String[] types) throws ClassNotFoundException, MalformedURLException
 	{
 		Class<?>[] classes = new Class<?>[types.length];
@@ -415,7 +411,11 @@ public final class ObjectBenchUtility
 			colorButton.setText("Color");
 			colorButton.setData("typeKey", "color");
 			colorButton.addSelectionListener(new SelectionListener(){
-
+				
+				/*
+				 * (non-Javadoc)
+				 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+				 */
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 			        ColorDialog dlg = new ColorDialog(control.getShell());
@@ -440,11 +440,12 @@ public final class ObjectBenchUtility
 					
 				}
 
+				/*
+				 * (non-Javadoc)
+				 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
+				 */
 				@Override
-				public void widgetDefaultSelected(SelectionEvent e) {
-					// TODO Auto-generated method stub
-					
-				}
+				public void widgetDefaultSelected(SelectionEvent e) {}
 				
 			});
 			
@@ -468,7 +469,11 @@ public final class ObjectBenchUtility
 
 			}
 			comboBox.addSelectionListener(new SelectionListener(){
-
+				
+				/*
+				 * (non-Javadoc)
+				 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+				 */
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					int current = comboBox.getSelectionIndex(); 
@@ -482,7 +487,11 @@ public final class ObjectBenchUtility
 					}
 
 				}
-
+				
+				/*
+				 * (non-Javadoc)
+				 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
+				 */
 				@Override
 				public void widgetDefaultSelected(SelectionEvent e) {
 

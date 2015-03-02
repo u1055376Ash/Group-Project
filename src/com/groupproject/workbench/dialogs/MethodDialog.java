@@ -8,14 +8,10 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.Text;
-
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 
 /*
@@ -23,8 +19,8 @@ import com.groupproject.workbench.utility.ObjectBenchUtility;
  */
 public class MethodDialog extends Dialog {
 	
-	public Method myMethod; 
-	Composite container;					//The main view in this dialog. 
+	public Method myMethod; 				//A copy of the method used
+	Composite container;					//The main view in this dialog
 	List<Control> controls; 				//A list of controls
 	Object[] objects;						//A list of objects
 	
@@ -95,7 +91,10 @@ public class MethodDialog extends Dialog {
 		return objects; 
 	}
 	 
-	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
+	 */
 	@Override
 	protected void okPressed()
 	{
@@ -103,6 +102,9 @@ public class MethodDialog extends Dialog {
 		super.okPressed();
 	}
 	
+	/*
+	 * Get Parameters - returns the parameters entered into the dialog. 
+	 */
 	public Object[] getParameters()
 	{
 		return objects; 

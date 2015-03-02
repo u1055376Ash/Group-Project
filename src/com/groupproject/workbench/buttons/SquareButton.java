@@ -116,9 +116,7 @@ public class SquareButton extends Canvas {
 	}
 	
 	
-	protected void widgetDisposed(DisposeEvent e) {
-		// TODO clean up here (listeners?)
-	}
+	protected void widgetDisposed(DisposeEvent e) {}
 	
 	
 	protected void addListeners() {
@@ -252,7 +250,6 @@ public class SquareButton extends Canvas {
 	
 	
 	protected void setTraversable (boolean canTraverse) {
-		// TODO is there a better way to do this?
 		try {
 			if (canTraverse)
 				this.addListener (SWT.KeyDown, keyListener);

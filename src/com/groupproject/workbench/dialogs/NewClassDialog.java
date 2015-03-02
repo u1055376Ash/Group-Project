@@ -106,7 +106,6 @@ public class NewClassDialog extends Dialog {
 		try {
 			JavaModelHelper.newClass(classNameField.getText(), getRadioButton(),pName);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
 		super.okPressed();

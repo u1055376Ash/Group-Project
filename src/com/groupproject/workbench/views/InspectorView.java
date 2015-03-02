@@ -3,14 +3,11 @@ package com.groupproject.workbench.views;
 import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
@@ -19,7 +16,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -36,7 +32,6 @@ import com.groupproject.workbench.utility.ObjectBenchUtility;
 /*
  * Inspector View - The class for the inspector view. The inspector is where an instantiated class can be inspected to determine 
  * field values. 
- * TODO - Maybe we can also make the fields editable through the inspector? 
  */
 public class InspectorView extends ViewPart {
 
@@ -71,6 +66,9 @@ public class InspectorView extends ViewPart {
 		clear();
 	}
 	
+	/*
+	 * Clear - Clears the inspector view. 
+	 */
 	public void clear()
 	{
 	    for (Control control : mainViewArea.getChildren()) {
@@ -346,7 +344,6 @@ public class InspectorView extends ViewPart {
 	
 	/*
 	 * Dispose Labels - Destroys all labels. 
-	 *TODO - Refactor this to remove object fields when we implement editing. 
 	 */
 	public void disposeLabels()
 	{
