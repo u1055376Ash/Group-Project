@@ -694,7 +694,7 @@ public final class JavaModelHelper {
 	 */
 	public static IPackageFragment[] getPackages(IJavaProject project) throws JavaModelException
 	{
-		if(project.isOpen())
+		if(!project.isOpen())
 		{
 			return null;
 		}
@@ -861,7 +861,6 @@ public final class JavaModelHelper {
 		{
 			activeProject = resource.getProject();
 		}
-		
 		return activeProject; 
 	}
 	

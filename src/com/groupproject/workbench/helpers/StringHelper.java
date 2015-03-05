@@ -71,6 +71,10 @@ public final class StringHelper {
 	 */
 	public static String stripExtension(String s)
 	{
+		if(s.contains(".") == false)
+		{
+			return s;
+		}
 		try
 		{
 			return s.substring(0,s.lastIndexOf("."));
@@ -78,7 +82,6 @@ public final class StringHelper {
 		catch(StringIndexOutOfBoundsException e)
 		{
 			e.printStackTrace();
-			System.err.println(s + " : STRING");
 			//System.out.print(s);
 		}
 		return s;
