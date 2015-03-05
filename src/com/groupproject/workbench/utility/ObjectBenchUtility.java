@@ -1,12 +1,15 @@
 package com.groupproject.workbench.utility;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -162,6 +165,7 @@ public final class ObjectBenchUtility
 	 */
 	public static void setActiveInstance(BenchInstance i) throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ArrayIndexOutOfBoundsException, NoSuchMethodException, ClassNotFoundException, MalformedURLException
 	{
+		getObjectBench().clearSelection();
 		activeInstance = i; 
 		if(inspectorView != null)
 		{
@@ -231,9 +235,39 @@ public final class ObjectBenchUtility
 		{
 			return java.awt.Color.class;
 		}
+		if(s.equals("String[]") || s.equals("[QString"))
+		{
+			return String[].class; 
+		}
+		if(s.equals("int[]") || s.equals("[QI") || s.equals("[I"))
+		{
+			return int[].class; 
+		}
+		if(s.equals("boolean[]") || s.equals("[Z"))
+		{
+			return boolean.class; 
+		}
+		if(s.equals("float[]") || s.equals("[F"))
+		{
+			return float.class; 
+		}
+		if(s.equals("byte[]") || s.equals("[B"))
+		{
+			return byte.class; 
+		}
+		if(s.equals("double[]") || s.equals("[D"))
+		{
+			return double.class; 
+		}
 		
-		
-		Class<?> c = JavaModelHelper.getClassFromLoader(s);
+
+		Class<?> c = JavaModelHelper.getClassFromLoader(s.replace("[]", ""));
+		if(s.contains("[]"))
+		{
+			Object o = Array.newInstance(c, 0);
+			return o.getClass();
+			
+		}
 		if(c != null)
 		{
 			return c; 
@@ -294,6 +328,30 @@ public final class ObjectBenchUtility
 		if(s.equals("QColor;"))
 		{
 			return true;
+		}
+		if(s.equals("String[]") || s.equals("[QString"))
+		{
+			return true; 
+		}
+		if(s.equals("int[]") || s.equals("[QI") || s.equals("[I"))
+		{
+			return true; 
+		}
+		if(s.equals("boolean[]") || s.equals("[Z"))
+		{
+			return true; 
+		}
+		if(s.equals("float[]") || s.equals("[F"))
+		{
+			return true; 
+		}
+		if(s.equals("byte[]") || s.equals("[B"))
+		{
+			return true; 
+		}
+		if(s.equals("double[]") || s.equals("[D"))
+		{
+			return true; 
 		}
 		
 		return false; 
@@ -503,6 +561,9 @@ public final class ObjectBenchUtility
 		return null; 
 	}
 	
+	/*
+	 * Add Constructors to Combo - Adds constructors to combo boxes for creation in new instances.
+	 */
 	public static Combo addConstructorsToCombo(Combo c, String className, String packageName)
 	{
 		return c;
@@ -702,5 +763,21 @@ public final class ObjectBenchUtility
 	    }
 	    return(file.delete());
 	 }
+	
+	/*
+	 * Get Image Descriptor - Returns an image descriptor for use in toolbars and other controls. 
+	 */
+	public static ImageDescriptor getImageDescriptor(String path)
+	{
+        String iconPath = "icons/";
+        try {
+                URL url = new URL("platform:/plugin/com.groupproject.workbench/img/" + path);
+                return ImageDescriptor.createFromURL(url);
+        }
+        catch (MalformedURLException e) {
+                // should not happen
+                return ImageDescriptor.getMissingImageDescriptor();
+        }
+	}
 	
 }

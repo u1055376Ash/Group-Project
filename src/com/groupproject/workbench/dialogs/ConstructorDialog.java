@@ -1,6 +1,7 @@
 package com.groupproject.workbench.dialogs;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 
 /*
@@ -115,6 +117,30 @@ public class ConstructorDialog  extends Dialog{
 //		for(Object o:objects)
 //		{
 //			//System.out.println(o.toString());
+//		}
+//		for(int i = 0; i<objects.length;i++)
+//		{
+//			if(objects[i].getClass().equals(constructor.getParameterTypes()[i]))
+//			{
+//				System.out.println("MATCHED");
+//			}
+//			else
+//			{
+//				System.out.println("FUCKED");
+//				Object o = constructor.getParameterTypes()[i].newInstance();
+//				for(int x = 0; x < o.getClass().getFields().length; x++)
+//				{
+//					Field oldField = objects.getClass().getFields()[x];
+//					Field newField = o.getClass().getFields()[x];
+//					oldField.setAccessible(true);
+//					newField.setAccessible(true);
+//					newField.set(o, oldField.get(objects[i]));
+//				}
+//				if(o != null)
+//				{
+//					objects[i] = o;
+//				}
+//			}
 //		}
 		return constructor.newInstance(objects);
 	}

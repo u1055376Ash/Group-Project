@@ -1,7 +1,12 @@
 package com.groupproject.workbench;
 
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import com.groupproject.workbench.utility.MyResourceChangeListener;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -27,6 +32,13 @@ public class Activator extends AbstractUIPlugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		IResourceChangeListener listener = new MyResourceChangeListener(); 
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(listener,
+				      IResourceChangeEvent.PRE_CLOSE
+				      | IResourceChangeEvent.PRE_DELETE
+				      | IResourceChangeEvent.PRE_BUILD
+				      | IResourceChangeEvent.POST_BUILD
+				      | IResourceChangeEvent.POST_CHANGE);
 		plugin = this;
 	}
 

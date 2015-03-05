@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -36,7 +38,7 @@ public class ObjectBenchView extends ViewPart  {
 
 	private List<ObjectBenchButton> objectBenchButtons; 					//The list of buttons on the object bench.
 	private Composite mainViewArea;											//A reference to the main view area.
-	
+	private Action deleteAction; 											//An action to clear the object bench.
 	/*
 	 * Default Constructor
 	 */
@@ -58,8 +60,32 @@ public class ObjectBenchView extends ViewPart  {
 		sc.setMinSize(mainViewArea.computeSize(1000, 100));
 		sc.setMinHeight(110);
 		ObjectBenchUtility.registerObjectBench(this); //Register this with the ObjectBenchUtility so other classes can access this instance
+		createActions();
+		createToolbar();
+		
 	}
 	
+	/*
+	 * Create Actions - Creates actions that can be assigned to a variety of controls. 
+	 */
+	void createActions()
+	{
+		deleteAction = new Action("Clear Bench"){
+			public void run(){
+				clearBench();
+			}
+		};
+		deleteAction.setImageDescriptor(ObjectBenchUtility.getImageDescriptor("delete.png"));
+	}
+	
+	/*
+	 * Create Toolbar - Creates the toolbar buttons. 
+	 */
+	void createToolbar()
+	{
+		IToolBarManager mgr = getViewSite().getActionBars().getToolBarManager();
+		mgr.add(deleteAction);
+	}
 	/*
 	 * Build Context Menu - Builds the context menu for the class view. 
 	 */
@@ -88,7 +114,7 @@ public class ObjectBenchView extends ViewPart  {
 	/*
 	 * Clear Bench - Clears the Object Bench of Instances
 	 */
-	void clearBench()
+	public void clearBench()
 	{
 		if(objectBenchButtons != null)
 		{
@@ -165,7 +191,10 @@ public class ObjectBenchView extends ViewPart  {
 			@Override
 			public void mouseUp(MouseEvent e) {
 				try {
+					clearSelection();
 					ObjectBenchUtility.setActiveInstance(newButton.getInstance());
+					newButton.setSelected(true);
+					//clearSelection();
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				} 
@@ -173,6 +202,18 @@ public class ObjectBenchView extends ViewPart  {
 		});
 		newButton.setMenu(buildMenuForClass(newButton));
 		objectBenchButtons.add(newButton);
+		layoutButtons();
+	}
+	
+	/*
+	 * Clear Selection - Clears the current selection. 
+	 */
+	public void clearSelection()
+	{
+		for(ObjectBenchButton b:objectBenchButtons)
+		{
+			b.setSelected(false);
+		}
 		layoutButtons();
 	}
 	
@@ -373,6 +414,19 @@ public class ObjectBenchView extends ViewPart  {
 		return getInstancesOfType(c.getName());
 	}
 	
+	/*
+	 * Replace Instance - Replaces an instance on the object bench. 
+	 */
+	public void replaceInstance(Object old, Object theNew)
+	{
+		for(ObjectBenchButton b:objectBenchButtons)
+		{
+			if(b.getInstance().myInstance.equals(old))
+			{
+				b.getInstance().setObject(theNew);
+			}
+		}
+	}
 
 //	@Override
 //	      public void resourceChanged(IResourceChangeEvent event) {

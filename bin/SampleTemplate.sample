@@ -11,7 +11,7 @@ public class CLASSNAME
     private int x;
 
     /**
-     * Constructor for objects of class a
+     * Constructor for objects of class CLASSNAME
      */
     public CLASSNAME()
     {

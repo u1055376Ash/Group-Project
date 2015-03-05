@@ -25,5 +25,7 @@ public class PreferenceConstants {
 	
 	public static final String P_COLOR_SIX = "colorPreferenceSix";
 	
+	public static final String P_COLOR_SELECTED = "colorSelected";
+	
 	public static final String P_BOOLEAN_SHOWEMPTY = "showEmptyPackagePreference";
 }

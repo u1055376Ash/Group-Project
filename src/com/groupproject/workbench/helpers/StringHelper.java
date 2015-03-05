@@ -11,10 +11,16 @@ public final class StringHelper {
 	public static String fixType(String s)
 	{
 		s = s.replace(";", "");
+		if(s.startsWith("["))
+		{
+			s = s.substring(1);
+			s = s.concat("[]");
+		}
 		if(s.startsWith("Q"))
 		{
 			s = s.substring(1);
 		}
+
 		
 		if(s.equals("I"))
 		{
@@ -65,7 +71,18 @@ public final class StringHelper {
 	 */
 	public static String stripExtension(String s)
 	{
-		return s.substring(0,s.lastIndexOf('.'));
+		try
+		{
+			return s.substring(0,s.lastIndexOf("."));
+		}
+		catch(StringIndexOutOfBoundsException e)
+		{
+			e.printStackTrace();
+			System.err.println(s + " : STRING");
+			//System.out.print(s);
+		}
+		return s;
+
 	}
 	
 	/*
@@ -73,9 +90,16 @@ public final class StringHelper {
 	 */
 	public static String getQualifiedName(String className,String packageName)
 	{
-		if(packageName.equals(""))
+		if(packageName.equals("") && (className.equals("") == false))
 		{
-			return stripExtension(className);
+			if(className.contains("."))
+			{
+				return stripExtension(className);
+			}
+			else
+			{
+				return className;
+			}
 		}
 		if(className.isEmpty() || packageName.isEmpty() || className == null || packageName == null || className.length() <= 0 || packageName.length() <= 0)
 		{

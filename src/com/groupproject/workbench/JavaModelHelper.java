@@ -34,6 +34,7 @@ import org.eclipse.ui.ISelectionService;
 
 import com.groupproject.workbench.helpers.StringHelper;
 import com.groupproject.workbench.helpers.TemplateLoader;
+import com.groupproject.workbench.utility.ObjectBenchUtility;
 
 /*
  * JavaModelHelper - This class contains methods to gather information on user defined classes. This class can traverse the Eclipse AST and gather
@@ -50,6 +51,7 @@ public final class JavaModelHelper {
 	private static URLClassLoader classLoader;					//The classloader used to load classes
 	private static List<URL> myUrls; 							//A list of locations of classes loaded by the class loader
 	
+	private static boolean initialised = false; 
 	/*
 	 * Constructor
 	 */
@@ -75,8 +77,21 @@ public final class JavaModelHelper {
 		{
 			activeProject = projects[0];
 		}
-		addToClassPath();
+		if(!initialised)
+		{
+			addToClassPath();
+			initialised = true;
+		}
 		//myUrls = 
+	}
+	
+	/*
+	 * Rebuild - Rebuilds the project.
+	 */
+	public static void rebuild() throws MalformedURLException, Exception
+	{
+		addToClassPath();
+		ObjectBenchUtility.getObjectBench().clearBench();
 	}
 	
 	/*
@@ -89,6 +104,9 @@ public final class JavaModelHelper {
 		p.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, pm);
 	}
 	
+	/*
+	 * Build Active Project - Builds the active project. 
+	 */
 	public static void buildActiveProject() throws CoreException
 	{
 
@@ -665,7 +683,7 @@ public final class JavaModelHelper {
 		for(int i = 0; i<classes.length;i++)
 		{
 			strings[i] = classes[i].getElementName();
-			addToClassPath(classes[i].getElementName(), myPackage); 
+			//addToClassPath(classes[i].getElementName(), myPackage); 
 		}
 		return strings;
 		
@@ -676,6 +694,10 @@ public final class JavaModelHelper {
 	 */
 	public static IPackageFragment[] getPackages(IJavaProject project) throws JavaModelException
 	{
+		if(project.isOpen())
+		{
+			return null;
+		}
 		return project.getPackageFragments();
 	}
 	
@@ -857,7 +879,8 @@ public final class JavaModelHelper {
 	public static void addURL(URL url) throws Exception{
 		myUrls.add(url);
      	URL[] urls = myUrls.toArray(new URL[myUrls.size()]);		
-     	classLoader = new URLClassLoader(urls);
+     	classLoader = null; 
+     	classLoader = new URLClassLoader(urls, null);
 	}
 	
 	/*

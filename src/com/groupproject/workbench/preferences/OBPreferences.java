@@ -45,6 +45,7 @@ public class OBPreferences
 		addField(new ColorFieldEditor(PreferenceConstants.P_COLOR_TWO, "Package Color Bottom", getFieldEditorParent()));
 		addField(new ColorFieldEditor(PreferenceConstants.P_COLOR_THREE, "Class Color Top", getFieldEditorParent()));
 		addField(new ColorFieldEditor(PreferenceConstants.P_COLOR_FOUR, "Class Color Bottom", getFieldEditorParent()));
+		addField(new ColorFieldEditor(PreferenceConstants.P_COLOR_SELECTED, "Selected Instance Color", getFieldEditorParent()));
 	}
 
 	/* (non-Javadoc)
