@@ -115,7 +115,7 @@ public class InspectorView extends ViewPart {
 			fieldNameLabels.get(fieldNameLabels.size()-1).setText(fieldNames[i]);
 			//FormData labelData = new FormData(100, SWT.DEFAULT);
 			//Position Label
-			FormData labelData = new FormData(70 + (fieldNames.length * 4), SWT.DEFAULT);
+			FormData labelData = new FormData(60 + (fieldNames.length * 4), SWT.DEFAULT);
 			if(i == 0)
 			{
 				labelData.top = new FormAttachment(header, 25);
@@ -140,7 +140,7 @@ public class InspectorView extends ViewPart {
 				FormData sizeData = new FormData(30, SWT.DEFAULT);
 				
 				sizeData.top = new FormAttachment(previousLabel, 15);
-				sizeData.left = new FormAttachment(8);
+				sizeData.left = new FormAttachment(10);
 				sizeLabel.setLayoutData(sizeData);
 				
 				final Spinner spinner = new Spinner(mainViewArea,SWT.BORDER);

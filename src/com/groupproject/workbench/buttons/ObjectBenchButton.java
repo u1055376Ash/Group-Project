@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 
 import com.groupproject.workbench.BenchInstance;
 import com.groupproject.workbench.preferences.PreferenceConstants;
@@ -61,22 +62,31 @@ public class ObjectBenchButton extends ClassButton {
 	/*
 	 * Set Selected sets the selected stated of the button. 
 	 */
-	public void setSelected(boolean selected)
+	public void setSelected(final boolean selected)
 	{
-		if(this.isDisposed())
-		{
-			return;
-		}
-		if(selected == true)
-		{
-			this.selectedColor = ObjectBenchUtility.getColorFromString(PreferenceConstants.P_COLOR_SELECTED);
-			this.setBackground(ObjectBenchUtility.getColorFromString(PreferenceConstants.P_COLOR_SELECTED));
-			//this.backgroundColor = selected ? ObjectBenchUtility.getColorFromString(PreferenceConstants.P_COLOR_SELECTED):defaultColor;
-		}
-		else
-		{
-			this.setBackground(defaultColor);
-		}
+		Display display = this.getDisplay();
+		if(display.isDisposed())return;
+		final ObjectBenchButton bn = this;
+	    display.asyncExec(new Runnable() {
+	        @Override
+	        public void run() {
+	    		if(bn.isDisposed())
+	    		{
+	    			return;
+	    		}
+	    		if(selected == true)
+	    		{
+	    			bn.selectedColor = ObjectBenchUtility.getColorFromString(PreferenceConstants.P_COLOR_SELECTED);
+	    			bn.setBackground(ObjectBenchUtility.getColorFromString(PreferenceConstants.P_COLOR_SELECTED));
+	    			//this.backgroundColor = selected ? ObjectBenchUtility.getColorFromString(PreferenceConstants.P_COLOR_SELECTED):defaultColor;
+	    		}
+	    		else
+	    		{
+	    			bn.setBackground(defaultColor);
+	    		}
+	        }
+	      });
+
 
 	}
 

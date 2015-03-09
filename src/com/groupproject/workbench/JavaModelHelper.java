@@ -91,7 +91,11 @@ public final class JavaModelHelper {
 	public static void rebuild() throws MalformedURLException, Exception
 	{
 		addToClassPath();
-		ObjectBenchUtility.getObjectBench().clearBench();
+		if(ObjectBenchUtility.getObjectBench() != null)
+		{
+			ObjectBenchUtility.getObjectBench().clearBench();
+		}
+
 	}
 	
 	/*
