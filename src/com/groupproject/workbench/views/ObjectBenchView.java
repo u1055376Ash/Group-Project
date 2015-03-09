@@ -20,6 +20,7 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.part.ViewPart;
@@ -143,6 +144,10 @@ public class ObjectBenchView extends ViewPart  {
 	{
 		for(int i = 0; i<objectBenchButtons.size();i++)
 		{
+			if(objectBenchButtons.get(i).isDisposed())
+			{
+				continue;
+			}
 			FormData buttonData = new FormData(90+(objectBenchButtons.get(i).getText().length() *3),80);
 			if(i == 0)
 			{
@@ -191,7 +196,7 @@ public class ObjectBenchView extends ViewPart  {
 			@Override
 			public void mouseUp(MouseEvent e) {
 				try {
-					clearSelection();
+					clearSelection(false);
 					ObjectBenchUtility.setActiveInstance(newButton.getInstance());
 					newButton.setSelected(true);
 					//clearSelection();
@@ -208,13 +213,17 @@ public class ObjectBenchView extends ViewPart  {
 	/*
 	 * Clear Selection - Clears the current selection. 
 	 */
-	public void clearSelection()
+	public void clearSelection(boolean clearingAll)
 	{
 		for(ObjectBenchButton b:objectBenchButtons)
 		{
 			b.setSelected(false);
 		}
-		layoutButtons();
+		if(!clearingAll)
+		{
+			layoutButtons();
+		}
+
 	}
 	
 	/*
@@ -351,7 +360,7 @@ public class ObjectBenchView extends ViewPart  {
 	/*
 	 * Remove Object(Dirty) - This removes an object from the bench without removing it from the collection.
 	 */
-	void removeObject(ObjectBenchButton bn, boolean quick) throws ArrayIndexOutOfBoundsException, JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, ClassNotFoundException, MalformedURLException
+	void removeObject(final ObjectBenchButton bn, boolean quick) throws ArrayIndexOutOfBoundsException, JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, ClassNotFoundException, MalformedURLException
 	{
 		if(quick)
 		{
@@ -359,7 +368,16 @@ public class ObjectBenchView extends ViewPart  {
 		}
 		else
 		{
-			bn.dispose();
+			Display display = bn.getDisplay(); 
+		    display.asyncExec(new Runnable() {
+		        @Override
+		        public void run() {
+		          if (!bn.isDisposed()) {
+		        	  bn.dispose();
+
+		          }
+		        }
+		      });
 			ObjectBenchUtility.setActiveInstance(null);
 			mainViewArea.layout();
 		}

@@ -15,6 +15,8 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -428,11 +430,13 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 				classButtons.add(new ClassButton(parent,SWT.NONE,classes[i],i,activePackageName));
 				classButtons.get(i).setText(entryString);
 				classButtons.get(i).setMenu(buildMenuForClass(classes[i], classButtons.get(i)));
-				
+				GC gc = new GC(mainViewArea);
 				//Position the button
 				FormData buttonData = new FormData(90+(entryString.length() * 3),80);
 				if(i-1 >= 0)
 				{
+					
+					//gc.drawLine(classButtons.get(i).getBounds().x, classButtons.get(i).getBounds().y, classButtons.get(i-1).getBounds().x, classButtons.get(i-1).getBounds().y);
 					buttonData.left = new FormAttachment(classButtons.get(i-1), 50, SWT.RIGHT);
 					buttonData.bottom = new FormAttachment(classButtons.get(i-1), 0, SWT.BOTTOM);
 					buttonData.top =  new FormAttachment(classButtons.get(i-1),0, SWT.TOP);
@@ -457,8 +461,16 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 					public void mouseUp(MouseEvent e) {}
 				});
 				classButtons.get(i).setLayoutData(buttonData);
+				if(i-1 >= 0)
+				{
+					Point a = classButtons.get(i).toDisplay(new Point(0,0));
+					Point b = classButtons.get(i-1).toDisplay(new Point(0,0));
+					//System.out.println(a + "[]"+b);
+					//gc.drawLine(a.x/10, a.y, b.x, b.y);
+					//gc.drawLine(b, classButtons.get(i).getBounds().y, classButtons.get(i-1).getBounds().x, classButtons.get(i-1).getBounds().y);
+				}
 				classButtons.get(i).getColor();//hack to fix a bug
-				
+				//gc.dispose();
 			}
 		}
 		parent.layout();
@@ -496,6 +508,8 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	 */
 	void drawInheritanceLink(ClassButton a, ClassButton b)
 	{
+		FormData data = (FormData)a.getLayoutData();
+		
 		//TODO - If a class inherits from another class draw a link between them. 
 	}
 	

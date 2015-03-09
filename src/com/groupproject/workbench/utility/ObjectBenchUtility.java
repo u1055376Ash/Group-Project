@@ -165,7 +165,14 @@ public final class ObjectBenchUtility
 	 */
 	public static void setActiveInstance(BenchInstance i) throws JavaModelException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ArrayIndexOutOfBoundsException, NoSuchMethodException, ClassNotFoundException, MalformedURLException
 	{
-		getObjectBench().clearSelection();
+		if(i == null)
+		{
+			getObjectBench().clearSelection(true);
+		}
+		else
+		{
+			getObjectBench().clearSelection(false);
+		}
 		activeInstance = i; 
 		if(inspectorView != null)
 		{
@@ -526,6 +533,7 @@ public final class ObjectBenchUtility
 				comboBox.add(instances[i].className + " - " + i, i);
 
 			}
+			comboBox.add("null");
 			comboBox.addSelectionListener(new SelectionListener(){
 				
 				/*
@@ -542,6 +550,11 @@ public final class ObjectBenchUtility
 							comboBox.setData("typeData", instances[i].myInstance);
 
 						}
+					}
+					if(comboBox.getData("typeData") == null)
+					{
+						comboBox.setData("typeData", null);
+						comboBox.select(comboBox.getItemCount()-1);
 					}
 
 				}
@@ -689,7 +702,7 @@ public final class ObjectBenchUtility
 		if(s.equals("combo"))
 		{
 			Combo combo = (Combo)c;
-			
+			boolean found  = false; 
 			final BenchInstance[] instances = ObjectBenchUtility.getObjectBench().getInstancesOfType(combo.getData("classData").toString());
 			//int current = combo.getSelectionIndex(); 
 			for(int i = 0; i < instances.length; i++)
@@ -697,8 +710,13 @@ public final class ObjectBenchUtility
 				if(instances[i].myInstance.equals(o))
 				{
 					combo.select(i);
+					found = true; 
 					//combo.setData("typeData", instances[i].myInstance);
 				}
+			}
+			if(found == false)
+			{
+				combo.select(combo.getItemCount()-1);
 			}
 			
 		}
