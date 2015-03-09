@@ -16,7 +16,6 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -40,7 +39,7 @@ import com.groupproject.workbench.perspectives.ObjectBenchPerspective;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 
 /*
- * Class Diagram View - This is the class taht holds the Class Diagram view. 
+ * Class Diagram View - This is the class that holds the Class Diagram view. 
  * 
  */
 public class ClassDiagramView extends ViewPart implements ISelectionListener{
@@ -430,13 +429,11 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 				classButtons.add(new ClassButton(parent,SWT.NONE,classes[i],i,activePackageName));
 				classButtons.get(i).setText(entryString);
 				classButtons.get(i).setMenu(buildMenuForClass(classes[i], classButtons.get(i)));
-				GC gc = new GC(mainViewArea);
+				
 				//Position the button
 				FormData buttonData = new FormData(90+(entryString.length() * 3),80);
 				if(i-1 >= 0)
 				{
-					
-					//gc.drawLine(classButtons.get(i).getBounds().x, classButtons.get(i).getBounds().y, classButtons.get(i-1).getBounds().x, classButtons.get(i-1).getBounds().y);
 					buttonData.left = new FormAttachment(classButtons.get(i-1), 50, SWT.RIGHT);
 					buttonData.bottom = new FormAttachment(classButtons.get(i-1), 0, SWT.BOTTOM);
 					buttonData.top =  new FormAttachment(classButtons.get(i-1),0, SWT.TOP);
@@ -461,16 +458,9 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 					public void mouseUp(MouseEvent e) {}
 				});
 				classButtons.get(i).setLayoutData(buttonData);
-				if(i-1 >= 0)
-				{
-					Point a = classButtons.get(i).toDisplay(new Point(0,0));
-					Point b = classButtons.get(i-1).toDisplay(new Point(0,0));
-					//System.out.println(a + "[]"+b);
-					//gc.drawLine(a.x/10, a.y, b.x, b.y);
-					//gc.drawLine(b, classButtons.get(i).getBounds().y, classButtons.get(i-1).getBounds().x, classButtons.get(i-1).getBounds().y);
-				}
 				classButtons.get(i).getColor();//hack to fix a bug
-				//gc.dispose();
+				checkSuperClass(classButtons.get(i),parent);
+				
 			}
 		}
 		parent.layout();
@@ -480,7 +470,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	/*
 	 * Check Super Class - Checks if the class is inherited. 
 	 */
-	void checkSuperClass(ClassButton b) throws Exception
+	void checkSuperClass(ClassButton b, Composite parent) throws Exception
 	{
 		Class<?> superClass = JavaModelHelper.getSuperclass(b.getMyClass()); 
 		if(superClass != null)
@@ -489,7 +479,16 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			{
 				if(a.getMyClass().equals(superClass))
 				{
-					drawInheritanceLink(b,a); //Maybe 
+					System.out.println("Super class = " + superClass);
+					FormData data = (FormData)a.getLayoutData();
+					FormData bdata = (FormData)b.getLayoutData();
+					//System.out.println("Class (a) = " + a.getMyClass());
+					//System.out.println("Left: " + data.left + " Right: " + data.right + " Top: " + data.top + " Bottom: " + data.bottom);
+					//System.out.println("Class (b) = " + b.getMyClass());
+					//System.out.println("Left: " + bdata.left + " Right: " + bdata.right + " Top: " + bdata.top + " Bottom: " + bdata.bottom);
+					//System.out.println("Passed class (b) = " + b.getMyClass());
+					//System.out.println("Class (a) = " + a.getMyClass());
+					drawInheritanceLink(b,a,parent); //Maybe 
 				}
 			}
 		}
@@ -506,11 +505,13 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	/*
 	 * Draw Inheritance Link - Draws an arrow tipped line between two given classes. 
 	 */
-	void drawInheritanceLink(ClassButton a, ClassButton b)
+	void drawInheritanceLink(ClassButton a, ClassButton b, Composite parent)
 	{
-		FormData data = (FormData)a.getLayoutData();
-		
-		//TODO - If a class inherits from another class draw a link between them. 
+		//TODO - Still needs to be finished, currently unable to attain location of class buttons
+		GC gc = new GC(parent);
+		gc.drawLine(a.getLocation().x, a.getLocation().y, b.getLocation().x, b.getLocation().y);
+		//gc.drawLine(100, 100, 400, 400);
+		//System.out.println("Drawing inheritance link, class A cords= " + a.getLocation() + " class B coords=" + b.getLocation());
 	}
 	
 	/*
