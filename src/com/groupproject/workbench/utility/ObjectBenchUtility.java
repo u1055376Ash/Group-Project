@@ -576,7 +576,7 @@ public final class ObjectBenchUtility
 						if(current == i)
 						{
 							comboBox.setData("typeData", instances[i].myInstance);
-
+							//System.out.println("Setting Data:" + instances[i].myInstance.toString());
 						}
 					}
 					if(comboBox.getData("typeData") == null)
@@ -700,6 +700,10 @@ public final class ObjectBenchUtility
 			Button b = (Button)c;
 			o = (java.awt.Color)b.getData("typeData");
 			
+		}
+		if(s.equals("combo"))
+		{
+			o = c.getData("typeData");
 		}
 		
 		if(c.getData("typeData") != null)

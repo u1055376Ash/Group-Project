@@ -4,6 +4,8 @@ import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -250,8 +252,8 @@ public class ArrayControl extends Composite {
 			
 			number.setText("[" + x + "]");
 			number.setLayoutData(lData);
-			System.out.println("My Class: " + myClass.getName());
-			final Control c = ObjectBenchUtility.getControl(this, myClass.getComponentType().getName());
+			//System.out.println("My Class: " + myClass.getName());
+			final Control c = ObjectBenchUtility.getControl(this, myClass.getComponentType().getSimpleName());
 //			if(c == null)
 //			{
 //				//Maybe destroy everything here to be safe? 
@@ -273,18 +275,27 @@ public class ArrayControl extends Composite {
 				@Override
 				public void mouseDown(MouseEvent e) {
 					Array.set(array,index,ObjectBenchUtility.getControlValue(c));	
-					clear();
-					try {
-						refresh();
-					} catch (ClassNotFoundException e1) {
-						e1.printStackTrace();
-					} catch (MalformedURLException e1) {
-						e1.printStackTrace();
-					}
 				}
 
 				@Override
-				public void mouseUp(MouseEvent e) {}
+				public void mouseUp(MouseEvent e) {
+					Array.set(array,index,ObjectBenchUtility.getControlValue(c));	
+				}
+				
+			});
+			c.addFocusListener(new FocusListener(){
+
+				@Override
+				public void focusGained(FocusEvent e) {
+					Array.set(array,index,ObjectBenchUtility.getControlValue(c));	
+					
+				}
+
+				@Override
+				public void focusLost(FocusEvent e) {
+					Array.set(array,index,ObjectBenchUtility.getControlValue(c));	
+					
+				}
 				
 			});
 			previousLabel = number; 

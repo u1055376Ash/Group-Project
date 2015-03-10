@@ -192,7 +192,7 @@ public class InspectorView extends ViewPart {
 					number.setLayoutData(lData);
 					yValue += 25;
 					//System.out.println(Array.get(arrayField, x).getClass().getName());
-					final Control c = ObjectBenchUtility.getControl(mainViewArea, arrayField.getClass().getComponentType().getName());
+					final Control c = ObjectBenchUtility.getControl(mainViewArea, arrayField.getClass().getComponentType().getSimpleName());
 					if(c == null)
 					{
 						//TryToGetObjectsFromBench
@@ -225,6 +225,10 @@ public class InspectorView extends ViewPart {
 			{
 				if(instance.getFieldClass(fieldNames[i]) != null)
 				{
+					if(instance.getFieldClass(fieldNames[i]).isArray())
+					{
+						continue;
+					}
 					final String currentName = fieldNames[i];
 					//System.out.println(instance.getFieldClass(fieldNames[i]).getName());
 					final Control c = ObjectBenchUtility.getControl(mainViewArea, instance.getFieldClass(fieldNames[i]).getSimpleName());
