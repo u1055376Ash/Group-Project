@@ -572,11 +572,13 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 								classes.add(myClass);
 							}
 							ConstructorDialog dialog = new ConstructorDialog(mainViewArea.getShell(),JavaModelHelper.getClassFromLoader((StringHelper.getQualifiedName(selectedClass, activePackageName))).getDeclaredConstructor(classes.toArray(new Class<?>[classes.size()])));
+					
 							if(dialog.open() == Window.OK)
 							{
 								if(dialog.getReturnCode() != Window.CANCEL)
 								{
 									object = dialog.getInstance();
+									
 									ObjectBenchUtility.getObjectBench().addObject(selectedClass,activePackageName, object);
 								}
 							}

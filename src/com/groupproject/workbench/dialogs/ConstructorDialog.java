@@ -3,11 +3,14 @@ package com.groupproject.workbench.dialogs;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -33,7 +36,9 @@ public class ConstructorDialog  extends Dialog{
 	 */
 	public ConstructorDialog(Shell parentShell, Constructor<?> con) {
 		super(parentShell);
-		constructor = con; 
+		constructor = con;
+		//constructor.
+		ObjectBenchUtility.setActivePackage(constructor.getDeclaringClass().getPackage().getName());
 	}
 	
 
@@ -44,20 +49,34 @@ public class ConstructorDialog  extends Dialog{
 	@Override
 	protected Control createDialogArea(Composite parent){
 		Composite area = (Composite) super.createDialogArea(parent);
-		container = new Composite(area, SWT.NONE);
+		ScrolledComposite sc = new ScrolledComposite(area, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+		
+		container = new Composite(sc, SWT.NONE);
+		
 		container.setLayoutData(new GridData(GridData.FILL_BOTH));
 		GridLayout layout = new GridLayout(2,false);
-		container.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true, true));
+	//	container.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true, true));
 		container.setLayout(layout);
+		container.setSize(400,300);
+		sc.setContent(container);
+		sc.setExpandHorizontal(true);
+		sc.setExpandVertical(true);
+		sc.setMinSize(container.computeSize(300, 300));
 		controls = new ArrayList<Control>();
-		parseParameters();
+		try {
+			parseParameters();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
 		return container;
 	}
 	
 	/*
 	 * This method parses the parameters in the constructor and creates a control relative to it.
 	 */
-	void parseParameters()
+	void parseParameters() throws ClassNotFoundException, MalformedURLException
 	{
 		if(constructor.getParameterTypes().length < 1)
 		{
@@ -68,7 +87,8 @@ public class ConstructorDialog  extends Dialog{
 		{
 			//System.out.println(c.getName());
 			Label lbl = new Label(container,SWT.NONE);
-			lbl.setText(c.getName());
+			lbl.setText(c.getSimpleName());
+
 			Control control = ObjectBenchUtility.getControl(container, c.getSimpleName()); //Gets a control from the utility. 
 			controls.add(control);
 			GridData gD = new GridData();
@@ -78,7 +98,13 @@ public class ConstructorDialog  extends Dialog{
 			if(control != null)
 			{
 				control.setLayoutData(gD);
+//				if(c.isArray())
+//				{
+//					Point size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT,false);
+//					control.setSize(size);
+//				}
 			}
+
 
 		}
 		container.layout();
