@@ -38,7 +38,10 @@ public class ConstructorDialog  extends Dialog{
 		super(parentShell);
 		constructor = con;
 		//constructor.
-		ObjectBenchUtility.setActivePackage(constructor.getDeclaringClass().getPackage().getName());
+		if(constructor.getDeclaringClass().getPackage() != null)
+		{
+			ObjectBenchUtility.setActivePackage(constructor.getDeclaringClass().getPackage().getName());
+		}
 	}
 	
 

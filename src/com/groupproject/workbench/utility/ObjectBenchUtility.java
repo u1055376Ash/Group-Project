@@ -266,9 +266,14 @@ public final class ObjectBenchUtility
 		{
 			return double.class; 
 		}
+		if(s.equals("[I[]") || s.equals("int[][]")|| s.equals("[[I"))
+		{
+			return int[][].class;
+		}
 		Class<?> c = null; 
 		try
 		{
+			//s.replaceFirst(regex, replacement)
 			c = JavaModelHelper.getClassFromLoader(s.replace("[]", ""));
 		}
 		catch(ClassNotFoundException e2)
@@ -365,6 +370,10 @@ public final class ObjectBenchUtility
 			return true; 
 		}
 		if(s.equals("double[]") || s.equals("[D"))
+		{
+			return true; 
+		}
+		if(s.equals("[I[]") || s.equals("int[][]") || s.equals("[[I"))
 		{
 			return true; 
 		}
