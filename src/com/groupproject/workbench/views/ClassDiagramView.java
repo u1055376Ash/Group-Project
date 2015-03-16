@@ -566,11 +566,12 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 												   ObjectBenchUtility.getClassFromType(s):ObjectBenchUtility.getClassFromType(StringHelper.getQualifiedName(StringHelper.fixType(s), activePackageName));
 								if(myClass == null)
 								{
-									System.out.println("Class-Not-Found");
+									System.out.println("Class-Not-Found: " + s);
 									continue;
 								}
 								classes.add(myClass);
 							}
+							System.out.println(classes.toString());
 							ConstructorDialog dialog = new ConstructorDialog(mainViewArea.getShell(),JavaModelHelper.getClassFromLoader((StringHelper.getQualifiedName(selectedClass, activePackageName))).getDeclaredConstructor(classes.toArray(new Class<?>[classes.size()])));
 							if(dialog.open() == Window.OK)
 							{

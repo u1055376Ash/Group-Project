@@ -88,7 +88,7 @@ public final class ObjectBenchUtility
 	}
 	
 	/*
-	 * Set Active Pacakage - Sets the active package. 
+	 * Set Active Package - Sets the active package. 
 	 */
 	public static void setActivePackage(String s)
 	{
@@ -191,14 +191,14 @@ public final class ObjectBenchUtility
 	/*
 	 * Get Class From Type - Returns a class type from a string.
 	 */
-	public static Class<?> getClassFromType(String s) throws ClassNotFoundException, MalformedURLException
+	public static Class<?> getClassFromType(String s) throws MalformedURLException
 	{
 		System.out.println(":"+s+":");
-		if(s.equals("I"))
+		if(s.equals("I") || s.equals("int"))
 		{
 			return int.class;
 		}
-		if(s.equals("QString"))
+		if(s.equals("QString")|| s.equals("String"))
 		{
 			return String.class;
 		}
@@ -210,31 +210,31 @@ public final class ObjectBenchUtility
 		{
 			return String.class;
 		}
-		if(s.equals("B"))
+		if(s.equals("B") || s.equals("byte"))
 		{
 			return byte.class;
 		}
-		if(s.equals("S"))
+		if(s.equals("S")|| s.equals("short"))
 		{
 			return short.class;
 		}
-		if(s.equals("J"))
+		if(s.equals("J")|| s.equals("long"))
 		{
 			return long.class;
 		}
-		if(s.equals("F"))
+		if(s.equals("F")|| s.equals("float"))
 		{
 			return float.class;
 		}
-		if(s.equals("D"))
+		if(s.equals("D")|| s.equals("double"))
 		{
 			return double.class;
 		}
-		if(s.equals("Z"))
+		if(s.equals("Z")|| s.equals("boolean"))
 		{
 			return boolean.class;
 		}
-		if(s.equals("C"))
+		if(s.equals("C")|| s.equals("char"))
 		{
 			return char.class;
 		}
@@ -266,10 +266,22 @@ public final class ObjectBenchUtility
 		{
 			return double.class; 
 		}
-		
-
-		Class<?> c = JavaModelHelper.getClassFromLoader(s.replace("[]", ""));
-		if(s.contains("[]"))
+		if(s.equals("[I[]") || s.equals("int[][]")|| s.equals("[[I"))
+		{
+			return int[][].class;
+		}
+		Class<?> c = null; 
+		try
+		{
+			//s.replaceFirst(regex, replacement)
+			c = JavaModelHelper.getClassFromLoader(s.replace("[]", ""));
+		}
+		catch(ClassNotFoundException e2)
+		{
+			c = null;
+		}
+		 
+		if(s.contains("[]") && c !=null)
 		{
 			Object o = Array.newInstance(c, 0);
 			return o.getClass();
@@ -279,6 +291,7 @@ public final class ObjectBenchUtility
 		{
 			return c; 
 		}
+
 		return null; 
 		
 	}
@@ -360,6 +373,10 @@ public final class ObjectBenchUtility
 		{
 			return true; 
 		}
+		if(s.equals("[I[]") || s.equals("int[][]") || s.equals("[[I"))
+		{
+			return true; 
+		}
 		
 		return false; 
 	}
@@ -381,7 +398,7 @@ public final class ObjectBenchUtility
 	/*
 	 * Get Control - Gets a control based on a string type. 
 	 */
-	public static Control getControl(final Composite control, final String s)
+	public static Control getControl(final Composite control, final String s) throws ClassNotFoundException, MalformedURLException
 	{
 		if(s.equals("I") || s.equals("int") || s.equals("java.lang.Integer"))
 		{
@@ -517,6 +534,26 @@ public final class ObjectBenchUtility
 			return colorButton;
 		}
 		
+		if(s.contains("[]"))
+		{
+			ArrayControl arrayControl = null;
+			String clean = s.replace("[]", "");
+			System.out.println(clean + "CLEAN");
+			if(getClassFromType(clean) != null)
+			{
+				System.out.println("in here");
+				arrayControl = new ArrayControl(control, SWT.NONE, getClassFromType(clean));
+			}
+			else
+			{
+				//System.out.println( getClassFromType(StringHelper.getQualifiedName(s.replace("[]", ""), getActivePackage())).getName() + "FUCK");
+				arrayControl = new ArrayControl(control, SWT.NONE, getClassFromType(StringHelper.getQualifiedName(clean, getActivePackage())));
+			}
+			
+			arrayControl.setData("typeKey", "array");
+			return arrayControl;
+		}
+		
 		/*
 		 * Failing this object isn't a primitive type (or known) we need to try and see if there are any instances on the object bench. 
 		 */
@@ -548,7 +585,7 @@ public final class ObjectBenchUtility
 						if(current == i)
 						{
 							comboBox.setData("typeData", instances[i].myInstance);
-
+							//System.out.println("Setting Data:" + instances[i].myInstance.toString());
 						}
 					}
 					if(comboBox.getData("typeData") == null)
@@ -571,7 +608,41 @@ public final class ObjectBenchUtility
 			});
 			return comboBox;
 		}
-		return null; 
+		else
+		{
+			final Combo comboBox = new Combo(control, SWT.READ_ONLY);
+			comboBox.setEnabled(true);
+			comboBox.setData("typeKey", "combo");
+			comboBox.setData("classData", s);
+			comboBox.add("null");
+			comboBox.addSelectionListener(new SelectionListener(){
+				
+				/*
+				 * (non-Javadoc)
+				 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+				 */
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					if(comboBox.getData("typeData") == null)
+					{
+						comboBox.setData("typeData", null);
+						comboBox.select(comboBox.getItemCount()-1);
+					}
+
+				}
+				
+				/*
+				 * (non-Javadoc)
+				 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
+				 */
+				@Override
+				public void widgetDefaultSelected(SelectionEvent e) {
+
+				}
+				
+			});
+			return comboBox;
+		}
 	}
 	
 	/*
@@ -639,13 +710,21 @@ public final class ObjectBenchUtility
 			o = (java.awt.Color)b.getData("typeData");
 			
 		}
+		if(s.equals("combo"))
+		{
+			o = c.getData("typeData");
+		}
 		
 		if(c.getData("typeData") != null)
 		{
 			o = c.getData("typeData");
 			//return o;
 		}
-		
+		if(s.equals("array"))
+		{
+			ArrayControl a = (ArrayControl)c;
+			o = a.getArray();
+		}
 		return o;
 	}
 	
@@ -704,21 +783,28 @@ public final class ObjectBenchUtility
 			Combo combo = (Combo)c;
 			boolean found  = false; 
 			final BenchInstance[] instances = ObjectBenchUtility.getObjectBench().getInstancesOfType(combo.getData("classData").toString());
-			//int current = combo.getSelectionIndex(); 
-			for(int i = 0; i < instances.length; i++)
+			//int current = combo.getSelectionIndex();
+			if(instances != null)
 			{
-				if(instances[i].myInstance.equals(o))
+				for(int i = 0; i < instances.length; i++)
 				{
-					combo.select(i);
-					found = true; 
-					//combo.setData("typeData", instances[i].myInstance);
+					if(instances[i].myInstance.equals(o))
+					{
+						combo.select(i);
+						found = true; 
+						//combo.setData("typeData", instances[i].myInstance);
+					}
 				}
 			}
 			if(found == false)
 			{
 				combo.select(combo.getItemCount()-1);
 			}
-			
+		}
+		if(s.equals("array"))
+		{
+			ArrayControl a = (ArrayControl)c;
+			a.setArrayObject(o);
 		}
 	}
 	

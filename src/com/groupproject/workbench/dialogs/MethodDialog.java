@@ -1,6 +1,7 @@
 package com.groupproject.workbench.dialogs;
 
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 
 /*
@@ -45,14 +47,20 @@ public class MethodDialog extends Dialog {
 		container.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true, true));
 		container.setLayout(layout);
 		controls = new ArrayList<Control>();
-		parseParameters();
+		try {
+			parseParameters();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
 		return container;
 	}
 	
 	/*
 	 * This method parses the parameters in the constructor and creates a control relative to it.
 	 */
-	void parseParameters()
+	void parseParameters() throws ClassNotFoundException, MalformedURLException
 	{
 		for(Class<?> c:myMethod.getParameterTypes())
 		{

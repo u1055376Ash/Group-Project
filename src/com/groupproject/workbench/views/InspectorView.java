@@ -159,11 +159,6 @@ public class InspectorView extends ViewPart {
 						{
 							Object o = Array.newInstance(arrayField.getClass().getComponentType(), spinner.getSelection());
 							try {
-								
-							} catch (Exception e2) {
-								e2.printStackTrace();
-							}
-							try {
 								int oldLength = Array.getLength(arrayField) > Array.getLength(o) ? Array.getLength(o):Array.getLength(arrayField);//Array.getLength(arrayField) > length ? Array.getLength(arrayField): Array.getLength(o);
 								System.arraycopy(arrayField, 0, o, 0, oldLength);
 								// o = Arrays.copyOf((Object[]) arrayField, Array.getLength(o));
@@ -197,7 +192,7 @@ public class InspectorView extends ViewPart {
 					number.setLayoutData(lData);
 					yValue += 25;
 					//System.out.println(Array.get(arrayField, x).getClass().getName());
-					final Control c = ObjectBenchUtility.getControl(mainViewArea, arrayField.getClass().getComponentType().getName());
+					final Control c = ObjectBenchUtility.getControl(mainViewArea, arrayField.getClass().getComponentType().getSimpleName());
 					if(c == null)
 					{
 						//TryToGetObjectsFromBench
@@ -226,111 +221,119 @@ public class InspectorView extends ViewPart {
 				}
 				continue;
 			}
-			//Create value label
-			if(instance.getFieldClass(fieldNames[i]) != null)
+			else
 			{
-				final String currentName = fieldNames[i];
-				//System.out.println(instance.getFieldClass(fieldNames[i]).getName());
-				final Control c = ObjectBenchUtility.getControl(mainViewArea, instance.getFieldClass(fieldNames[i]).getSimpleName());
-				//System.out.println("--" + instance.getFieldClass(fieldNames[i]).getName() + "--");
-				if(c == null)
+				if(instance.getFieldClass(fieldNames[i]) != null)
 				{
-					//Do something
-				}
-				else
-				{
-					ObjectBenchUtility.setControlValue(c, instance.getField(currentName));
-				}
-
-				if(c != null)
-				{
-					FormData controlData = new FormData(80, SWT.DEFAULT);
-					for(Label l :fieldNameLabels)
+					if(instance.getFieldClass(fieldNames[i]).isArray())
 					{
-						if(l.getText().equals(fieldNames[i]))
+						continue;
+					}
+					final String currentName = fieldNames[i];
+					//System.out.println(instance.getFieldClass(fieldNames[i]).getName());
+					final Control c = ObjectBenchUtility.getControl(mainViewArea, instance.getFieldClass(fieldNames[i]).getSimpleName());
+					//System.out.println("--" + instance.getFieldClass(fieldNames[i]).getName() + "--");
+					if(c == null)
+					{
+						//Do something
+					}
+					else
+					{
+						ObjectBenchUtility.setControlValue(c, instance.getField(currentName));
+					}
+
+					if(c != null)
+					{
+						FormData controlData = new FormData(80, SWT.DEFAULT);
+						for(Label l :fieldNameLabels)
 						{
-							controlData.top = new FormAttachment(l, 0, SWT.TOP);
-							controlData.left = new FormAttachment(l, 100,SWT.LEFT);
+							if(l.getText().equals(fieldNames[i]))
+							{
+								controlData.top = new FormAttachment(l, 0, SWT.TOP);
+								controlData.left = new FormAttachment(l, 100,SWT.LEFT);
+							}
 						}
+
+						c.setLayoutData(controlData);
+						try {
+								c.addFocusListener(new FocusListener(){
+
+									@Override
+									public void focusGained(FocusEvent e) {
+										try {
+											instance.setValue(currentName,ObjectBenchUtility.getControlValue(c));
+										} catch (Exception e1) {
+											e1.printStackTrace();
+										}
+										
+									}
+
+									@Override
+									public void focusLost(FocusEvent e) {
+										try {
+											instance.setValue(currentName,ObjectBenchUtility.getControlValue(c));
+										} catch (Exception e1) {
+											e1.printStackTrace();
+										}
+										
+									}
+									
+								});
+								c.addKeyListener(new KeyListener(){
+
+									@Override
+									public void keyPressed(KeyEvent e) {
+										try {
+											instance.setValue(currentName,ObjectBenchUtility.getControlValue(c));
+										} catch (Exception e1) {
+											e1.printStackTrace();
+										}
+										
+									}
+
+									@Override
+									public void keyReleased(KeyEvent e) {
+										try {
+											instance.setValue(currentName,ObjectBenchUtility.getControlValue(c));
+										} catch (Exception e1) {
+											e1.printStackTrace();
+										}
+										
+									}
+									
+								});
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						} 
+
 					}
-
-					c.setLayoutData(controlData);
-					try {
-							c.addFocusListener(new FocusListener(){
-
-								@Override
-								public void focusGained(FocusEvent e) {
-									try {
-										instance.setValue(currentName,ObjectBenchUtility.getControlValue(c));
-									} catch (Exception e1) {
-										e1.printStackTrace();
-									}
-									
-								}
-
-								@Override
-								public void focusLost(FocusEvent e) {
-									try {
-										instance.setValue(currentName,ObjectBenchUtility.getControlValue(c));
-									} catch (Exception e1) {
-										e1.printStackTrace();
-									}
-									
-								}
-								
-							});
-							c.addKeyListener(new KeyListener(){
-
-								@Override
-								public void keyPressed(KeyEvent e) {
-									try {
-										instance.setValue(currentName,ObjectBenchUtility.getControlValue(c));
-									} catch (Exception e1) {
-										e1.printStackTrace();
-									}
-									
-								}
-
-								@Override
-								public void keyReleased(KeyEvent e) {
-									try {
-										instance.setValue(currentName,ObjectBenchUtility.getControlValue(c));
-									} catch (Exception e1) {
-										e1.printStackTrace();
-									}
-									
-								}
-								
-							});
-					} catch (Exception e1) {
-						e1.printStackTrace();
-					} 
-
-				}
-				else
-				{
-					fieldValueLabels.add(new Label(mainViewArea, SWT.BORDER));
-					String s = instance.getValue(fieldNames[i]) != null ? instance.getValue(fieldNames[i]).toString():"null";
-					fieldValueLabels.get(fieldValueLabels.size()-1).setText(s);
-					FormData valueData = new FormData(85 + (fieldValueLabels.get(fieldValueLabels.size()-1).getText().length() * 4), SWT.DEFAULT);
-					
-					if(i == 0)
+					else
 					{
-						valueData.top = new FormAttachment(30); 
-						valueData.left = new FormAttachment(fieldNameLabels.get(fieldValueLabels.size()-1),20);
-					}
-					if(i-1 >= 0)
-					{
-						if(previousLabel == null)
+						fieldValueLabels.add(new Label(mainViewArea, SWT.BORDER));
+						String s = instance.getValue(fieldNames[i]) != null ? instance.getValue(fieldNames[i]).toString():"null";
+						fieldValueLabels.get(fieldValueLabels.size()-1).setText(s);
+						FormData valueData = new FormData(85 + (fieldValueLabels.get(fieldValueLabels.size()-1).getText().length() * 4), SWT.DEFAULT);
+						
+						if(i == 0)
 						{
-							previousLabel = fieldNameLabels.get(fieldValueLabels.size()-2); 
+							valueData.top = new FormAttachment(30); 
+							valueData.left = new FormAttachment(fieldNameLabels.get(fieldValueLabels.size()-1),20);
 						}
-						valueData.top = new FormAttachment(previousLabel,-15);
-						valueData.left = new FormAttachment(previousLabel,20);
+						if(i-1 >= 0)
+						{
+							if(previousLabel == null)
+							{
+								previousLabel = fieldNameLabels.get(fieldValueLabels.size()-2); 
+							}
+							valueData.top = new FormAttachment(previousLabel,-15);
+							valueData.left = new FormAttachment(previousLabel,20);
+						}
+						fieldValueLabels.get(fieldValueLabels.size()-1).setLayoutData(valueData);
 					}
-					fieldValueLabels.get(fieldValueLabels.size()-1).setLayoutData(valueData);
 				}
 			}
+			//Create value label
+
 
 
 		}
