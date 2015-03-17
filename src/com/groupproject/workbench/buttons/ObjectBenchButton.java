@@ -22,13 +22,16 @@ public class ObjectBenchButton extends ClassButton {
 	 */
 	public ObjectBenchButton(Composite parent, int style, String cn, int id,
 			String pn) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException {
+	//public ObjectBenchButton(Composite parent, int style, String cn, int id,
+	//		String pn) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException {
 		super(parent, style, cn, id, pn);
 		myInstance = new BenchInstance(cn,pn);
 		defaultColor = this.backgroundColor;
 	}
-	
 	public ObjectBenchButton(Composite parent, int style, String cn, int id,
 			String pn, Object instance) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException {
+	//public ObjectBenchButton(Composite parent, int style, String cn, int id,
+	//		String pn, Object instance) throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException {
 		super(parent, style, cn, id, pn);
 		myInstance = new BenchInstance(cn,pn,instance);
 		defaultColor = this.backgroundColor;

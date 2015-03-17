@@ -53,6 +53,7 @@ public class ObjectBenchView extends ViewPart  {
 	public void createPartControl(Composite parent) {
 		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 		mainViewArea = new Composite(sc, SWT.NONE);
+		//mainViewArea = new Composite(sc, SWT.NONE);
 		mainViewArea.setLayout(new FormLayout());
 		mainViewArea.setSize(600,100);
 		mainViewArea.setMenu(buildContextMenu());
