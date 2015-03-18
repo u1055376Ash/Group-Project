@@ -4,7 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="resources"/>
-	<classpathentry kind="lib" path="C:/Users/Ashhad/Desktop/eclipse/org.eclipse.jdt.ui_3.8.2.v20130107-165834.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Ashhad/Desktop/eclipse/org.eclipse.ui.console_3.5.100.v20120521-2012.jar"/>
+	<classpathentry kind="lib" path="org.eclipse.jdt.ui_3.8.2.v20130107-165834.jar"/>
+	<classpathentry kind="lib" path="org.eclipse.ui.console_3.5.100.v20120521-2012.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
