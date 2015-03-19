@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
+import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -400,6 +401,32 @@ public final class JavaModelHelper {
 	}
 	
 	/*
+	 * Get Imports - Gets the imports of a given class. 
+	 */
+	private static String[] getImports(ICompilationUnit unit) throws JavaModelException
+	{
+		if(unit == null)
+		{
+			return null;
+		}
+		IImportDeclaration[] imports = unit.getImports();
+		List<String> strings = new ArrayList<String>(); 
+		for(int i = 0; i< imports.length;i++)
+		{
+			strings.add(imports[i].getElementName());
+		}
+		return strings.toArray(new String[strings.size()]); 
+	}
+	
+	/*
+	 * Get Imports - Gets the imports from a given string. 
+	 */
+	public static String[] getImports(String myPackage, String myClass) throws JavaModelException
+	{
+		 return getImports(getClass(myPackage,myClass));
+	}
+	
+	/*
 	 * Get Field Types - Returns a collection of string representations of a fields type.
 	 */
 	private static String[] getFieldTypes(ICompilationUnit unit) throws JavaModelException
@@ -419,6 +446,7 @@ public final class JavaModelHelper {
 		return strings.toArray(new String[strings.size()]);
 	}
 	
+
 	/*
 	 * Get Field Types - Returns a collection of string representations of a fields type from a given class and package. 
 	 */

@@ -479,6 +479,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		for(int j = 0; j < classes.length;j++) 
 		{
 			checkSuperClass(classButtons.get(j),parent);	
+			checkDependencies(classButtons.get(j),parent);
 		}
 		
 		parent.addListener(SWT.Paint, new Listener() { // paint listener to redraw inheritance link
@@ -522,9 +523,67 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	/*
 	 * Check Dependencies - This method will check to see if a given class depends on any other class in the diagram. 
 	 */
-	void checkDependencies(ClassButton b)
+	void checkDependencies(ClassButton b, Composite parent) throws JavaModelException
 	{
-		//TODO - Implement a check to see if the class uses any other class in the same diagram. 
+		String[] fieldTypes = JavaModelHelper.getFieldTypes(b.packageName,b.className);
+
+		List<ClassButton> dependencies = new ArrayList<ClassButton>();
+		//System.out.println("Fields\n ------");
+		//debugAddToDependencies(fieldTypes,dependencies,"Fields\n-----------\n");
+		addToDependencies(fieldTypes,dependencies);
+		String[][] constructorParameters = JavaModelHelper.getConstructorParameters(b.packageName, b.className);
+		for(String[] t:constructorParameters)
+		{
+			//System.out.println("Constructors\n -----------");
+			//debugAddToDependencies(t,dependencies,"Constructors\n-----------\n");
+			addToDependencies(t,dependencies);
+		}
+		String[][] methodParameters = JavaModelHelper.getClassMethodParameterTypes(b.packageName, b.className);
+		for(String[] m:methodParameters)
+		{
+			//System.out.println("Methods\n -------");
+			//debugAddToDependencies(m,dependencies,"Methods\n-------\n");
+			addToDependencies(m,dependencies);
+		}
+		
+		for(ClassButton a:dependencies)
+		{
+			drawDependenceLink(b,a,parent);
+		}
+		
+	}
+	
+	/*
+	 * Add To Dependencies - Adds dependencies to a list based on a specified set of types represented by strings. 
+	 */
+	void addToDependencies(String[] strings, List<ClassButton> list)
+	{
+		for(String s:strings)
+		{
+			for(ClassButton a:classButtons)
+			{
+				if(StringHelper.stripExtension(a.className).equals(StringHelper.fixType(s)))
+				{
+					System.out.println("Depending on: " + StringHelper.fixType(s) + "\n");
+					if(!list.contains(a))
+					{
+						
+						list.add(a);					
+					}
+				}
+			}
+			
+			//System.out.println(b.className + " contains: " + StringHelper.fixType(s));
+		}
+	}
+	
+	/*
+	 * Debug Add To Dependencies - Used to check dependencies. 
+	 */
+	void debugAddToDependencies(String[] strings, List<ClassButton> list, String type)
+	{
+		System.out.println(type);
+		addToDependencies(strings,list);
 	}
 	
 	/*
@@ -547,7 +606,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	/*
 	 * Draw Dependence Link - Draws a dashed? line between two given classes that are dependent on each other. 
 	 */
-	void drawDependenceLink(ClassButton a, ClassButton b)
+	void drawDependenceLink(ClassButton a, ClassButton b, Composite parent)
 	{
 		//TODO - Implement this. 
 	}
