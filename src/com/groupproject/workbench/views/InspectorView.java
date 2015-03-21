@@ -36,7 +36,7 @@ import com.groupproject.workbench.utility.ObjectBenchUtility;
 public class InspectorView extends ViewPart {
 
 	Boolean enableEditing; 					//Will allow a user to edit values from within the inspector. 
-	Composite myParent; 
+	Composite myParent; 					//The parent of the inspector.
 	Composite mainViewArea;					//The main view area 
 	Label header; 							//The header, usually the name of the instance
 	List<Label> fieldNameLabels;			//A list of field names

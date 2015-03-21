@@ -25,6 +25,7 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -218,7 +219,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		{
 			updateHeader();
 			activePackageName = "";
-			disposeButtons(true);
+			disposeButtons(false);
 		}
 	}
 	
@@ -384,7 +385,11 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	 */
 	public void createClassButtons(Composite parent, Boolean pushDown) throws MalformedURLException, Exception
 	{
-		
+		if(!JavaModelHelper.isProjectOpen(activeProjectName))
+		{
+			disposeButtons(false);
+			return;
+		}
 		if(upButton == null || upButton.isDisposed() && !activePackageName.equals(""))
 			{
 				addUpButton(parent);
@@ -398,7 +403,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		}
 			final String[] classes = JavaModelHelper.getClassNames(activePackageName); //Get the class names 
 			
-		System.out.println("Number of Classes: " + classes.length);	
+		//System.out.println("Number of Classes: " + classes.length);	
 		
 		for(int i = 0; i < classes.length;i++) 
 		{
@@ -511,9 +516,9 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 				//System.out.println("Class A: " + a.getMyClass() + " SuperClass: " + superClass);
 				if(a.getMyClass().equals(superClass))		
 				{
-					System.out.println("Super class = " + superClass);					
-					System.out.println("Class (a) = " + a.getMyClass());
-					System.out.println("Class (b) = " + b.getMyClass());
+					//System.out.println("Super class = " + superClass);					
+					//System.out.println("Class (a) = " + a.getMyClass());
+					//System.out.println("Class (b) = " + b.getMyClass());
 					drawInheritanceLink(b,a,parent); //Maybe 
 				}
 			}
@@ -564,7 +569,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			{
 				if(StringHelper.stripExtension(a.className).equals(StringHelper.fixType(s)))
 				{
-					System.out.println("Depending on: " + StringHelper.fixType(s) + "\n");
+					//System.out.println("Depending on: " + StringHelper.fixType(s) + "\n");
 					if(!list.contains(a))
 					{
 						
@@ -784,8 +789,13 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	/*
 	 * Create Package Buttons - Creates the buttons to represent packages
 	 */
-	public void createPackageButtons(Composite parent)
+	public void createPackageButtons(Composite parent) throws MalformedURLException, Exception
 	{
+		if(!JavaModelHelper.isProjectOpen(activeProjectName))
+		{
+			disposeButtons(false);
+			return;
+		}
 		try {
 			final String[] packages = JavaModelHelper.getPackageNames(activeProjectName);
 			for(int i = 0; i < packages.length;i++)
@@ -919,6 +929,10 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	 */
 	public void fullRefresh() throws MalformedURLException, Exception
 	{
+		if(!JavaModelHelper.isProjectOpen(activeProjectName))
+		{
+			disposeButtons(false);
+		}
 		if(state == 0)
 		{
 			viewPackages();
@@ -1012,6 +1026,13 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 					newPackageButton.dispose();
 				}
 			}
+	}
+	
+	private void disposeAll()
+	{
+	    for (Control control : mainViewArea.getChildren()) {
+	        control.dispose();
+	    }
 	}
 	
 }
