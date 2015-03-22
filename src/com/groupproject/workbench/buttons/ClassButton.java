@@ -26,7 +26,6 @@ public class ClassButton extends SquareButton{
 	 * Constructors 
 	 */
 	public ClassButton(Composite parent, int style, String cn, int id,String pn) throws ClassNotFoundException {
-	//public ClassButton(Composite parent, int style, String cn, int id,String pn) throws ClassNotFoundException {
 		super(parent, style);
 		classId = id;
 		className = cn; 

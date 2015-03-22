@@ -1,8 +1,5 @@
 package com.groupproject.workbench.views;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +13,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -383,7 +382,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	/*
 	 * Create Class Buttons - This is the method that draws the class icons. 
 	 */
-	public void createClassButtons(Composite parent, Boolean pushDown) throws MalformedURLException, Exception
+	public void createClassButtons(final Composite parent, Boolean pushDown) throws MalformedURLException, Exception
 	{
 		if(!JavaModelHelper.isProjectOpen(activeProjectName))
 		{
@@ -402,8 +401,6 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			return; //If a package is empty then return 
 		}
 			final String[] classes = JavaModelHelper.getClassNames(activePackageName); //Get the class names 
-			
-		//System.out.println("Number of Classes: " + classes.length);	
 		
 		for(int i = 0; i < classes.length;i++) 
 		{
@@ -461,7 +458,12 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 					buttonData.top = pushDown ?  new FormAttachment(25):new FormAttachment(15);
 				}	
 				
+				//Probably move these somewhere more appropriate 
+				final Point[] offset = new Point[1];
+				final ClassButton currentClassButton = classButtons.get(i);
+				
 				//Set up the listeners 
+				//TODO - Fix glitchiness here & repositioning of buttons  
 				classButtons.get(i).addMouseListener(new MouseListener(){
 
 					@Override
@@ -470,10 +472,37 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 					}
 
 					@Override
-					public void mouseDown(MouseEvent e) {}
+					public void mouseDown(MouseEvent e) {
+						try {
+							System.out.println("Mouse down event for: " + currentClassButton.getMyClass());
+							Point pt1 = currentClassButton.toDisplay(0, 0);
+					       // Point pt2 = parent.getShell().toDisplay(e.x, e.y);
+					       // offset[0] = new Point(pt2.x - pt1.x, pt2.y - pt1.y);
+							offset[0] = new Point(pt1.x, pt1.y);
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
+					}
+					
 					@Override
-					public void mouseUp(MouseEvent e) {}
+					public void mouseUp(MouseEvent e) {
+						System.out.println("Mouse up event for: " + classes[currentClassId]);
+						 offset[0] = null;
+					}
 				});
+				
+				classButtons.get(i).addMouseMoveListener(new MouseMoveListener(){
+
+					@Override
+					public void mouseMove(MouseEvent e) {
+						if (offset[0] != null) {
+							System.out.println("Mouse move event for: " + classes[currentClassId]);
+				            Point pt = offset[0];
+				            currentClassButton.setLocation(e.x - pt.x, e.y - pt.y);
+					}
+					}					
+				});
+				
 				classButtons.get(i).setLayoutData(buttonData);
 				classButtons.get(i).getColor();//hack to fix a bug
 			}
@@ -487,7 +516,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			checkDependencies(classButtons.get(j),parent);
 		}
 		
-		parent.addListener(SWT.Paint, new Listener() { // paint listener to redraw inheritance link
+		parent.addListener(SWT.Paint, new Listener() { // paint listener to redraw links
 		      public void handleEvent(Event e) {
 		    	  for(int j = 0; j < classes.length;j++) 
 		  		{
@@ -511,14 +540,8 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		{
 			for(ClassButton a:classButtons)
 			{
-				//System.out.println("for(ClassButton a:classButtons) called");
-				//System.out.println("ClassButton B: " + b.getMyClass());
-				//System.out.println("Class A: " + a.getMyClass() + " SuperClass: " + superClass);
 				if(a.getMyClass().equals(superClass))		
 				{
-					//System.out.println("Super class = " + superClass);					
-					//System.out.println("Class (a) = " + a.getMyClass());
-					//System.out.println("Class (b) = " + b.getMyClass());
 					drawInheritanceLink(b,a,parent); //Maybe 
 				}
 			}
@@ -597,15 +620,11 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	void drawInheritanceLink(ClassButton b, ClassButton a, Composite parent) throws Exception
 	{
 		GC gc = new GC(parent);
-		//System.out.println("Class (a) = " + a.getMyClass());
-		//System.out.println("Class (b) = " + b.getMyClass());
-		
-		//System.out.println("Drawing inheritance link, class A cords= " + a.getLocation() + " class B coords=" + b.getLocation());
 		gc.drawLine(a.getLocation().x, a.getLocation().y+40, b.getLocation().x, b.getLocation().y+40);
 		
-		gc.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE)); 
-		gc.drawPolygon(new int[] { a.getLocation().x,a.getLocation().y+40,a.getLocation().x-10,a.getLocation().y+47,a.getLocation().x-10,a.getLocation().y+33 });
-		gc.fillPolygon(new int[] { a.getLocation().x-1,a.getLocation().y+40,a.getLocation().x-9,a.getLocation().y+46,a.getLocation().x-9,a.getLocation().y+34 });
+		//gc.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE)); 
+		//gc.drawPolygon(new int[] { a.getLocation().x,a.getLocation().y+40,a.getLocation().x-10,a.getLocation().y+47,a.getLocation().x-10,a.getLocation().y+33 });
+		//gc.fillPolygon(new int[] { a.getLocation().x-1,a.getLocation().y+40,a.getLocation().x-9,a.getLocation().y+46,a.getLocation().x-9,a.getLocation().y+34 });
 	}
 	
 	/*
