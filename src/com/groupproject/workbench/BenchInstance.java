@@ -6,8 +6,8 @@ import java.net.MalformedURLException;
 
 import org.eclipse.jdt.core.JavaModelException;
 
-import com.groupproject.workbench.helpers.StringHelper;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
+import com.groupproject.workbench.utility.StringHelper;
 /*
  * The class that controls an instance of a users class.
  * Contains methods to access fields of an instantiated class and call methods related to the class. 

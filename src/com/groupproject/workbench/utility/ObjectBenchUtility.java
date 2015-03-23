@@ -31,7 +31,6 @@ import org.eclipse.ui.ide.IDE;
 import com.groupproject.workbench.Activator;
 import com.groupproject.workbench.BenchInstance;
 import com.groupproject.workbench.JavaModelHelper;
-import com.groupproject.workbench.helpers.StringHelper;
 import com.groupproject.workbench.preferences.PreferenceConstants;
 import com.groupproject.workbench.views.InspectorView;
 import com.groupproject.workbench.views.ObjectBenchView;

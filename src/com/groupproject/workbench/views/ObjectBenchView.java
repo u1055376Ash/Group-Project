@@ -29,8 +29,8 @@ import com.groupproject.workbench.BenchInstance;
 import com.groupproject.workbench.JavaModelHelper;
 import com.groupproject.workbench.buttons.ObjectBenchButton;
 import com.groupproject.workbench.dialogs.MethodDialog;
-import com.groupproject.workbench.helpers.StringHelper;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
+import com.groupproject.workbench.utility.StringHelper;
 
 /*
  * Object Bench View - This is the view for the object bench. This class controls all instances of user classes and stores them in ObjectBenchButton.

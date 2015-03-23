@@ -1,4 +1,4 @@
-package com.groupproject.workbench.helpers;
+package com.groupproject.workbench.utility;
 
 import java.io.BufferedReader;
 import java.io.IOException;

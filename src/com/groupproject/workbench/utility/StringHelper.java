@@ -1,4 +1,4 @@
-package com.groupproject.workbench.helpers;
+package com.groupproject.workbench.utility;
 
 /*
  * String Helper - A collection of methods to assist in building strings used throughout the plugin. 

@@ -41,9 +41,9 @@ import com.groupproject.workbench.buttons.SquareButton;
 import com.groupproject.workbench.dialogs.ConstructorDialog;
 import com.groupproject.workbench.dialogs.NewClassDialog;
 import com.groupproject.workbench.dialogs.NewPackageDialog;
-import com.groupproject.workbench.helpers.StringHelper;
 import com.groupproject.workbench.perspectives.ObjectBenchPerspective;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
+import com.groupproject.workbench.utility.StringHelper;
 
 /*
  * Class Diagram View - This is the class that holds the Class Diagram view. 

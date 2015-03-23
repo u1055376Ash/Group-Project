@@ -33,9 +33,9 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISelectionService;
 
-import com.groupproject.workbench.helpers.StringHelper;
-import com.groupproject.workbench.helpers.TemplateLoader;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
+import com.groupproject.workbench.utility.StringHelper;
+import com.groupproject.workbench.utility.TemplateLoader;
 
 /*
  * JavaModelHelper - This class contains methods to gather information on user defined classes. This class can traverse the Eclipse AST and gather

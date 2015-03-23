@@ -8,9 +8,9 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 
 import com.groupproject.workbench.JavaModelHelper;
-import com.groupproject.workbench.helpers.StringHelper;
 import com.groupproject.workbench.preferences.PreferenceConstants;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
+import com.groupproject.workbench.utility.StringHelper;
 
 /*
  * Class Button - A representation of a class that can be used as a button. Inherits from Square Button. 
