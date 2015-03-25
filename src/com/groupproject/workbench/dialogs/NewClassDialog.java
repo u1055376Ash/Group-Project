@@ -1,6 +1,7 @@
 package com.groupproject.workbench.dialogs;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
@@ -104,8 +105,13 @@ public class NewClassDialog extends Dialog {
 	protected void okPressed()
 	{
 		try {
-			JavaModelHelper.newClass(classNameField.getText(), getRadioButton(),pName);
+			String className = classNameField.getText().replace(" ", "");
+			if(!JavaModelHelper.newClass(className, getRadioButton(),pName))
+			{
+				MessageDialog.openError(container.getShell(), "Error", "No duplicate classes, remove existing class first!");
+			}
 		} catch (Exception e) {
+			MessageDialog.openError(container.getShell(), "Error", "Class names cannot contain spaces and certain special characters!");
 			e.printStackTrace();
 		} 
 		super.okPressed();

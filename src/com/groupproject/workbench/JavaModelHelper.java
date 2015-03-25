@@ -29,6 +29,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISelectionService;
@@ -130,8 +131,12 @@ public final class JavaModelHelper {
 	/*
 	 * New Class - Creates a new class
 	 */
-	public static void newClass(String className, int classType, String myPackage) throws IOException, JavaModelException
+	public static boolean newClass(String className, int classType, String myPackage) throws Exception
 	{
+		if(getClass(myPackage,className) != null)
+		{
+			return false; 
+		}
 		Template t = TemplateLoader.getTemplate(classType); 
 		t.setName(className, myPackage);
 		className += ".java";
@@ -139,10 +144,11 @@ public final class JavaModelHelper {
 		if(p == null)
 		{
 			System.out.println("No Package Found");
-			return;
+			return false;
 		}
 		p.createCompilationUnit(className, t.getBody(), true, null);
 		p.save(null, true);
+		return true;
 	}
 	
 	/*

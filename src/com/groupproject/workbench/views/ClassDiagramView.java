@@ -1,5 +1,6 @@
 package com.groupproject.workbench.views;
 
+import java.awt.dnd.MouseDragGestureRecognizer;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +63,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	private SquareButton newPackageButton;				//The reference to the "new package" button.
 	private int state = 0; 								//The state that the view is in Package Viewing = 0 | Class Viewing = 1 
 	
+	private ClassButton selectedButton;
 	/*
 	 * Default Constructor 
 	 */
@@ -405,8 +407,8 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		for(int i = 0; i < classes.length;i++) 
 		{
 			
-			String entryString = classes[i];
-			entryString = entryString.substring(0,entryString.lastIndexOf('.'));
+			final String entryString = classes[i].substring(0,classes[i].lastIndexOf('.'));
+			//entryString = entryString.substring(0,entryString.lastIndexOf('.'));
 			final int currentClassId = i; 
 			Boolean createNew = true; 
 			for(int x = 0; x<classButtons.size();x++)
@@ -440,7 +442,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 				//Create a new class button. 
 
 				//Add the button
-				classButtons.add(new ClassButton(parent,SWT.NONE,classes[i],i,activePackageName));
+				classButtons.add(new ClassButton(parent,SWT.NO_BACKGROUND,classes[i],i,activePackageName));
 				classButtons.get(i).setText(entryString);
 				classButtons.get(i).setMenu(buildMenuForClass(classes[i], classButtons.get(i)));
 				
@@ -475,10 +477,17 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 					public void mouseDown(MouseEvent e) {
 						try {
 							System.out.println("Mouse down event for: " + currentClassButton.getMyClass());
-							Point pt1 = currentClassButton.toDisplay(0, 0);
+							//Point pt1 = currentClassButton.getLocation();
+							//Point pt1 = currentClassButton.toDisplay(offset[0].x, offset[0].y);
 					       // Point pt2 = parent.getShell().toDisplay(e.x, e.y);
 					       // offset[0] = new Point(pt2.x - pt1.x, pt2.y - pt1.y);
-							offset[0] = new Point(pt1.x, pt1.y);
+							
+							Point pt1 = currentClassButton.toDisplay(0,0);
+							Point pt2 = currentClassButton.getShell().toDisplay(e.x,e.y);
+							offset[0] = new Point(pt2.x - pt1.x, pt2.y - pt1.y);
+							//currentClassButton.setLocation(e.x, e.y);
+							selectedButton = currentClassButton;
+
 						} catch (Exception e1) {
 							e1.printStackTrace();
 						}
@@ -490,16 +499,19 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 						 offset[0] = null;
 					}
 				});
-				
+				//
 				classButtons.get(i).addMouseMoveListener(new MouseMoveListener(){
 
 					@Override
 					public void mouseMove(MouseEvent e) {
-						if (offset[0] != null) {
-							System.out.println("Mouse move event for: " + classes[currentClassId]);
-				            Point pt = offset[0];
-				            currentClassButton.setLocation(e.x - pt.x, e.y - pt.y);
-					}
+						
+						if(offset[0] != null)
+						{
+							//currentClassButton.getDisplay().getCursorLocation()
+							Point pt = offset[0]; 
+							currentClassButton.setLocation(e.x - pt.x, e.y - pt.y);
+						}
+
 					}					
 				});
 				

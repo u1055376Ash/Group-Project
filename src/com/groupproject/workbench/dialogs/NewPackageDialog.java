@@ -75,7 +75,8 @@ public class NewPackageDialog extends Dialog{
 				return;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			MessageDialog.openError(container.getShell(), "Error", "Package name should not contain '.package'");
+			//e.printStackTrace();
 		} 
 		super.okPressed();
 	}
