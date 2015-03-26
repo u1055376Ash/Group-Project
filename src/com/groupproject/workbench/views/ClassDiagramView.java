@@ -19,11 +19,14 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -53,6 +56,9 @@ import com.groupproject.workbench.utility.StringHelper;
 public class ClassDiagramView extends ViewPart implements ISelectionListener{
 
 	private Composite mainViewArea;						//A reference to the scrollable main view area
+	private Composite classViewArea;					//A reference to the class view area
+	private Listener [] paintListeners;
+	
 	private Label viewHeader; 							//A label showing the active package/project
 	private List<PackageButton> packageButtons;			//A list of package buttons used to display packages
 	private List<ClassButton> classButtons; 			//List of class buttons used to display classes
@@ -62,6 +68,8 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	private SquareButton newClassButton;				//The reference to the "new class" button.
 	private SquareButton newPackageButton;				//The reference to the "new package" button.
 	private int state = 0; 								//The state that the view is in Package Viewing = 0 | Class Viewing = 1 
+	private Boolean paintListenerEnabled;
+	private Boolean buttonMoving;							//The state that the view is in Package Viewing = 0 | Class Viewing = 1 
 	
 	private ClassButton selectedButton;
 	/*
@@ -94,6 +102,19 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		sc.setMinSize(mainViewArea.computeSize(1000, 1000));
 		viewHeader = new Label(mainViewArea,0);
 		mainViewArea.setMenu(buildContextMenu());
+		
+		classViewArea = new Composite(mainViewArea, SWT.NONE);
+		FormData newClassViewData = new FormData(1000,1000);
+		newClassViewData.top = new FormAttachment(25);
+		newClassViewData.left = new FormAttachment(2);
+		Color blue = parent.getDisplay().getSystemColor(SWT.COLOR_WHITE);
+		classViewArea.setBackground(blue);
+		classViewArea.setLayoutData(newClassViewData);
+		//classViewArea.setLayout(new FormLayout());
+		classViewArea.setLayout(new GridLayout(4, false));	
+		paintListenerEnabled = true;
+		buttonMoving = false;
+		
 		getViewSite().getPage().addSelectionListener(this); //Listens to the project resource explorer
 		ObjectBenchPerspective.hideEditor();
 		
@@ -164,6 +185,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		if(dialog.open() == Window.OK){}
 		try {
 			JavaModelHelper.buildProject(activeProjectName);
+			classViewArea.redraw();
 			fullRefresh();
 		} catch (Exception e) {e.printStackTrace();}
 	}
@@ -203,8 +225,9 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	/*
 	 * Display Package View - This displays the packages in a given project. 
 	 */
-	public void displayPackageView(Composite parent) throws MalformedURLException, Exception
+	public void displayPackageView(Composite parent, Composite classView) throws MalformedURLException, Exception
 	{
+		classView.redraw();
 		JavaModelHelper.Initialise();
 		//activeProjectName = JavaModelHelper.getActiveProjectName(); 
 		checkProjectName();
@@ -213,7 +236,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			updateHeader();
 			createPackageButtons(parent);
 			disposeButtons(true);
-			createClassButtons(parent, true);
+			createClassButtons(parent, classView, true);
 			return;
 		}
 		else
@@ -227,7 +250,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	/*
 	 * Display Class View - This displays the classes in a selected package. 
 	 */
-	public void displayClassView(Composite parent) throws MalformedURLException, Exception
+	public void displayClassView(Composite parent, Composite classView) throws MalformedURLException, Exception
 	{
 		//System.out.println("Displaying Classes");
 		JavaModelHelper.Initialise(); //Initialises the Java Model
@@ -237,7 +260,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		if(activeProjectName != null)
 		{
 				updateHeader();
-				createClassButtons(parent,false);
+				createClassButtons(parent, classView, false);
 		}
 		else
 		{
@@ -384,7 +407,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	/*
 	 * Create Class Buttons - This is the method that draws the class icons. 
 	 */
-	public void createClassButtons(final Composite parent, Boolean pushDown) throws MalformedURLException, Exception
+	public void createClassButtons(final Composite parent, Composite classView, Boolean pushDown) throws MalformedURLException, Exception
 	{
 		if(!JavaModelHelper.isProjectOpen(activeProjectName))
 		{
@@ -398,6 +421,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			}
 		addNewClassButton(parent);
 		addNewPackageButton(parent);
+		
 		if(JavaModelHelper.getClassNames(activePackageName) == null)
 		{
 			return; //If a package is empty then return 
@@ -442,10 +466,17 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 				//Create a new class button. 
 
 				//Add the button
-				classButtons.add(new ClassButton(parent,SWT.NO_BACKGROUND,classes[i],i,activePackageName));
+				classButtons.add(new ClassButton(classView,SWT.NONE,classes[i],i,activePackageName));
 				classButtons.get(i).setText(entryString);
 				classButtons.get(i).setMenu(buildMenuForClass(classes[i], classButtons.get(i)));
 				
+				GridData buttonData = new GridData(90+(entryString.length() * 3),80);
+				buttonData.horizontalIndent = 90;
+				buttonData.verticalIndent = 70;
+				
+				classButtons.get(i).setLayoutData(buttonData);
+				classButtons.get(i).setMenu(buildMenuForClass(classes[i], classButtons.get(i)));
+				/*
 				//Position the button
 				FormData buttonData = new FormData(90+(entryString.length() * 3),80);
 				if(i-1 >= 0)
@@ -458,11 +489,12 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 				{
 					buttonData.left = new FormAttachment(5);
 					buttonData.top = pushDown ?  new FormAttachment(25):new FormAttachment(15);
-				}	
+				}	*/
 				
 				//Probably move these somewhere more appropriate 
 				final Point[] offset = new Point[1];
 				final ClassButton currentClassButton = classButtons.get(i);
+				paintListeners = classViewArea.getListeners(SWT.Paint);
 				
 				//Set up the listeners 
 				//TODO - Fix glitchiness here & repositioning of buttons  
@@ -476,18 +508,26 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 					@Override
 					public void mouseDown(MouseEvent e) {
 						try {
-							System.out.println("Mouse down event for: " + currentClassButton.getMyClass());
+							//System.out.println("Mouse down event for: " + currentClassButton.getMyClass());
+							paintListenerEnabled = false;
+							buttonMoving = true;
+							//Point pt1 = currentClassButton.toDisplay(0, 0);
 							//Point pt1 = currentClassButton.getLocation();
-							//Point pt1 = currentClassButton.toDisplay(offset[0].x, offset[0].y);
-					       // Point pt2 = parent.getShell().toDisplay(e.x, e.y);
-					       // offset[0] = new Point(pt2.x - pt1.x, pt2.y - pt1.y);
 							
-							Point pt1 = currentClassButton.toDisplay(0,0);
-							Point pt2 = currentClassButton.getShell().toDisplay(e.x,e.y);
-							offset[0] = new Point(pt2.x - pt1.x, pt2.y - pt1.y);
-							//currentClassButton.setLocation(e.x, e.y);
-							selectedButton = currentClassButton;
-
+							Point pt3 = classViewArea.getDisplay().getCurrent().getCursorLocation();
+							Point pt1 = classViewArea.getDisplay().getCurrent().getFocusControl().toControl(pt3);
+							
+					        //Point pt2 = mainViewArea.getShell().toDisplay(e.x, e.y);
+							//Point pt2 = classViewArea.getDisplay().getCurrent().getCursorLocation();
+							
+					        //offset[0] = new Point(pt2.x - pt1.x, pt2.y - pt1.y);
+							
+					        System.out.println("Mouse down Button Coords x: " + pt1.x + " y: " + pt1.y);
+					        
+					        //System.out.println("Cursor Location on mouse move: " + pt2.x + " y: " + pt2.y);
+					        //System.out.println("Mouse down ClassViewArea Coords x: " + pt2.x + " y: " + pt2.y);
+							//System.out.println("Mouse down Offset Coords x: " + (pt2.x - pt1.x) + " y: " + (pt2.y - pt1.y));
+							offset[0] = new Point(pt1.x, pt1.y);
 						} catch (Exception e1) {
 							e1.printStackTrace();
 						}
@@ -495,7 +535,19 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 					
 					@Override
 					public void mouseUp(MouseEvent e) {
-						System.out.println("Mouse up event for: " + classes[currentClassId]);
+						//System.out.println("Mouse up event for: " + classes[currentClassId]);
+						classViewArea.redraw();
+						paintListenerEnabled = true;
+						buttonMoving = false;
+						for(int j = 0; j < classes.length;j++) 
+				  		{
+				  			try {
+								checkSuperClass(classButtons.get(j),classViewArea);
+								checkDependencies(classButtons.get(j),classViewArea);
+							} catch (Exception e1) {
+								//e1.printStackTrace();
+							}	
+				  		}
 						 offset[0] = null;
 					}
 				});
@@ -505,13 +557,35 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 					@Override
 					public void mouseMove(MouseEvent e) {
 						
-						if(offset[0] != null)
-						{
-							//currentClassButton.getDisplay().getCursorLocation()
-							Point pt = offset[0]; 
-							currentClassButton.setLocation(e.x - pt.x, e.y - pt.y);
-						}
-
+						if (offset[0] != null) {
+							System.out.println("Mouse move event for: " + classes[currentClassId]);
+							/*for(int i = 0 ; i< paintListeners.length; i++){
+								System.out.println("Removed PaintListener");
+							    classViewArea.removeListener(SWT.Paint, paintListeners[i]);
+							}*/
+							
+							Point pt3 = classViewArea.getDisplay().getCurrent().getCursorLocation();
+							Point pt4 = classViewArea.getDisplay().getCurrent().getFocusControl().toControl(pt3);
+							Point pt1 = currentClassButton.getLocation();
+							
+							
+					        System.out.println("Mouse move Button Coords x: " + pt1.x + " y: " + pt1.y);
+							System.out.println("Cursor Location on mouse move: " + pt4.x + " y: " + pt4.y);
+							
+				            Point pt = offset[0];
+				            System.out.println("Mouse move pt offset[0] Coords x: " + pt.x + " y: " + pt.y);
+				            currentClassButton.setLocation(pt4.x, pt4.y);
+				            
+				            //currentClassButton.setLocation(e.x - pt.x, e.y - pt.y);
+				            //currentClassButton.setLocation(pt.x,pt.y);
+				            //currentClassButton.setLocation(pt4.x - pt.x, pt4.y - pt.y);
+				           
+				            /*Rectangle rect = classViewArea.getBounds();
+					          if (!rect.contains(currentClassButton.getLocation())) {
+					        	  currentClassButton.setLocation(pt.x,pt.y);					        	  
+					          }
+				            */
+					}
 					}					
 				});
 				
@@ -519,27 +593,36 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 				classButtons.get(i).getColor();//hack to fix a bug
 			}
 		}
+		classView.layout();
 		parent.layout();
 		parent.getShell().layout();
 		
 		for(int j = 0; j < classes.length;j++) 
 		{
-			checkSuperClass(classButtons.get(j),parent);	
-			checkDependencies(classButtons.get(j),parent);
+			checkSuperClass(classButtons.get(j),classView);	
+			checkDependencies(classButtons.get(j),classView);
 		}
 		
-		parent.addListener(SWT.Paint, new Listener() { // paint listener to redraw links
+		classView.addListener(SWT.Paint, new Listener() { // paint listener to redraw links
 		      public void handleEvent(Event e) {
-		    	  for(int j = 0; j < classes.length;j++) 
-		  		{
-		  			try {
-						checkSuperClass(classButtons.get(j),mainViewArea);
-					} catch (Exception e1) {
-						//e1.printStackTrace();
-					}	
-		  		}
+		    	  if(!paintListenerEnabled)
+		    	  {
+		    	  }
+		    	  if(paintListenerEnabled)
+		    	  {
+		    		  for(int j = 0; j < classes.length;j++) 
+				  		{
+				  			try {
+								checkSuperClass(classButtons.get(j),classViewArea);
+								checkDependencies(classButtons.get(j),classViewArea);
+							} catch (Exception e1) {
+								//e1.printStackTrace();
+							}	
+				  		}
+		    	  }
+		    	  
 		        }
-		});		
+		});	
 	}
 	
 	/*
@@ -563,7 +646,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	/*
 	 * Check Dependencies - This method will check to see if a given class depends on any other class in the diagram. 
 	 */
-	void checkDependencies(ClassButton b, Composite parent) throws JavaModelException
+	void checkDependencies(ClassButton b, Composite classView) throws JavaModelException
 	{
 		String[] fieldTypes = JavaModelHelper.getFieldTypes(b.packageName,b.className);
 
@@ -588,7 +671,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		
 		for(ClassButton a:dependencies)
 		{
-			drawDependenceLink(b,a,parent);
+			drawDependenceLink(b,a,classView);
 		}
 		
 	}
@@ -642,9 +725,11 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	/*
 	 * Draw Dependence Link - Draws a dashed? line between two given classes that are dependent on each other. 
 	 */
-	void drawDependenceLink(ClassButton a, ClassButton b, Composite parent)
+	void drawDependenceLink(ClassButton a, ClassButton b, Composite classView)
 	{
-		//TODO - Implement this. 
+		GC gc = new GC(classView);
+		gc.setLineStyle(SWT.LINE_DASH);
+		gc.drawLine(a.getLocation().x, a.getLocation().y+40, b.getLocation().x, b.getLocation().y+40);
 	}
 	
 	/*
@@ -760,6 +845,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 				try {
 					ObjectBenchUtility.DeleteFile(JavaModelHelper.getClassFile(bn.packageName, bn.className));
 					ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE,null);
+					classViewArea.redraw();
 					fullRefresh();
 					refresh();
 				} catch (Exception e1) {
@@ -933,7 +1019,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 				{
 					viewPackages();
 				}
-				displayPackageView(mainViewArea);	
+				displayPackageView(mainViewArea, classViewArea);	
 			}
 			if(state == 1)
 			{
@@ -943,7 +1029,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 					//displayPackageView(mainViewArea);
 					return;
 				}
-				displayClassView(mainViewArea);
+				displayClassView(mainViewArea, classViewArea);
 			}
 		}
 		catch(Exception e)
@@ -967,11 +1053,11 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		if(state == 0)
 		{
 			viewPackages();
-			displayPackageView(mainViewArea);	
+			displayPackageView(mainViewArea, classViewArea);	
 		}
 		if(state == 1)
 		{
-			displayClassView(mainViewArea);
+			displayClassView(mainViewArea, classViewArea);
 		}
 	}
 	
@@ -984,7 +1070,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		activePackageName = mypackage; 
 		state = 1;
 		getViewSite().getPage().addSelectionListener(this);
-		displayClassView(mainViewArea);
+		displayClassView(mainViewArea, classViewArea);
 	}
 	
 	/*
@@ -996,7 +1082,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		activePackageName = ""; 
 		state = 0;
 		getViewSite().getPage().addSelectionListener(this);
-		displayPackageView(mainViewArea);
+		displayPackageView(mainViewArea, classViewArea);
 	}
 	
 	/*
