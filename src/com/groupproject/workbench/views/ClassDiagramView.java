@@ -29,6 +29,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -70,7 +71,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	private int state = 0; 								//The state that the view is in Package Viewing = 0 | Class Viewing = 1 
 	private Boolean paintListenerEnabled;
 	private Boolean buttonMoving;							//The state that the view is in Package Viewing = 0 | Class Viewing = 1 
-	
+	private Point previousPoint; 
 	private ClassButton selectedButton;
 	/*
 	 * Default Constructor 
@@ -508,26 +509,8 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 					@Override
 					public void mouseDown(MouseEvent e) {
 						try {
-							//System.out.println("Mouse down event for: " + currentClassButton.getMyClass());
 							paintListenerEnabled = false;
 							buttonMoving = true;
-							//Point pt1 = currentClassButton.toDisplay(0, 0);
-							//Point pt1 = currentClassButton.getLocation();
-							
-							Point pt3 = classViewArea.getDisplay().getCurrent().getCursorLocation();
-							Point pt1 = classViewArea.getDisplay().getCurrent().getFocusControl().toControl(pt3);
-							
-					        //Point pt2 = mainViewArea.getShell().toDisplay(e.x, e.y);
-							//Point pt2 = classViewArea.getDisplay().getCurrent().getCursorLocation();
-							
-					        //offset[0] = new Point(pt2.x - pt1.x, pt2.y - pt1.y);
-							
-					        System.out.println("Mouse down Button Coords x: " + pt1.x + " y: " + pt1.y);
-					        
-					        //System.out.println("Cursor Location on mouse move: " + pt2.x + " y: " + pt2.y);
-					        //System.out.println("Mouse down ClassViewArea Coords x: " + pt2.x + " y: " + pt2.y);
-							//System.out.println("Mouse down Offset Coords x: " + (pt2.x - pt1.x) + " y: " + (pt2.y - pt1.y));
-							offset[0] = new Point(pt1.x, pt1.y);
 						} catch (Exception e1) {
 							e1.printStackTrace();
 						}
@@ -535,7 +518,6 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 					
 					@Override
 					public void mouseUp(MouseEvent e) {
-						//System.out.println("Mouse up event for: " + classes[currentClassId]);
 						classViewArea.redraw();
 						paintListenerEnabled = true;
 						buttonMoving = false;
@@ -552,39 +534,16 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 					}
 				});
 				//
-				classButtons.get(i).addMouseMoveListener(new MouseMoveListener(){
+				classButtons.get(i).addMouseMoveListener(new MouseMoveListener(){					//
 
 					@Override
 					public void mouseMove(MouseEvent e) {
 						
-						if (offset[0] != null) {
-							System.out.println("Mouse move event for: " + classes[currentClassId]);
-							/*for(int i = 0 ; i< paintListeners.length; i++){
-								System.out.println("Removed PaintListener");
-							    classViewArea.removeListener(SWT.Paint, paintListeners[i]);
-							}*/
-							
-							Point pt3 = classViewArea.getDisplay().getCurrent().getCursorLocation();
-							Point pt4 = classViewArea.getDisplay().getCurrent().getFocusControl().toControl(pt3);
-							Point pt1 = currentClassButton.getLocation();
-							
-							
-					        System.out.println("Mouse move Button Coords x: " + pt1.x + " y: " + pt1.y);
-							System.out.println("Cursor Location on mouse move: " + pt4.x + " y: " + pt4.y);
-							
-				            Point pt = offset[0];
-				            System.out.println("Mouse move pt offset[0] Coords x: " + pt.x + " y: " + pt.y);
-				            currentClassButton.setLocation(pt4.x, pt4.y);
-				            
-				            //currentClassButton.setLocation(e.x - pt.x, e.y - pt.y);
-				            //currentClassButton.setLocation(pt.x,pt.y);
-				            //currentClassButton.setLocation(pt4.x - pt.x, pt4.y - pt.y);
-				           
-				            /*Rectangle rect = classViewArea.getBounds();
-					          if (!rect.contains(currentClassButton.getLocation())) {
-					        	  currentClassButton.setLocation(pt.x,pt.y);					        	  
-					          }
-				            */
+						
+						if (buttonMoving) {
+							Point pt3 = Display.getCurrent().getCursorLocation();//classViewArea.getDisplay().map(classViewArea, currentClassButton, e.x,e.y);
+							Point pt4 = classViewArea.toControl(pt3);
+							currentClassButton.setLocation(pt4.x - (currentClassButton.getBounds().width/2),pt4.y - (currentClassButton.getBounds().height/2));
 					}
 					}					
 				});
