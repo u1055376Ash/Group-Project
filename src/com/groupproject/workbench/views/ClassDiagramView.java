@@ -1,6 +1,5 @@
 package com.groupproject.workbench.views;
 
-import java.awt.dnd.MouseDragGestureRecognizer;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,13 +14,12 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -58,7 +56,6 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 
 	private Composite mainViewArea;						//A reference to the scrollable main view area
 	private Composite classViewArea;					//A reference to the class view area
-	private Listener [] paintListeners;
 	
 	private Label viewHeader; 							//A label showing the active package/project
 	private List<PackageButton> packageButtons;			//A list of package buttons used to display packages
@@ -71,8 +68,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	private int state = 0; 								//The state that the view is in Package Viewing = 0 | Class Viewing = 1 
 	private Boolean paintListenerEnabled;
 	private Boolean buttonMoving;							//The state that the view is in Package Viewing = 0 | Class Viewing = 1 
-	private Point previousPoint; 
-	private ClassButton selectedButton;
+
 	/*
 	 * Default Constructor 
 	 */
@@ -103,15 +99,16 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 		sc.setMinSize(mainViewArea.computeSize(1000, 1000));
 		viewHeader = new Label(mainViewArea,0);
 		mainViewArea.setMenu(buildContextMenu());
+		Color maColour = parent.getDisplay().getSystemColor(SWT.COLOR_WHITE);
+		mainViewArea.setBackground(maColour);
 		
 		classViewArea = new Composite(mainViewArea, SWT.NONE);
 		FormData newClassViewData = new FormData(1000,1000);
 		newClassViewData.top = new FormAttachment(25);
 		newClassViewData.left = new FormAttachment(2);
-		Color blue = parent.getDisplay().getSystemColor(SWT.COLOR_WHITE);
-		classViewArea.setBackground(blue);
+		Color cvColour = parent.getDisplay().getSystemColor(SWT.COLOR_WHITE);
+		classViewArea.setBackground(cvColour);
 		classViewArea.setLayoutData(newClassViewData);
-		//classViewArea.setLayout(new FormLayout());
 		classViewArea.setLayout(new GridLayout(4, false));	
 		paintListenerEnabled = true;
 		buttonMoving = false;
@@ -408,7 +405,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 	/*
 	 * Create Class Buttons - This is the method that draws the class icons. 
 	 */
-	public void createClassButtons(final Composite parent, Composite classView, Boolean pushDown) throws MalformedURLException, Exception
+	public void createClassButtons(final Composite parent, final Composite classView, Boolean pushDown) throws MalformedURLException, Exception
 	{
 		if(!JavaModelHelper.isProjectOpen(activeProjectName))
 		{
@@ -495,10 +492,8 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 				//Probably move these somewhere more appropriate 
 				final Point[] offset = new Point[1];
 				final ClassButton currentClassButton = classButtons.get(i);
-				paintListeners = classViewArea.getListeners(SWT.Paint);
 				
 				//Set up the listeners 
-				//TODO - Fix glitchiness here & repositioning of buttons  
 				classButtons.get(i).addMouseListener(new MouseListener(){
 
 					@Override
@@ -511,6 +506,9 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 						try {
 							paintListenerEnabled = false;
 							buttonMoving = true;
+							Point pt1 = currentClassButton.getLocation();
+					        offset[0] = new Point(pt1.x, pt1.y);
+
 						} catch (Exception e1) {
 							e1.printStackTrace();
 						}
@@ -519,8 +517,15 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 					@Override
 					public void mouseUp(MouseEvent e) {
 						classViewArea.redraw();
+						Rectangle rect = classView.getBounds();
 						paintListenerEnabled = true;
 						buttonMoving = false;
+						if(!rect.contains(currentClassButton.getBounds().x+25,currentClassButton.getBounds().y+250))
+						{
+							System.out.println("Class Button out of bounds called");
+							Point pt = offset[0];
+							currentClassButton.setLocation(pt.x,pt.y);
+						} 
 						for(int j = 0; j < classes.length;j++) 
 				  		{
 				  			try {
