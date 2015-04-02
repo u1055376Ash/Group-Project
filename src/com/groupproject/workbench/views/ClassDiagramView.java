@@ -1109,6 +1109,9 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 			}
 	}
 	
+	/*
+	 * Dispose All - Disposes all components in GUI. 
+	 */
 	private void disposeAll()
 	{
 	    for (Control control : mainViewArea.getChildren()) {

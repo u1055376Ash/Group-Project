@@ -745,7 +745,7 @@ public final class ObjectBenchUtility
 		if(s.equals("double"))
 		{
 			Spinner spin = (Spinner)c;
-			spin.setValues((int)o, 0, Integer.MAX_VALUE, 4, 1, 3);
+			spin.setValues((int) (Double.parseDouble(o.toString()) * 1000), 0, Integer.MAX_VALUE, 4, 1, 3);
 		}
 		if(s.equals("float"))
 		{

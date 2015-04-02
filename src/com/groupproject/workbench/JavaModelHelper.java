@@ -493,8 +493,10 @@ public final class JavaModelHelper {
 	private static IMethod[] getMethods(ICompilationUnit unit) throws JavaModelException
 	{
 		List<IMethod> methods = new ArrayList<IMethod>();
+	
 		for(IType type:unit.getAllTypes())
 		{
+			
 			//System.out.println(type.getElementName());
 			for(IMethod method:type.getMethods())
 			{
@@ -504,6 +506,7 @@ public final class JavaModelHelper {
 				}
 				else
 				{
+					
 					methods.add(method);	
 				}
 			}
@@ -516,6 +519,7 @@ public final class JavaModelHelper {
 	 */
 	public static String[] getClassMethodNames(String myPackage, String myClass) throws JavaModelException
 	{
+		
 		IPackageFragment localPackage = getPackage(myPackage);
 		if(localPackage == null)
 		{
