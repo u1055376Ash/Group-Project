@@ -474,20 +474,7 @@ public class ClassDiagramView extends ViewPart implements ISelectionListener{
 				
 				classButtons.get(i).setLayoutData(buttonData);
 				classButtons.get(i).setMenu(buildMenuForClass(classes[i], classButtons.get(i)));
-				/*
-				//Position the button
-				FormData buttonData = new FormData(90+(entryString.length() * 3),80);
-				if(i-1 >= 0)
-				{
-					buttonData.left = new FormAttachment(classButtons.get(i-1), 50, SWT.RIGHT);
-					buttonData.bottom = new FormAttachment(classButtons.get(i-1), 0, SWT.BOTTOM);
-					buttonData.top =  new FormAttachment(classButtons.get(i-1),0, SWT.TOP);
-				}
-				if(i == 0)
-				{
-					buttonData.left = new FormAttachment(5);
-					buttonData.top = pushDown ?  new FormAttachment(25):new FormAttachment(15);
-				}	*/
+
 				
 				//Probably move these somewhere more appropriate 
 				final Point[] offset = new Point[1];

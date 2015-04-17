@@ -181,11 +181,12 @@ public class ObjectBenchView extends ViewPart  {
 		}
 		String entryString = className;
 		entryString = StringHelper.stripExtension(entryString);
-		//entryString = entryString.substring(0,entryString.lastIndexOf('.')); 
 		entryString += " (Instance) ";
+		
 		//Create an ObjectBenchButton to represent instance. 
 		final ObjectBenchButton newButton = new ObjectBenchButton(mainViewArea,SWT.NONE,className,objectBenchButtons.size(), packageName, instance);
 		newButton.setText(entryString);
+		
 		//Set up the listener for the buttons. 
 		newButton.addMouseListener(new MouseListener(){
 

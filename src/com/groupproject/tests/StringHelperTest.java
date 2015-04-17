@@ -12,16 +12,22 @@ public class StringHelperTest {
 	@Test
 	public void testFixType() {
 		
+		//Arrange
 		String input = "I";
-		String result = "Integer";
 		String inputTwo = "D";
-		String resultTwo = "Double";
 		String inputThree = "[I";
-		String resultThree = "I[]";
+
 		
-		assertTrue(StringHelper.fixType(input).equals(result));
-		assertTrue(StringHelper.fixType(inputTwo).equals(resultTwo));
-		assertTrue(StringHelper.fixType(inputThree).equals(resultThree));
+		//Act
+		String result = StringHelper.fixType(input);
+		String resultTwo = StringHelper.fixType(inputTwo);
+		String resultThree = StringHelper.fixType(inputThree);
+		
+		//Assert
+		assertEquals(result, "Integer");
+		assertEquals(resultTwo, "Double");
+		assertEquals(resultThree, "I[]");
+		
 	}
 
 	

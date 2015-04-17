@@ -679,18 +679,6 @@ public final class JavaModelHelper {
 		return stringReturn;
 	}
 	
-//	private static IField[] getFields(ICompilationUnit unit) throws JavaModelException
-//	{
-//		List<IField> fields = new ArrayList<IField>();
-//		for(IType type:unit.getTypes())
-//		{
-//			for(IField field:type.getFields())
-//			{
-//				fields.add(field);
-//			}
-//		}
-//		return fields.toArray(new IField[fields.size()]);
-//	}
 	
 	/*
 	 * Get Class Fields - Gets a collection of fields from a given class. 
@@ -786,15 +774,7 @@ public final class JavaModelHelper {
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
-		
-//		URL[] urls= null;
-//		File dir = new File(System.getProperty("user.dir") + File.separator + "dir" + File.separator);
-//		URL url = dir.toURI().toURL();
-//		urls = new URL[] {url};
-//		ClassLoader cl = new URLClassLoader(urls);
-//		return cl.loadClass(s);
 		return classLoader.loadClass(s);
-		//return ClassLoader.getSystemClassLoader().loadClass(s);
 	}
 	
 	/*
