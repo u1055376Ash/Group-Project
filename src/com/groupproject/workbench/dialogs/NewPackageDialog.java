@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import com.groupproject.workbench.JavaModelHelper;
+import com.groupproject.workbench.utility.JavaModelHelper;
 
 public class NewPackageDialog extends Dialog{
 

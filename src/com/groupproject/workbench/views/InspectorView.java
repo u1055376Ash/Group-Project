@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.part.ViewPart;
 
 import com.groupproject.workbench.BenchInstance;
-import com.groupproject.workbench.JavaModelHelper;
+import com.groupproject.workbench.utility.JavaModelHelper;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 
 /*

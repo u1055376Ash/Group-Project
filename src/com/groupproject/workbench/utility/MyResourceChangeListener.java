@@ -6,8 +6,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 
-import com.groupproject.workbench.JavaModelHelper;
-
 public class MyResourceChangeListener implements IResourceChangeListener{
 
 	/*

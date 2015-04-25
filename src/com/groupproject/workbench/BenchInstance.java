@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 
 import org.eclipse.jdt.core.JavaModelException;
 
+import com.groupproject.workbench.utility.JavaModelHelper;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 import com.groupproject.workbench.utility.StringHelper;
 /*

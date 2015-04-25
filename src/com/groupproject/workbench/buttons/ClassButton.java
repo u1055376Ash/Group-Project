@@ -7,8 +7,8 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 
-import com.groupproject.workbench.JavaModelHelper;
 import com.groupproject.workbench.preferences.PreferenceConstants;
+import com.groupproject.workbench.utility.JavaModelHelper;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 import com.groupproject.workbench.utility.StringHelper;
 

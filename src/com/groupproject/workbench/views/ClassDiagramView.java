@@ -37,7 +37,6 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
 
-import com.groupproject.workbench.JavaModelHelper;
 import com.groupproject.workbench.buttons.ClassButton;
 import com.groupproject.workbench.buttons.PackageButton;
 import com.groupproject.workbench.buttons.SquareButton;
@@ -45,6 +44,7 @@ import com.groupproject.workbench.dialogs.ConstructorDialog;
 import com.groupproject.workbench.dialogs.NewClassDialog;
 import com.groupproject.workbench.dialogs.NewPackageDialog;
 import com.groupproject.workbench.perspectives.ObjectBenchPerspective;
+import com.groupproject.workbench.utility.JavaModelHelper;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 import com.groupproject.workbench.utility.StringHelper;
 

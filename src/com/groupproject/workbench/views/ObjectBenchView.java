@@ -26,9 +26,9 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.part.ViewPart;
 
 import com.groupproject.workbench.BenchInstance;
-import com.groupproject.workbench.JavaModelHelper;
 import com.groupproject.workbench.buttons.ObjectBenchButton;
 import com.groupproject.workbench.dialogs.MethodDialog;
+import com.groupproject.workbench.utility.JavaModelHelper;
 import com.groupproject.workbench.utility.ObjectBenchUtility;
 import com.groupproject.workbench.utility.StringHelper;
 
